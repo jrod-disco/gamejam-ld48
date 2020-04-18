@@ -9,15 +9,19 @@
   "private": false,
   "dependencies": {},
   "devDependencies": {
+    "gsap": "^3.2.5",
+    "pixi-sound": "^3.0.4",
+    "pixi.js": "^5.1.6",
+    "@pixi/filter-glitch": "^3.1.1",
     "@rollup/plugin-node-resolve": "^7.1.1",
     "@typescript-eslint/eslint-plugin": "^2.24.0",
     "@typescript-eslint/parser": "^2.24.0",
     "eslint": "^6.8.0",
-    "pixi.js": "^5.2.1",
     "prettier": "^2.0.1",
     "rimraf": "^3.0.2",
     "rollup": "^2.1.0",
     "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-copy": "^3.3.0",
     "rollup-plugin-html2": "^1.0.0",
     "rollup-plugin-livereload": "^1.1.0",
     "rollup-plugin-scss": "^2.1.0",
@@ -29,6 +33,6 @@
   "scripts": {
     "start": "rollup -c -w",
     "clean": "rimraf dist",
-    "build": "rimraf dist rollup -c"
+    "build": "rollup -c"
   }
 }

@@ -1,18 +1,24 @@
 import * as PIXI from 'pixi.js';
 
-const initPIXI = (): void => {
-  const pixiConfig = {
-    width: 300,
-    height: 300,
-    backgroundColor: 0x1099bb,
-    resolution: window.devicePixelRatio || 1,
-  };
+export interface PixiConfig {
+  width: number;
+  height: number;
+  backgroundColor: number;
+  antialias: boolean;
+  resolution: number;
+}
 
+const initPIXI = (
+  pixiConfig: PixiConfig,
+  baseElement: HTMLElement
+): { app: PIXI.Application; mainContainer: PIXI.Container } => {
   const app = new PIXI.Application(pixiConfig);
-  document.body.appendChild(app.view);
+  baseElement.appendChild(app.view);
 
-  const container = new PIXI.Container();
-  app.stage.addChild(container);
+  const mainContainer = new PIXI.Container();
+  app.stage.addChild(mainContainer);
+
+  return { app, mainContainer };
 };
 
 export default initPIXI;

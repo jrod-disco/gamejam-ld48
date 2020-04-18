@@ -14,3 +14,13 @@ body {
   font-size: calc(10px + 2vmin);
   color: white;
 }
+
+.app-container {
+  display: flex;
+  justify-content: center;
+
+  margin: 2em;
+  min-width: 200px;
+  min-height: 200px;
+  background-color: #ff00ff;
+}
