@@ -11,23 +11,23 @@ interface Props {
 }
 
 export const example = (props: Props): ReturnType => {
-  const container = new PIXI.Container();
-
   const pos = props.pos ?? { x: 0, y: 0 };
-  const texture = PIXI.Texture.from('./assets/example/example.png');
+  const container = new PIXI.Container();
+  container.x = pos.x;
+  container.y = pos.y;
+
+  const texture = PIXI.Texture.from('../../assets/example/example.png');
   const sprite = new PIXI.Sprite(texture);
   sprite.anchor.set(0.5);
   // sprite.scale.set(0.5);
   // sprite.blendMode = PIXI.BLEND_MODES.SCREEN;
-  sprite.x = pos.x;
-  sprite.y = pos.y;
-  sprite.scale.x *= -1;
+  // sprite.scale.x *= -1;
 
   container.addChild(sprite);
 
   const update = (delta): void => {
     // Update called by main
-    console.log('example update', delta);
+    container.rotation -= 0.05 * delta;
   };
 
   return { container, update };
