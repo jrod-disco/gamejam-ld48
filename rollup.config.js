@@ -30,7 +30,7 @@ export default [
       copy({
         targets: [
           {
-            src: './src/assets/**/*',
+            src: './src/assets/*',
             dest: 'dist/assets/',
           },
         ],

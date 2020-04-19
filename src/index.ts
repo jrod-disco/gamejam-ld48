@@ -24,18 +24,24 @@ const app = (): void => {
   const { app, mainContainer } = initPIXI(pixiConfig, hostDiv);
   app.renderer.autoDensity = true;
 
+  // Instance a component
   const exampleComponent = comp.example({
     pos: {
       x: APP_WIDTH / 2,
       y: APP_HEIGHT / 2,
     },
   });
-  const example = mainContainer.addChild(exampleComponent.container);
-  console.log(example);
+  // Add it to the main container
+  mainContainer.addChild(exampleComponent.container);
+
+  // Add music as a component
+  const audioLayer = comp.audio();
+  audioLayer.init();
+
   // Register component UPDATE routines
   // ------------------------------------
   app.ticker.add((delta) => {
-    // Update individual components
+    // Update it
     exampleComponent.update(delta);
   });
 };
