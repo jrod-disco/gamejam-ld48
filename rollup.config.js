@@ -5,25 +5,48 @@ import livereload from 'rollup-plugin-livereload';
 import typescript from 'rollup-plugin-typescript2';
 import commonjs from 'rollup-plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
+import copy from 'rollup-plugin-copy';
+import { terser } from 'rollup-plugin-terser';
+
+const isProd = process.env.BUILD === 'prod';
+const isDev = process.env.BUILD === 'dev';
 
 export default [
   {
-    input: './src/index.ts',
+    input: './src/main.ts',
     output: [
       {
         file: './dist/app.js',
         format: 'iife',
+        globals: {
+          'pixi.js': 'PIXI',
+        },
       },
     ],
 
     plugins: [
-      resolve({ browser: true, preferBuiltins: false }),
-      commonjs(),
+      resolve({ base: 'src', browser: true, preferBuiltins: false }),
       typescript({}),
+      commonjs({
+        namedExports: {
+          'node_modules/pixi.js/lib/pixi.es.js': ['sound'],
+        },
+      }),
       scss(),
-      html({ template: './src/index.html' }),
-      serve('dist/'),
-      livereload(),
+      html({ template: './src/index.html', inject: false }),
+      isProd && terser(),
+      copy({
+        targets: [
+          {
+            src: './src/assets/*',
+            dest: 'dist/assets/',
+          },
+        ],
+      }),
+      isDev && serve('dist/'),
+      isDev && livereload(),
     ],
+    // Don't bundle PIXI -- coming via CDN in index.html
+    external: ['pixi.js'],
   },
 ];

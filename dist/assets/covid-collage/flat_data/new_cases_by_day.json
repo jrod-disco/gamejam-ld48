@@ -1,0 +1,301 @@
+{
+  "padding": {
+    "top": 10,
+    "right": 5,
+    "bottom": 0,
+    "left": 50
+  },
+  "donut": {
+    "width": 70
+  },
+  "data": {
+    "type": "bar",
+    "x": "x",
+    "xFormat": "%m/%d/%Y",
+    "empty": {
+      "label": {
+        "text": "No Data Available"
+      }
+    },
+    "columns": [
+      [
+        "x",
+        "2/25/2020",
+        "2/26/2020",
+        "2/27/2020",
+        "2/28/2020",
+        "2/29/2020",
+        "3/01/2020",
+        "3/02/2020",
+        "3/03/2020",
+        "3/04/2020",
+        "3/05/2020",
+        "3/06/2020",
+        "3/07/2020",
+        "3/08/2020",
+        "3/09/2020",
+        "3/10/2020",
+        "3/11/2020",
+        "3/12/2020",
+        "3/13/2020",
+        "3/14/2020",
+        "3/15/2020",
+        "3/16/2020",
+        "3/17/2020",
+        "3/18/2020",
+        "3/19/2020",
+        "3/20/2020",
+        "3/21/2020",
+        "3/22/2020",
+        "3/23/2020",
+        "3/24/2020",
+        "3/25/2020",
+        "3/26/2020",
+        "3/27/2020",
+        "3/28/2020",
+        "3/29/2020",
+        "3/30/2020",
+        "3/31/2020",
+        "4/01/2020",
+        "4/02/2020",
+        "4/03/2020",
+        "4/04/2020",
+        "4/05/2020",
+        "4/06/2020",
+        "4/07/2020",
+        "4/08/2020",
+        "4/09/2020",
+        "4/10/2020",
+        "4/11/2020",
+        "4/12/2020",
+        "4/13/2020",
+        "4/14/2020",
+        "4/15/2020",
+        "4/16/2020",
+        "4/17/2020",
+        "4/18/2020",
+        "4/19/2020",
+        "4/20/2020",
+        "4/21/2020",
+        "4/22/2020",
+        "4/23/2020",
+        "4/24/2020",
+        "4/25/2020",
+        "4/26/2020",
+        "4/27/2020"
+      ],
+      [
+        "data1",
+        0,
+        0,
+        1,
+        0,
+        8,
+        6,
+        23,
+        25,
+        20,
+        66,
+        47,
+        64,
+        147,
+        225,
+        290,
+        278,
+        414,
+        267,
+        338,
+        1237,
+        755,
+        2797,
+        3419,
+        4777,
+        3528,
+        5836,
+        8821,
+        10934,
+        10115,
+        13987,
+        16916,
+        17965,
+        19332,
+        18251,
+        22635,
+        22562,
+        27043,
+        26135,
+        18819,
+        9338,
+        63455,
+        43438,
+        34347,
+        31534,
+        31705,
+        33251,
+        33288,
+        29145,
+        24157,
+        26385,
+        27259,
+        29164,
+        29002,
+        29916,
+        26008,
+        29468,
+        26527,
+        25868,
+        37144,
+        30226,
+        33119,
+        28586,
+        23459
+      ]
+    ],
+    "names": {
+      "Cases": "Cases",
+      "data1": "Cases"
+    },
+    "labels": false,
+    "groups": [
+      [
+        "Cases",
+        "data1"
+      ]
+    ],
+    "types": {},
+    "min": -4442,
+    "max": 67897
+  },
+  "color": {
+    "pattern": [
+      "#377eb8",
+      "#ff7f00",
+      "#4daf4a",
+      "#984ea3",
+      "#e41a1c",
+      "#ffff33",
+      "#a65628",
+      "#f781bf",
+      "#3399CC"
+    ]
+  },
+  "axis": {
+    "x": {
+      "type": "timeseries",
+      "tick": {
+        "fit": true,
+        "rotate": 0,
+        "multiline": false,
+        "stringFormat": "%m/%d/%Y",
+        "format": "%m/%d/%Y"
+      },
+      "height": 50,
+      "padding": {
+        "left": 0,
+        "right": 0
+      },
+      "label": {
+        "text": "",
+        "position": "outer-center"
+      }
+    },
+    "y": {
+      "label": {
+        "position": "outer-middle",
+        "text": "Number of New Cases"
+      },
+      "type": "indexed",
+      "padding": {
+        "top": 0,
+        "bottom": 0
+      }
+    }
+  },
+  "cdc": {
+    "type": "bar",
+    "labels": {
+      "null": "Access Data Table",
+      "data": false
+    },
+    "ui": {
+      "axis": {
+        "x": {
+          "amount": 0,
+          "multiplier": "week"
+        },
+        "y": {
+          "amount": 0,
+          "multiplier": "none"
+        }
+      }
+    },
+    "isCategorical": false,
+    "xPaddingAuto": false,
+    "showLegend": true,
+    "legendMode": "highlightSeries",
+    "legendDisplay": "below",
+    "fontSize": "small",
+    "lineThickness": "default",
+    "paddingLeft": 23,
+    "paddingRight": 0,
+    "xPaddingPercent": 5,
+    "xLabelPadding": 5,
+    "xLabelBaseRotation": 0,
+    "yPaddingPercent": 7,
+    "yLabelPadding": 4,
+    "yTickFormat": ",",
+    "barBorderThickness": null,
+    "tableDateFormat": "%m/%d/%Y",
+    "colorPaletteName": "Qualitative - Bold",
+    "attribution": {
+      "label": "",
+      "link": ""
+    },
+    "locale": "en_us",
+    "regionTableLabel": "Region Name",
+    "yTopTickValue": 334,
+    "yBottomTickValue": 26,
+    "seriesWhiteList": [
+      "Cases",
+      "data1"
+    ],
+    "xform": null,
+    "stackBars": true,
+    "dataTableTitle": "View Data",
+    "externalDataUrl": "/coronavirus/2019-ncov/json/new-cases-chart-data.json",
+    "collapseTableDefault": true
+  },
+  "transition": {
+    "duration": 350
+  },
+  "grid": {
+    "x": {
+      "show": false
+    },
+    "y": {
+      "show": false
+    }
+  },
+  "line": {
+    "connectNull": false
+  },
+  "empty": {
+    "label": {
+      "text": "Access Data Table"
+    }
+  },
+  "title": "",
+  "legend": {
+    "show": false
+  },
+  "tooltip": {
+    "format": {
+      "formatString": ","
+    }
+  },
+  "bar": {
+    "width": {
+      "ratio": 0.71
+    }
+  }
+}

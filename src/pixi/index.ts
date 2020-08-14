@@ -1,18 +1,32 @@
 import * as PIXI from 'pixi.js';
 
-const initPIXI = (): void => {
-  const pixiConfig = {
-    width: 300,
-    height: 300,
-    backgroundColor: 0x1099bb,
-    resolution: window.devicePixelRatio || 1,
-  };
+export interface PixiConfig {
+  width: number;
+  height: number;
+  backgroundColor: number;
+  antialias: boolean;
+  resolution: number;
+}
 
-  const app = new PIXI.Application(pixiConfig);
-  document.body.appendChild(app.view);
+/**
+ * Initializes the PIXI container and adds it to the DOM.
+ *
+ * @param pixiConfig - PIXI configuration object
+ * @param baseElement - DOM element to add PIXI canvas to
+ *
+ */
+const initPIXI = (
+  pixiConfig: PixiConfig,
+  baseElement: HTMLElement
+): { pixiApp: PIXI.Application; mainContainer: PIXI.Container } => {
+  const pixiApp = new PIXI.Application(pixiConfig);
+  baseElement.appendChild(pixiApp.view);
 
   const container = new PIXI.Container();
-  app.stage.addChild(container);
+  container.name = 'main';
+  pixiApp.stage.addChild(container);
+
+  return { pixiApp, mainContainer: container };
 };
 
 export default initPIXI;
