@@ -2,9 +2,9 @@
 
 The goal of DCollage is to facilitate the creation of multi-layered, interactive, collages similar to those I created back in the days of Flash. Surprise it works for simple games too!
 
-# OneBit Typer
+# Project Title
 
-A simple typing game with one bit artwork.
+Project description may appear here.
 
 ## Concept and Mechanics
 

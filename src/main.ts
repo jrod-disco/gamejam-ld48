@@ -21,10 +21,10 @@ const pixiConfig: PixiConfig = {
   height: hostHeight,
   backgroundColor: 0x000000,
   antialias: false,
-  resolution: 3, // window.devicePixelRatio || 1,
+  resolution: window.devicePixelRatio || 1, // use resolution: 3 to scale up
 };
-// No anti-alias
-PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
+// No anti-alias - Uncomment for pixel art
+// PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 
 type SpriteSheets = {
   main: PIXI.Spritesheet | null;
@@ -34,7 +34,7 @@ interface BootstrapApp {
 }
 
 const onAssetsLoaded = (): void => {
-  console.log('onAssetsLoaded');
+  //console.log('onAssetsLoaded');
 
   // Store preloade spritesheets
   const spriteSheets = {
@@ -54,9 +54,10 @@ preloader
   .add('MainTheme', './assets/file_example_MP3_1MG.mp3');
 
 preloader.load(onAssetsLoaded);
-preloader.onProgress.add((e, f) =>
-  console.log(`Progress ${Math.floor(e.progress)} (${f.name}.${f.extension})`)
-);
+// Uncomment to log individual assets as they load
+// preloader.onProgress.add((e, f) =>
+//   console.log(`Progress ${Math.floor(e.progress)} (${f.name}.${f.extension})`)
+// );
 
 /**
  * Kicks off the application proper by instantiating the various components and wiring up their update methods to the update loop of the main application.
