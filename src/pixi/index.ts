@@ -8,17 +8,25 @@ export interface PixiConfig {
   resolution: number;
 }
 
+/**
+ * Initializes the PIXI container and adds it to the DOM.
+ *
+ * @param pixiConfig - PIXI configuration object
+ * @param baseElement - DOM element to add PIXI canvas to
+ *
+ */
 const initPIXI = (
   pixiConfig: PixiConfig,
   baseElement: HTMLElement
-): { app: PIXI.Application; mainContainer: PIXI.Container } => {
-  const app = new PIXI.Application(pixiConfig);
-  baseElement.appendChild(app.view);
+): { pixiApp: PIXI.Application; mainContainer: PIXI.Container } => {
+  const pixiApp = new PIXI.Application(pixiConfig);
+  baseElement.appendChild(pixiApp.view);
 
-  const mainContainer = new PIXI.Container();
-  app.stage.addChild(mainContainer);
+  const container = new PIXI.Container();
+  container.name = 'main';
+  pixiApp.stage.addChild(container);
 
-  return { app, mainContainer };
+  return { pixiApp, mainContainer: container };
 };
 
 export default initPIXI;
