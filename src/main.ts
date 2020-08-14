@@ -6,7 +6,7 @@ import jrvascii from './util/jrvascii';
 import { browserVisibility } from './util/browserVisibility';
 
 import initPIXI, { PixiConfig } from './pixi';
-import { APP_HEIGHT, APP_WIDTH } from './constants';
+import { APP_HEIGHT, APP_WIDTH, APP_NAME, APP_VERSION } from './constants';
 import './index.scss';
 
 import * as COMP from './components';
@@ -71,6 +71,10 @@ const bootstrapApp = (props: {
 }): BootstrapApp => {
   // Throw down ye olde ASCII tag
   jrvascii();
+  console.log('Built with the dCollage boilerplate.');
+  console.log(`Appplication Name: ${APP_NAME}`);
+  console.log(`Appplication Version: ${APP_VERSION}`);
+  // TODO Make distinction between APP_VERSION and DCO_VERSION (dCollage Boilerplate Version)
 
   // Instantiate PIXI
   PixiPlugin.registerPIXI(PIXI);

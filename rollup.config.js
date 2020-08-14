@@ -4,9 +4,13 @@ import serve from 'rollup-plugin-serve';
 import livereload from 'rollup-plugin-livereload';
 import typescript from 'rollup-plugin-typescript2';
 import commonjs from 'rollup-plugin-commonjs';
+import json from '@rollup/plugin-json';
 import resolve from '@rollup/plugin-node-resolve';
+import replace from '@rollup/plugin-replace';
 import copy from 'rollup-plugin-copy';
 import { terser } from 'rollup-plugin-terser';
+
+import pkg from './package.json';
 
 const isProd = process.env.BUILD === 'prod';
 const isDev = process.env.BUILD === 'dev';
@@ -26,6 +30,9 @@ export default [
 
     plugins: [
       resolve({ base: 'src', browser: true, preferBuiltins: false }),
+      replace({
+        __VERSION__: JSON.stringify(pkg.version),
+      }),
       typescript({}),
       commonjs({
         namedExports: {
