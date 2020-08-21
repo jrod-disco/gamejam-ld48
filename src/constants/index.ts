@@ -1,8 +1,7 @@
 // App
 
 // Ignoring this to suppress an error with __VERSION__ which will be rewritten with the version number on build.
-// @ts-ignore
-export const APP_VERSION = __VERSION__; // <- populated by rollup replace
+export const APP_VERSION = __VERSION__; // <- populated by rollup replace, ignore this error
 export const APP_NAME = 'dcollage-boilerplate';
 export const APP_HEIGHT = 200;
 export const APP_WIDTH = 350;

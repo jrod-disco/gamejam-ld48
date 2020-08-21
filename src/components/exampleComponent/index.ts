@@ -37,7 +37,7 @@ export const exampleComponent = (props: ComponentProps): Component => {
     align: 'center',
   });
 
-  const sampleText = new PIXI.Text('exampleComponent', textStyle);
+  const sampleText = new PIXI.Text('DCollage', textStyle);
   sampleText.anchor.set(0.5, 0);
 
   container.addChild(sampleText);

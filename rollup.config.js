@@ -4,11 +4,11 @@ import serve from 'rollup-plugin-serve';
 import livereload from 'rollup-plugin-livereload';
 import typescript from 'rollup-plugin-typescript2';
 import commonjs from 'rollup-plugin-commonjs';
-import json from '@rollup/plugin-json';
 import resolve from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import copy from 'rollup-plugin-copy';
 import { terser } from 'rollup-plugin-terser';
+import ttypescript from 'ttypescript';
 
 import pkg from './package.json';
 
@@ -27,13 +27,14 @@ export default [
         },
       },
     ],
-
     plugins: [
       resolve({ base: 'src', browser: true, preferBuiltins: false }),
       replace({
         __VERSION__: JSON.stringify(pkg.version),
       }),
-      typescript({}),
+      typescript({
+        typescript: ttypescript,
+      }),
       commonjs({
         namedExports: {
           'node_modules/pixi.js/lib/pixi.es.js': ['sound'],
