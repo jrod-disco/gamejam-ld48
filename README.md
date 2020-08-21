@@ -4,7 +4,7 @@ DCollage is a lightly opinionated PIXIJS based digital collage boilerplate with 
 
 The goal of DCollage is to facilitate the creation of multi-layered, interactive, collages similar to those I created back in the days of Flash. Surprise it works for simple games too! [See the repo WIKI for additional information.](https://github.com/jrod-disco/dcollage-pixijs-boilerplate/wiki)
 
-The section of the README below can be used to bootstrap your project readme or removed when you use this template.
+![dC logo](http://content.jrvhost.com/github/dc-logo.png)
 
 # Your Project Title
 
