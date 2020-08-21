@@ -1,10 +1,11 @@
 ### Bootstrapped with DCollage (Digital Collage Boilerplate w/ PIXIJS)
 
+![dC logo](http://content.jrvhost.com/github/dc-logo.png)
+
 DCollage is a lightly opinionated PIXIJS based digital collage boilerplate with game dev aspirations and a component driven paradigm written in TypeScript.
+The goal of DCollage is to facilitate the creation of multi-layered, interactive, collages similar to those I created back in the days of Flash. Surprise it works for simple games too!
 
-The goal of DCollage is to facilitate the creation of multi-layered, interactive, collages similar to those I created back in the days of Flash. Surprise it works for simple games too! [See the repo WIKI for additional information.](https://github.com/jrod-disco/dcollage-pixijs-boilerplate/wiki)
-
-The section of the README below can be used to bootstrap your project readme or removed when you use this template.
+[See the repo WIKI for additional information.](https://github.com/jrod-disco/dcollage-pixijs-boilerplate/wiki)
 
 # Your Project Title
 
@@ -25,33 +26,10 @@ DCollage is meant to get you up and running with a PIXI app in minutes. While th
 
 ## Have Fun!
 
-- Edit `main.ts` to add or remove components from the main container there will be a handful of `_prebuilt` example components included to help you get started
+- Edit `main.ts` to add or remove components from the main container
+- There is a `components/library` included to help you get started (please contribute yours back to the repo and namespace their directory E.g. `components/library/yourGithubUsername`)
 - Put your assets in `./src/assets` and add anything you want to preload to the `preloader` at the bottom of `main.ts`
-- Use any of the `_prebuilt` components, or make your own
-
-## DCollage Prebuilt Components
-
-- Components should be barreled up into a single `COMP` import, in addition "prebuilt componenents" that come with the boilerplate are double-barreled (shame on me) and available via `COMP.LIB`
-- if you follow this pattern you can create a new component by:
-
-  `const newComponent = COMP.LIB.prebuiltComponentName({prebuiltComponentPropsObject})`
-
-  or for a component you've created outside of the library:
-
-  `const myNewComponent = COMP.myComponentName({myComponentPropsObject})`
-
-- The component function will return a module object which will include a `container` for components that have a visual aspect
-- Add this container to the existing `mainContainer` or any container you create like so:
-
-  `mainContainer.addChild(newComponent.container);`
-
-- This allows for components to have a discreet "rendered" container as well as any logic and exposed functions the returned module object has available
-- It is key to note that components are functional modules rather than classes but this doesn't mean you couldn't use classes if you wanted to. See for more info: [The Revealing Module Pattern in Javascript](https://gist.github.com/zcaceres/bb0eec99c02dda6aac0e041d0d4d7bf2)
-
-## Eventing and Application Access
-
-- Currently events are all handled via callbacks; this has been sufficient for basic projects but a more robust pub-sub/eventBus is on the roadmap
-- At times you may want/need to access the PIXI Application instance; in this case you can tweak the bootstrapping function to `window.APP = bootstrapApp({ spriteSheets, sounds });` exposing the `APP` in the global space via window; this is helpful in the event that you want to freeze the app, say for a game PAUSE or something `window.APP.stop();` from within a nested component
+- Use any of the `components/library` components, or make your own
 
 # Build Scripts
 
