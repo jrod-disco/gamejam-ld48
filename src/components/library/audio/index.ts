@@ -1,6 +1,6 @@
 import * as PIXISOUND from 'pixi-sound';
 import gsap, { Power0 } from 'gsap';
-import { MUSIC_VOL_MULT } from '../../constants';
+import { MUSIC_VOL_MULT } from '@src/constants';
 
 export interface Sounds {
   MainTheme: PIXI.LoaderResource;

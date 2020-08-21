@@ -1,9 +1,9 @@
 /**
- * Barrel file for all component modules
+ * Barrel up our components for easy access
  */
-export { audio } from './audio';
-export { btnSample } from './buttons';
-export { runtime } from './runtime';
-export { bestScoreDisplay } from './bestScoreDisplay';
 
-// TODO Extract components such that they can be added/removed separate from the dCollage Boilerplate itself
+// Prebuilt Components Library
+export * as LIB from './library';
+
+// Your Components
+export { exampleComponent } from './exampleComponent';

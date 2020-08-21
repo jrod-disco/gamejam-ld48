@@ -19,14 +19,14 @@ interface Props {
  *
  * @returns Interface object containing methods that can be called on this module
  */
-export const btnSample = (props: Props): Button => {
+export const simpleButton = (props: Props): Button => {
   const { onPress } = props;
   const pos = props.pos ?? { x: 0, y: 0 };
   const container = new PIXI.Container();
   container.x = pos.x;
   container.y = pos.y;
 
-  container.name = 'btnSample';
+  container.name = 'simpleButton';
 
   const { buttonTexture } = props;
 
