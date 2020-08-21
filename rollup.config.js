@@ -3,7 +3,7 @@ import scss from 'rollup-plugin-scss';
 import serve from 'rollup-plugin-serve';
 import livereload from 'rollup-plugin-livereload';
 import typescript from 'rollup-plugin-typescript2';
-import commonjs from 'rollup-plugin-commonjs';
+import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
 import replace from '@rollup/plugin-replace';
 import copy from 'rollup-plugin-copy';
@@ -35,11 +35,7 @@ export default [
       typescript({
         typescript: ttypescript,
       }),
-      commonjs({
-        namedExports: {
-          'node_modules/pixi.js/lib/pixi.es.js': ['sound'],
-        },
-      }),
+      commonjs({}),
       scss(),
       html({ template: './src/index.html', inject: false }),
       isProd && terser(),
