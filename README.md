@@ -12,6 +12,8 @@ Your project description may appear here.
 
 # Getting Started
 
+DCollage is meant to get you up and running with a PIXI app in minutes. While there are a lot of nuances that can be tweaked and you are not forced to follow the patterns this boilerplate includes it should be a matter of clone, install, run.
+
 ## Clone or Template
 
 - Clone or spin up a new repo using the github template `https://github.com/jrod-disco/dcollage-pixijs-boilerplate.git`
@@ -29,10 +31,20 @@ Your project description may appear here.
 
 ## DCollage Prebuilt Components
 
-- These are barreled up into a single `COMP` import, and you can do the same with the ones you make
-- if you follow this pattern you can create a new component by `const newComponent = COMP.prebuiltComponentName({prebuiltComponentParamaters})`
+- Components should be barreled up into a single `COMP` import, in addition "prebuilt componenents" that come with the boilerplate are double-barreled (shame on me) and available via `COMP.LIB`
+- if you follow this pattern you can create a new component by:
+
+  `const newComponent = COMP.LIB.prebuiltComponentName({prebuiltComponentPropsObject})`
+
+  or for a component you've created outside of the library:
+
+  `const myNewComponent = COMP.myComponentName({myComponentPropsObject})`
+
 - The component function will return a module object which will include a `container` for components that have a visual aspect
-- Add this container to the existing `mainContainer` or any container you create like so `mainContainer.addChild(newComponent.container);`
+- Add this container to the existing `mainContainer` or any container you create like so:
+
+  `mainContainer.addChild(newComponent.container);`
+
 - This allows for components to have a discreet "rendered" container as well as any logic and exposed functions the returned module object has available
 - It is key to note that components are functional modules rather than classes but this doesn't mean you couldn't use classes if you wanted to. See for more info: [The Revealing Module Pattern in Javascript](https://gist.github.com/zcaceres/bb0eec99c02dda6aac0e041d0d4d7bf2)
 
