@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import gsap from 'gsap';
+import gsap, { Power0 } from 'gsap';
 import PixiPlugin from 'gsap/PixiPlugin';
 
 import jrvascii from './util/jrvascii';
@@ -9,9 +9,8 @@ import initPIXI, { PixiConfig } from './pixi';
 import { APP_HEIGHT, APP_WIDTH, APP_NAME, APP_VERSION } from './constants';
 import './index.scss';
 
+import { Sounds } from './components/library/audio';
 import * as COMP from './components';
-import { Sounds } from './components/audio';
-import { highScores, HighScoreManager } from './util/highScores';
 
 const hostDiv = document.getElementById('canvas');
 const hostWidth = APP_WIDTH;
@@ -33,6 +32,11 @@ interface BootstrapApp {
   app: PIXI.Application;
 }
 
+/**
+ * @function onAssetsLoaded
+ *
+ * @description Callback triggered when assets are done loading. These are defined at the end of this file in the `preloader` call.
+ */
 const onAssetsLoaded = (): void => {
   //console.log('onAssetsLoaded');
 
@@ -48,22 +52,12 @@ const onAssetsLoaded = (): void => {
   bootstrapApp({ spriteSheets, sounds });
 };
 
-const preloader = PIXI.Loader.shared;
-preloader
-  .add('mainSprites', './assets/sprites.json')
-  .add('MainTheme', './assets/file_example_MP3_1MG.mp3');
-
-preloader.load(onAssetsLoaded);
-// Uncomment to log individual assets as they load
-// preloader.onProgress.add((e, f) =>
-//   console.log(`Progress ${Math.floor(e.progress)} (${f.name}.${f.extension})`)
-// );
-
 /**
- * Kicks off the application proper by instantiating the various components and wiring up their update methods to the update loop of the main application.
+ * @function bootstrapApp
+ *
+ * @description Kicks off the application proper by instantiating the various components and wiring up their update methods to the update loop of the main application.
  *
  * @param props - Preloaded assets ({@link Spritesheets)}, {@link Sounds}) are passed in via props
- *
  */
 const bootstrapApp = (props: {
   spriteSheets: SpriteSheets;
@@ -82,54 +76,6 @@ const bootstrapApp = (props: {
   const { pixiApp, mainContainer } = initPIXI(pixiConfig, hostDiv);
   pixiApp.renderer.autoDensity = true;
 
-  const gameContainer = mainContainer.addChild(new PIXI.Container());
-  const uiContainer = mainContainer.addChild(new PIXI.Container());
-
-  const { spriteSheets, sounds } = props;
-
-  // High Score Manager
-  const highScoreManager: HighScoreManager = highScores();
-
-  // Declare component variables in advance when needed
-  let runtime = null;
-
-  // Add music as a component
-  const audioLayer = COMP.audio(sounds);
-  //audioLayer.music.mainTheme();
-
-  // Background
-  // const bg = COMP.background({});
-  // gameContainer.addChild(bg.container);
-
-  // Best Score Display
-  const bestScore = COMP.bestScoreDisplay({
-    pos: { x: Math.round(APP_WIDTH * 0.5), y: 10 },
-    particleTextures: [spriteSheets.main.textures['particle_3x3.png']],
-  });
-  uiContainer.addChild(bestScore.container);
-
-  // Play Again Button
-  let btnSample = null;
-
-  const onPlayAgain = (): void => {
-    // may want to wrap this in a conditional that assures that we should reset
-    runtime.reset();
-    runtime.start();
-    btnSample.setEnabled(false);
-    audioLayer.music.mainTheme();
-    bestScore.reset();
-  };
-
-  // Play again button
-  btnSample = COMP.btnSample({
-    buttonTexture: spriteSheets.main.textures['btn_again.png'],
-    onPress: onPlayAgain,
-    pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2 },
-  });
-  btnSample.setEnabled(true);
-
-  // Events --------------------------------------------------
-
   // Handle Browser visibility changes
   const handleBrowserVisibility = (isHidden: boolean): void => {
     if (isHidden) {
@@ -142,41 +88,94 @@ const bootstrapApp = (props: {
   };
   browserVisibility(handleBrowserVisibility);
 
-  /**
-   * Game Over sequence
-   */
-  const onGameOver = (): void => {
-    console.log('GAME OVER');
-    //audioLayer.music.somber();
-    btnSample.setEnabled(true);
+  // Get our preloader assets
+  const { spriteSheets, sounds } = props;
 
-    // check to see if this is a personal best
-    const finalScore = runtime.getRunTime();
-    const isNewPersonalBest = highScoreManager.checkPersonalBest(finalScore);
-    bestScore.setText(
-      String(highScoreManager.getPersonalBest()),
-      isNewPersonalBest
-    );
-    bestScore.setVisibility(true);
+  // Create a UI Container and add it to the mainContainer
+  const uiContainer = mainContainer.addChild(new PIXI.Container());
+
+  // Declare component variables in advance when needed
+  let runtime = null;
+  let btnSample = null;
+
+  // Add music as a component
+  const audioLayer = COMP.LIB.audio(sounds);
+
+  // Callback for Sample "Play Again" Button
+  const onPlayAgain = (): void => {
+    // may want to wrap this in a conditional that assures that we should reset
+    runtime.reset();
+    runtime.start();
+    btnSample.setEnabled(false);
+    audioLayer.music.mainTheme();
   };
 
-  // Add the hero items to the game container
-  //gameContainer.addChild(someComponent.container);
-
-  // Run Time
-  runtime = COMP.runtime({ pos: { x: 25, y: 25 } });
-  uiContainer.addChild(runtime.container);
-
+  // Instantiate a new Sample "Play Again" Button
+  // The texture comes from a spritesheet we've preloaded
+  btnSample = COMP.LIB.simpleButton({
+    pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2 },
+    buttonTexture: spriteSheets.main.textures['btn_again.png'],
+    onPress: onPlayAgain,
+  });
+  btnSample.setEnabled(true);
+  // Add the button's container to the uiContainer
   uiContainer.addChild(btnSample.container);
 
+  // Run Time is a simple clock that runs up
+  runtime = COMP.LIB.runtime({ pos: { x: 25, y: 25 } });
+  uiContainer.addChild(runtime.container);
+
+  // An wxample of a component you've created - not from the prebuilt library components
+  // This component's index can be used as a template for new components
+  const sampleComponent = COMP.exampleComponent({
+    pos: { x: APP_WIDTH / 2, y: APP_HEIGHT - 50 },
+  });
+  mainContainer.addChild(sampleComponent.container);
+
+  // We can also add a preloaded (or not preloaded PNG) if we wanted to
+  // Usually we'll nest these in a component for more flexibility but :shrug:
+  const texture = PIXI.Texture.from('./assets/example/example.png');
+  const sampleSprite = new PIXI.Sprite(texture);
+  sampleSprite.anchor.set(0.5);
+  sampleSprite.x = APP_WIDTH / 2;
+  sampleSprite.y = 50;
+  mainContainer.addChild(sampleSprite);
+
+  // We can even use Greensock to animate the resulting sprite
+  gsap.to(sampleSprite, 3, {
+    delay: 1,
+    pixi: {
+      scale: 0.5,
+      angle: 360,
+    },
+    ease: Power0.easeOut,
+    onComplete: () => {
+      // tweens have callbacks too!
+    },
+  });
+
+  // ------------------------------------
   // Register component UPDATE routines
   // ------------------------------------
+  // This is our main render loop running on RAF via PIXI
+  // Some components will expose an update function which we wire up here if we want them to run on this main timeline
+
   pixiApp.ticker.add((delta) => {
     // Update All The Things
-
     runtime.update(delta);
-    bestScore.update(delta);
   });
 
   return { app: pixiApp };
 };
+
+// Asset Preloader --------------------------------
+const preloader = PIXI.Loader.shared;
+preloader
+  .add('samplePng', './assets/example/example.png')
+  .add('mainSprites', './assets/example/sprites.json')
+  .add('MainTheme', './assets/example/example.mp3');
+preloader.load(onAssetsLoaded);
+// Uncomment to log individual assets as they load
+// preloader.onProgress.add((e, f) =>
+//   console.log(`Progress ${Math.floor(e.progress)} (${f.name}.${f.extension})`)
+// );

@@ -17,21 +17,30 @@ interface ComponentProps {
  *
  * @returns Interface object containing methods that can be called on this module
  */
-export const component = (props: ComponentProps): Component => {
+export const exampleComponent = (props: ComponentProps): Component => {
   const pos = props.pos ?? { x: 0, y: 0 };
   const container = new PIXI.Container();
   container.x = pos.x;
   container.y = pos.y;
 
-  container.name = 'component name';
+  container.name = 'exampleComponent';
 
   let state = {};
   const initialState = { ...state };
 
-  //   const texture = PIXI.Texture.from('./assets/coin.png');
-  //   const sprite = new PIXI.Sprite(texture);
-  //   sprite.anchor.set(0.5);
-  //   container.addChild(sprite);
+  // Text
+  const textStyle = new PIXI.TextStyle({
+    fontFamily: 'Impact, Charcoal, sans-serif',
+    fontSize: 21,
+    fontWeight: 'bold',
+    fill: ['#fff'],
+    align: 'center',
+  });
+
+  const sampleText = new PIXI.Text('exampleComponent', textStyle);
+  sampleText.anchor.set(0.5, 0);
+
+  container.addChild(sampleText);
 
   // Reset called by play again and also on init
   const reset = (): void => {
