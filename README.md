@@ -25,11 +25,12 @@ DCollage is meant to get you up and running with a PIXI app in minutes. While th
 
 ## Have Fun!
 
-- Edit `main.ts` to add or remove components from the main container there will be a handful of `_prebuilt` example components included to help you get started
+- Edit `main.ts` to add or remove components from the main container
+- There is a `components/library` included to help you get started (please contribute yours back to the repo and namespace their directory E.g. `components/library/yourGithubUsername`)
 - Put your assets in `./src/assets` and add anything you want to preload to the `preloader` at the bottom of `main.ts`
 - Use any of the `_prebuilt` components, or make your own
 
-## DCollage Prebuilt Components
+## DCollage Prebuilt Components Library
 
 - Components should be barreled up into a single `COMP` import, in addition "prebuilt componenents" that come with the boilerplate are double-barreled (shame on me) and available via `COMP.LIB`
 - if you follow this pattern you can create a new component by:
