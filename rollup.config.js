@@ -17,7 +17,7 @@ const isDev = process.env.BUILD === 'dev';
 
 export default [
   {
-    input: './src/main.ts',
+    input: './src/core.ts',
     output: [
       {
         file: './dist/app.js',
