@@ -1,7 +1,5 @@
 import * as PIXI from 'pixi.js';
 import gsap, { Power0 } from 'gsap';
-import * as COMP from '@src/components';
-import { Spritesheets } from '@src/core';
 import { APP_HEIGHT, APP_WIDTH } from '@src/constants';
 
 export type ScoreDataObject = { name: string; score: number };
@@ -13,6 +11,8 @@ export type VisibilityConfig = {
 };
 export interface MainMenuLayout {
   container: PIXI.Container;
+  reset: () => void;
+  update: (delta: number) => void;
   setVisibility: (config: VisibilityConfig) => void;
 }
 
@@ -36,25 +36,42 @@ export const secondLayout = (props: Props): MainMenuLayout => {
 
   container.name = 'second layout';
 
+  const reset = (): void => {
+    container.removeChildren();
+  };
+
   // Text
   const textStyle = new PIXI.TextStyle({
     fontFamily: 'Impact, Charcoal, sans-serif',
-    fontSize: 12,
-    fill: ['#ccc'],
+    fontSize: 14,
+    fill: ['#24506a', '#211e3c'],
     fillGradientType: 1,
     fillGradientStops: [0.35],
-    dropShadow: false,
-    dropShadowColor: '#000000',
+    dropShadow: true,
+    dropShadowColor: '#fda04f',
     dropShadowBlur: 10,
-    dropShadowDistance: 5,
+    dropShadowDistance: 0,
     align: 'center',
   });
 
-  const helloWorldText = new PIXI.Text('Hello from Second Screen.', textStyle);
+  const helloWorldText = new PIXI.Text(
+    'Hello World, from Second Screen.',
+    textStyle
+  );
   helloWorldText.anchor.set(0.5);
   helloWorldText.position.x = APP_WIDTH / 2;
-  helloWorldText.position.y = 180;
+  helloWorldText.position.y = APP_HEIGHT - 20;
   container.addChild(helloWorldText);
+
+  // Graphic Drawing Elements --------
+  const graphicsElement = new PIXI.Graphics();
+  graphicsElement.beginFill(0x79354a);
+  graphicsElement.lineStyle(2, 0xfda04f);
+  graphicsElement.drawRect(APP_WIDTH - 50, 50, 25, 100);
+  // Add it to container
+  container.addChild(graphicsElement);
+  // You can still draw on it
+  graphicsElement.drawCircle(50, 100, 25);
 
   // Interactive Elements --------
 
@@ -86,5 +103,10 @@ export const secondLayout = (props: Props): MainMenuLayout => {
     isAnimated: false,
   });
 
-  return { container, setVisibility };
+  const update = (delta: number): void => {
+    graphicsElement.x += 5 * delta; // throttle by delta
+    if (graphicsElement.x > APP_WIDTH) graphicsElement.x = APP_WIDTH * -1;
+  };
+
+  return { container, update, reset, setVisibility };
 };

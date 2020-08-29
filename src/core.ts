@@ -6,7 +6,14 @@ import jrvascii from './util/jrvascii';
 import { browserVisibility } from './util/browserVisibility';
 
 import initPIXI, { PixiConfig } from './pixi';
-import { APP_HEIGHT, APP_WIDTH, APP_NAME, APP_VERSION } from './constants';
+import {
+  APP_HEIGHT,
+  APP_WIDTH,
+  Z_UI,
+  Z_BASE,
+  APP_NAME,
+  APP_VERSION,
+} from './constants';
 import './index.scss';
 
 import * as COMP from './components';
@@ -82,8 +89,10 @@ const bootstrapApp = (props: {
   // Get our preloader assets
   const { spriteSheets, sounds } = props;
 
-  // Create a UI Container and add it to the mainContainer
-  const uiContainer = mainContainer.addChild(new PIXI.Container());
+  // Create empty BASE and UI containers and add them to the mainContainer
+  // Use constants for Z-index of these containers
+  const baseContainer = mainContainer.addChildAt(new PIXI.Container(), Z_BASE);
+  const uiContainer = mainContainer.addChildAt(new PIXI.Container(), Z_UI);
 
   // Declare component variables in advance when needed
   let runtime = null;
@@ -104,7 +113,14 @@ const bootstrapApp = (props: {
   mainContainer.addChild(sampleComponent.container);
 
   // We can also add a preloaded (or not preloaded PNG) if we wanted to
-  // Usually we'll nest these in a component for more flexibility but :shrug:
+  // Usually we'll nest these in a component for more flexibility but it's an example
+
+  const backgroundTexture = PIXI.Texture.from(
+    './assets/example/background.png'
+  );
+  const backgroundSprite = new PIXI.Sprite(backgroundTexture);
+  baseContainer.addChild(backgroundSprite);
+
   const texture = PIXI.Texture.from('./assets/example/example.png');
   const sampleSprite = new PIXI.Sprite(texture);
   sampleSprite.anchor.set(0.5);
@@ -167,7 +183,13 @@ const bootstrapApp = (props: {
 
   pixiApp.ticker.add((delta) => {
     // Update All The Things
+
+    // Individual components
     runtime.update(delta);
+
+    // Update this screen only when it is visible
+    if (SCREEN.controller.getCurrentScreen() === screenSecond)
+      screenSecond.update(delta);
   });
 
   /**
