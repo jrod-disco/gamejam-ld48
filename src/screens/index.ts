@@ -8,7 +8,11 @@
  * and maybe an index.ts to serve as the controller
  */
 
-// TODO Screens should evovlve to include a controller, maybe even a base class
+// Screen Controller
+export { controller } from './controller';
 
-// Example Screen
+// Example Screen One
 export { mainLayout } from './main/layout';
+
+// Example Screen Two
+export { secondLayout } from './second/layout';

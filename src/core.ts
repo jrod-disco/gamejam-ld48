@@ -9,8 +9,9 @@ import initPIXI, { PixiConfig } from './pixi';
 import { APP_HEIGHT, APP_WIDTH, APP_NAME, APP_VERSION } from './constants';
 import './index.scss';
 
-import { Sounds } from './components/library/audio';
 import * as COMP from './components';
+import * as SCREEN from './screens';
+import { Sounds } from './components/library/audio';
 
 declare global {
   interface Window {
@@ -35,7 +36,7 @@ const pixiConfig: PixiConfig = {
   height: hostHeight,
   backgroundColor: 0x000000,
   antialias: false,
-  resolution: 2, // window.devicePixelRatio || 1, // use resolution: 3 to scale up
+  resolution: window.devicePixelRatio || 1, // use resolution: >1 to scale up
 };
 // No anti-alias - Uncomment for pixel art
 // PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
@@ -86,30 +87,9 @@ const bootstrapApp = (props: {
 
   // Declare component variables in advance when needed
   let runtime = null;
-  let btnSample = null;
 
   // Add music as a component
   const audioLayer = COMP.LIB.audio(sounds);
-
-  // Callback for Sample "Play Again" Button
-  const onPlayAgain = (): void => {
-    // may want to wrap this in a conditional that assures that we should reset
-    runtime.reset();
-    runtime.start();
-    btnSample.setEnabled(false);
-    audioLayer.music.mainTheme();
-  };
-
-  // Instantiate a new Sample "Play Again" Button
-  // The texture comes from a spritesheet we've preloaded
-  btnSample = COMP.LIB.simpleButton({
-    pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2 },
-    buttonTexture: spriteSheets.main.textures['btn_again.png'],
-    onPress: onPlayAgain,
-  });
-  btnSample.setEnabled(true);
-  // Add the button's container to the uiContainer
-  uiContainer.addChild(btnSample.container);
 
   // Run Time is a simple clock that runs up
   runtime = COMP.LIB.runtime({ pos: { x: 25, y: 25 } });
@@ -142,7 +122,41 @@ const bootstrapApp = (props: {
     ease: Power0.easeOut,
     onComplete: () => {
       // tweens have callbacks too!
+      console.log('tween completed. welcome to pixi with gsap');
     },
+  });
+
+  // Screens UI -----------------------------------------
+
+  // TODO Going to need a screen manager
+
+  // Callback for Sample "Play Again" Button
+  const onSampleButtonPress = (): void => {
+    // may want to wrap this in a conditional that assures that we should reset
+    runtime.reset();
+    runtime.start();
+    SCREEN.controller.setCurrentScreen({
+      screen: screenSecond,
+      isAnimated: true,
+    });
+    audioLayer.music.mainTheme();
+  };
+
+  // Sample Screen One - Main Screen
+  const screenMain = SCREEN.mainLayout({
+    onSampleButtonPress,
+    spriteSheets,
+  });
+  uiContainer.addChild(screenMain.container);
+
+  // Sample Screen Two - Second Screen
+  const screenSecond = SCREEN.secondLayout({});
+  uiContainer.addChild(screenSecond.container);
+
+  //Operator: Main Screen Turn On...
+  SCREEN.controller.setCurrentScreen({
+    screen: screenMain,
+    isAnimated: true,
   });
 
   // ------------------------------------

@@ -8,8 +8,8 @@ export const APP_WIDTH = 350;
 
 // Layer Depths
 // MC = mainContainer
-export const Z_MC_UI = 1;
-export const Z_MC_GAME = 0;
+export const Z_UI = 1;
+export const Z_BASE = 0;
 
 // Audio
 export const MUSIC_VOL_MULT = 0.5;
