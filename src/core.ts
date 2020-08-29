@@ -115,11 +115,12 @@ const bootstrapApp = (props: {
   runtime = COMP.LIB.runtime({ pos: { x: 25, y: 25 } });
   uiContainer.addChild(runtime.container);
 
-  // An wxample of a component you've created - not from the prebuilt library components
+  // An example of a component you've created - not from the prebuilt library components
   // This component's index can be used as a template for new components
   const sampleComponent = COMP.exampleComponent({
     pos: { x: APP_WIDTH / 2, y: APP_HEIGHT - 50 },
   });
+
   mainContainer.addChild(sampleComponent.container);
 
   // We can also add a preloaded (or not preloaded PNG) if we wanted to
