@@ -12,6 +12,21 @@ import './index.scss';
 import { Sounds } from './components/library/audio';
 import * as COMP from './components';
 
+declare global {
+  interface Window {
+    APP: DcollageApp;
+  }
+}
+
+export interface DcollageApp {
+  pixiApp: PIXI.Application;
+  coreInterface: any;
+}
+
+export type Spritesheets = {
+  main: PIXI.Spritesheet | null;
+};
+
 const hostDiv = document.getElementById('canvas');
 const hostWidth = APP_WIDTH;
 const hostHeight = APP_WIDTH * (APP_HEIGHT / APP_WIDTH);
@@ -20,37 +35,10 @@ const pixiConfig: PixiConfig = {
   height: hostHeight,
   backgroundColor: 0x000000,
   antialias: false,
-  resolution: window.devicePixelRatio || 1, // use resolution: 3 to scale up
+  resolution: 2, // window.devicePixelRatio || 1, // use resolution: 3 to scale up
 };
 // No anti-alias - Uncomment for pixel art
 // PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
-
-type SpriteSheets = {
-  main: PIXI.Spritesheet | null;
-};
-interface BootstrapApp {
-  app: PIXI.Application;
-}
-
-/**
- * @function onAssetsLoaded
- *
- * @description Callback triggered when assets are done loading. These are defined at the end of this file in the `preloader` call.
- */
-const onAssetsLoaded = (): void => {
-  //console.log('onAssetsLoaded');
-
-  // Store preloade spritesheets
-  const spriteSheets = {
-    main: PIXI.Loader.shared.resources['mainSprites'].spritesheet,
-  };
-  const sounds: Sounds = {
-    MainTheme: PIXI.Loader.shared.resources['MainTheme'],
-  };
-
-  // Boostrap the app once assets are loaded
-  bootstrapApp({ spriteSheets, sounds });
-};
 
 /**
  * @function bootstrapApp
@@ -60,14 +48,16 @@ const onAssetsLoaded = (): void => {
  * @param props - Preloaded assets ({@link Spritesheets)}, {@link Sounds}) are passed in via props
  */
 const bootstrapApp = (props: {
-  spriteSheets: SpriteSheets;
+  spriteSheets: Spritesheets;
   sounds: Sounds;
-}): BootstrapApp => {
+}): DcollageApp => {
   // Throw down ye olde ASCII tag
   jrvascii();
   console.log('Built with the dCollage boilerplate.');
   console.log(`Appplication Name: ${APP_NAME}`);
+  console.log(`Built with the dCollage boilerplate ${APP_VERSION}`);
   console.log(`Appplication Version: ${APP_VERSION}`);
+  console.log('-------------------------------------------');
   // TODO Make distinction between APP_VERSION and DCO_VERSION (dCollage Boilerplate Version)
 
   // Instantiate PIXI
@@ -125,11 +115,12 @@ const bootstrapApp = (props: {
   runtime = COMP.LIB.runtime({ pos: { x: 25, y: 25 } });
   uiContainer.addChild(runtime.container);
 
-  // An wxample of a component you've created - not from the prebuilt library components
+  // An example of a component you've created - not from the prebuilt library components
   // This component's index can be used as a template for new components
   const sampleComponent = COMP.exampleComponent({
     pos: { x: APP_WIDTH / 2, y: APP_HEIGHT - 50 },
   });
+
   mainContainer.addChild(sampleComponent.container);
 
   // We can also add a preloaded (or not preloaded PNG) if we wanted to
@@ -165,17 +156,38 @@ const bootstrapApp = (props: {
     runtime.update(delta);
   });
 
-  return { app: pixiApp };
+  /**
+   * This project follows the revealing module pattern wherein a function
+   * returns its revealed internals serving as a public interface.
+   *
+   *  We are further encapsulating concerns here by having only 2 top-level objects:
+   *     1. pixiApp - direct access to PIXI's Application Module for lower level needs
+   *     2. coreInterface - an object with additional callbacks typed as any (this could be hardned down the line)
+   */
+  return { pixiApp, coreInterface: {} };
 };
 
-// Asset Preloader --------------------------------
-const preloader = PIXI.Loader.shared;
-preloader
-  .add('samplePng', './assets/example/example.png')
-  .add('mainSprites', './assets/example/sprites.json')
-  .add('MainTheme', './assets/example/example.mp3');
-preloader.load(onAssetsLoaded);
-// Uncomment to log individual assets as they load
-// preloader.onProgress.add((e, f) =>
-//   console.log(`Progress ${Math.floor(e.progress)} (${f.name}.${f.extension})`)
-// );
+// ----- Preload Assets Here -----
+
+/**
+ * onAssetsLoaded
+ * @description a callback triggered when preloader completes its work
+ */
+const onAssetsLoaded = (): void => {
+  // Store preloaded spritesheets
+  const spriteSheets = {
+    main: PIXI.Loader.shared.resources['mainSprites'].spritesheet,
+  };
+  const sounds: Sounds = {
+    MainTheme: PIXI.Loader.shared.resources['MainTheme'],
+  };
+
+  // This is the big boi that kicks off the whole DCollage App
+  // We are storing the return on the window.APP object
+  // for those few instances where we need direct access
+  // to the PIXI.Application and any coreInterface functions
+  window.APP = bootstrapApp({ spriteSheets, sounds });
+};
+
+const preloader = COMP.LIB.preloader({});
+preloader.init(onAssetsLoaded);
