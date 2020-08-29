@@ -6,11 +6,19 @@ import jrvascii from './util/jrvascii';
 import { browserVisibility } from './util/browserVisibility';
 
 import initPIXI, { PixiConfig } from './pixi';
-import { APP_HEIGHT, APP_WIDTH, APP_NAME, APP_VERSION } from './constants';
+import {
+  APP_HEIGHT,
+  APP_WIDTH,
+  Z_UI,
+  Z_BASE,
+  APP_NAME,
+  APP_VERSION,
+} from './constants';
 import './index.scss';
 
-import { Sounds } from './components/library/audio';
 import * as COMP from './components';
+import * as SCREEN from './screens';
+import { Sounds } from './components/library/audio';
 
 declare global {
   interface Window {
@@ -35,7 +43,7 @@ const pixiConfig: PixiConfig = {
   height: hostHeight,
   backgroundColor: 0x000000,
   antialias: false,
-  resolution: 2, // window.devicePixelRatio || 1, // use resolution: 3 to scale up
+  resolution: window.devicePixelRatio || 1, // use resolution: >1 to scale up
 };
 // No anti-alias - Uncomment for pixel art
 // PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
@@ -81,35 +89,16 @@ const bootstrapApp = (props: {
   // Get our preloader assets
   const { spriteSheets, sounds } = props;
 
-  // Create a UI Container and add it to the mainContainer
-  const uiContainer = mainContainer.addChild(new PIXI.Container());
+  // Create empty BASE and UI containers and add them to the mainContainer
+  // Use constants for Z-index of these containers
+  const baseContainer = mainContainer.addChildAt(new PIXI.Container(), Z_BASE);
+  const uiContainer = mainContainer.addChildAt(new PIXI.Container(), Z_UI);
 
   // Declare component variables in advance when needed
   let runtime = null;
-  let btnSample = null;
 
   // Add music as a component
   const audioLayer = COMP.LIB.audio(sounds);
-
-  // Callback for Sample "Play Again" Button
-  const onPlayAgain = (): void => {
-    // may want to wrap this in a conditional that assures that we should reset
-    runtime.reset();
-    runtime.start();
-    btnSample.setEnabled(false);
-    audioLayer.music.mainTheme();
-  };
-
-  // Instantiate a new Sample "Play Again" Button
-  // The texture comes from a spritesheet we've preloaded
-  btnSample = COMP.LIB.simpleButton({
-    pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2 },
-    buttonTexture: spriteSheets.main.textures['btn_again.png'],
-    onPress: onPlayAgain,
-  });
-  btnSample.setEnabled(true);
-  // Add the button's container to the uiContainer
-  uiContainer.addChild(btnSample.container);
 
   // Run Time is a simple clock that runs up
   runtime = COMP.LIB.runtime({ pos: { x: 25, y: 25 } });
@@ -124,7 +113,14 @@ const bootstrapApp = (props: {
   mainContainer.addChild(sampleComponent.container);
 
   // We can also add a preloaded (or not preloaded PNG) if we wanted to
-  // Usually we'll nest these in a component for more flexibility but :shrug:
+  // Usually we'll nest these in a component for more flexibility but it's an example
+
+  const backgroundTexture = PIXI.Texture.from(
+    './assets/example/background.png'
+  );
+  const backgroundSprite = new PIXI.Sprite(backgroundTexture);
+  baseContainer.addChild(backgroundSprite);
+
   const texture = PIXI.Texture.from('./assets/example/example.png');
   const sampleSprite = new PIXI.Sprite(texture);
   sampleSprite.anchor.set(0.5);
@@ -142,7 +138,41 @@ const bootstrapApp = (props: {
     ease: Power0.easeOut,
     onComplete: () => {
       // tweens have callbacks too!
+      console.log('tween completed. welcome to pixi with gsap');
     },
+  });
+
+  // Screens UI -----------------------------------------
+
+  // TODO Going to need a screen manager
+
+  // Callback for Sample "Play Again" Button
+  const onSampleButtonPress = (): void => {
+    // may want to wrap this in a conditional that assures that we should reset
+    runtime.reset();
+    runtime.start();
+    SCREEN.controller.setCurrentScreen({
+      screen: screenSecond,
+      isAnimated: true,
+    });
+    audioLayer.music.mainTheme();
+  };
+
+  // Sample Screen One - Main Screen
+  const screenMain = SCREEN.mainLayout({
+    onSampleButtonPress,
+    spriteSheets,
+  });
+  uiContainer.addChild(screenMain.container);
+
+  // Sample Screen Two - Second Screen
+  const screenSecond = SCREEN.secondLayout({});
+  uiContainer.addChild(screenSecond.container);
+
+  //Operator: Main Screen Turn On...
+  SCREEN.controller.setCurrentScreen({
+    screen: screenMain,
+    isAnimated: true,
   });
 
   // ------------------------------------
@@ -153,7 +183,13 @@ const bootstrapApp = (props: {
 
   pixiApp.ticker.add((delta) => {
     // Update All The Things
+
+    // Individual components
     runtime.update(delta);
+
+    // Update this screen only when it is visible
+    if (SCREEN.controller.getCurrentScreen() === screenSecond)
+      screenSecond.update(delta);
   });
 
   /**

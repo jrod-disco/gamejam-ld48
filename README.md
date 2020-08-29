@@ -26,6 +26,7 @@ DCollage is meant to get you up and running with a PIXI app in minutes. While th
 
 ## Have Fun!
 
+- Set the `APP_HEIGHT` and `APP_WIDTH` in `constants/index.ts`
 - Edit `main.ts` to add or remove components from the main container
 - There is a `components/library` included to help you get started (please contribute yours back to the repo and namespace their directory E.g. `components/library/yourGithubUsername`)
 - Put your assets in `./src/assets` and add anything you want to preload to the `preloader` at the bottom of `main.ts`
@@ -38,24 +39,36 @@ DCollage is meant to get you up and running with a PIXI app in minutes. While th
 - `yarn build` to create a distributable bundle in `/dist`
 - `yarn docs` to generate markdown documentation in `/docs`
 
+# Dev Tools for PIXI
+
+- [Pixi.js devtools Chrome Extension](https://chrome.google.com/webstore/detail/pixijs-devtools/aamddddknhcagpehecnhphigffljadon?hl=en) shows up in your Chrome Dev Tools Panel and can be super helpful - this is why we will usually name our containers w/ `container.name='foo'`
+
 ## Concept and Mechanics
 
 TBD
 
 ## Roadmap
 
-- [x] Bootstraping
+- [ ] Bootstrap DCollage Boilerplate for PIXI.JS
 
-  - [x] create repo
-  - [x] clean-up remnants from past usage
-  - [x] get it running the game loop bare bones
+  - [ ] clone this repo or spin up a repo via github template
+  - [ ] yarn install
+  - [ ] yarn start
 
-- [ ] TBD
-  - [ ] TBD
+- [ ] Learn how to use it
+
+  - [ ] Peep the [wiki](https://github.com/jrod-disco/dcollage-pixijs-boilerplate/wiki)
+  - [ ] Especially the [Patterns and Cookbook page](https://github.com/jrod-disco/dcollage-pixijs-boilerplate/wiki/Patterns-and-Cookbook)
+  - [ ] Cruise through the example code
+
+- [ ] Make cool stuff
+  - [ ] Have fun doing it
 
 ### Completed!
 
-Nothing yet
+- [ ] Discover DCollage Boilerplate for PIXI.JS
+
+  - [ ] Read the readme
 
 ## Libraries Used
 
