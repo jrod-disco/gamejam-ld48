@@ -72,7 +72,7 @@ const bootstrapApp = (props: {
   PixiPlugin.registerPIXI(PIXI);
   gsap.registerPlugin(PixiPlugin);
   const { pixiApp, mainContainer } = initPIXI(pixiConfig, hostDiv);
-  pixiApp.renderer.autoDensity = true;
+ 
 
   // Handle Browser visibility changes
   const handleBrowserVisibility = (isHidden: boolean): void => {

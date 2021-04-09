@@ -3,7 +3,7 @@ import gsap, { Power0 } from 'gsap';
 import { MUSIC_VOL_MULT } from '@src/constants';
 
 export interface Sounds {
-  MainTheme: PIXI.LoaderResource;
+  MainTheme: any; //PIXI.LoaderResource; <- this failed when updating to 6
 }
 export interface AudioLayer {
   music: {

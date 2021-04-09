@@ -30,6 +30,7 @@ export default [
     plugins: [
       resolve({ base: 'src', browser: true, preferBuiltins: false }),
       replace({
+        preventAssignment:true,
         __VERSION__: JSON.stringify(pkg.version),
       }),
       typescript({

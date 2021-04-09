@@ -18,9 +18,9 @@
     "@zerollup/ts-transform-paths": "^1.7.18",
     "eslint": "^6.8.0",
     "gsap": "^3.5.0",
-    "pixi-particles": "^4.2.1",
-    "pixi-sound": "^3.0.4",
-    "pixi.js": "5.2.0",
+    "pixi-particles": "^4.3.0",
+    "pixi-sound": "^3.0.5",
+    "pixi.js": "6.0.2",
     "prettier": "^2.0.5",
     "rimraf": "^3.0.2",
     "rollup": "^2.26.4",
@@ -38,9 +38,11 @@
     "typedoc-plugin-markdown": "^2.2.17",
     "typescript": "4.0.2"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@pixi/sound": "^4.0.1"
+  },
   "scripts": {
-    "start": "rollup -c -w --environment BUILD:dev",
+    "dev": "rollup -c -w --environment BUILD:dev",
     "clean": "rimraf dist",
     "build": "rimraf dist && rollup -c --environment BUILD:prod",
     "docs": "rimraf docs && npx typedoc --excludeExternals --entryPoint 'main' --stripInternal --readme none"
