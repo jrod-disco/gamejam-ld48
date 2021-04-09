@@ -6,6 +6,7 @@ import jrvascii from './util/jrvascii';
 import { browserVisibility } from './util/browserVisibility';
 
 import initPIXI, { PixiConfig } from './pixi';
+
 import {
   APP_HEIGHT,
   APP_WIDTH,
@@ -19,6 +20,7 @@ import './index.scss';
 import * as COMP from './components';
 import * as SCREEN from './screens';
 import { Sounds } from './components/library/audio';
+
 
 declare global {
   interface Window {
@@ -89,6 +91,7 @@ const bootstrapApp = (props: {
   // Get our preloader assets
   const { spriteSheets, sounds } = props;
 
+
   // Create empty BASE and UI containers and add them to the mainContainer
   // Use constants for Z-index of these containers
   const baseContainer = mainContainer.addChildAt(new PIXI.Container(), Z_BASE);
@@ -113,6 +116,7 @@ const bootstrapApp = (props: {
   mainContainer.addChild(sampleComponent.container);
 
   // We can also add a preloaded (or not preloaded PNG) if we wanted to
+
   // Usually we'll nest these in a component for more flexibility but it's an example
 
   const backgroundTexture = PIXI.Texture.from(
