@@ -59,7 +59,7 @@ export const runtime = (props: Props): RunTime => {
     fontSize: 16,
     align: 'left',
   });
-  titleText.anchor = new PIXI.Point(0, 0);
+  titleText.anchor = new PIXI.ObservablePoint(null, null, 0, 0);
   titleText.tint = THEME.TXT_TITLES_HEX;
   titleText.alpha = 0.8;
 
@@ -68,7 +68,7 @@ export const runtime = (props: Props): RunTime => {
     fontSize: 16,
     align: 'left',
   });
-  timeText.anchor = new PIXI.Point(0, 0);
+  timeText.anchor = new PIXI.ObservablePoint(null, null, 0, 0);
   timeText.tint = THEME.TXT_HUD_HEX;
   timeText.position.y += 20;
   timeText.position.x += 2;

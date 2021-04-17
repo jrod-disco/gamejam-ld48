@@ -26,7 +26,7 @@ const screenController = ({ initialScreen = null }: Props): SceenController => {
   const setCurrentScreen = ({ screen, isAnimated }): string => {
     const prevScreen = screenState.currentScreen;
     screenState.currentScreen = screen;
-    console.log(`screen transition from ${prevScreen} to ${screen}`);
+    console.log(`screen transition from %p to %c`, prevScreen, screen);
 
     screen?.setVisibility({
       isVisible: true,

@@ -5,7 +5,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #282c34;
+  background-color: #000000;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -13,13 +13,32 @@ body {
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: white;
+  overflow: auto;
+  background-image: url('./assets/bgtile.png');
+  background-repeat: repeat;
 }
 
 .app-container {
   display: flex;
   justify-content: center;
   margin: 1em;
-  min-width: 200px;
-  min-height: 200px;
-  background-color: #282c34;
+}
+
+.social-links {
+  display: flex;
+  flex-direction: row;
+  font-size: 0.5em;
+  color: #fff;
+  max-width: 600px;
+  a {
+    color: #778ddb;
+    text-decoration: underline;
+  }
+  img {
+    margin-right: 0.5em;
+  }
+}
+
+#footer {
+  display: none;
 }

@@ -12,6 +12,7 @@ export type VisibilityConfig = {
 export interface MainMenuLayout {
   container: PIXI.Container;
   setVisibility: (config: VisibilityConfig) => void;
+  name: () => string;
 }
 
 interface Props {
@@ -28,15 +29,22 @@ interface Props {
  *
  * @returns Interface object containing methods that can be called on this module
  */
-export const mainLayout = (props: Props): MainMenuLayout => {
-  const pos = props.pos ?? { x: 0, y: 0 };
+export const mainMenuLayout = (props: Props): MainMenuLayout => {
+  const pos = props.pos ?? {
+    x: 0,
+    y: 0,
+  };
   const container = new PIXI.Container();
   container.x = pos.x;
   container.y = pos.y;
 
-  const { spriteSheets, onSampleButtonPress } = props;
+  const { 
+    spriteSheets, 
+    onSampleButtonPress 
+  } = props;
 
-  container.name = 'main layout';
+  container.name = 'main menu layout';
+  const name = (): string => 'MAIN';
 
   // Text
   const textStyle = new PIXI.TextStyle({
@@ -61,7 +69,7 @@ export const mainLayout = (props: Props): MainMenuLayout => {
   // Interactive Elements --------
 
   // Start Button
-  const buttonStart = COMP.LIB.simpleButton({
+  const buttonStart = COMP.LIB.btnSimple({
     pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2 },
     buttonTexture: spriteSheets.main.textures['btn_again.png'],
     onPress: onSampleButtonPress,
@@ -96,5 +104,9 @@ export const mainLayout = (props: Props): MainMenuLayout => {
     isAnimated: false,
   });
 
-  return { container, setVisibility };
+  return {
+    container,
+    name,
+    setVisibility,
+  };
 };

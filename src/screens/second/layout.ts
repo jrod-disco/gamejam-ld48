@@ -9,7 +9,7 @@ export type VisibilityConfig = {
   isAnimated: boolean;
   onCompleteCallback?: () => void;
 };
-export interface MainMenuLayout {
+export interface SecondLayout {
   container: PIXI.Container;
   reset: () => void;
   update: (delta: number) => void;
@@ -28,7 +28,7 @@ interface Props {
  *
  * @returns Interface object containing methods that can be called on this module
  */
-export const secondLayout = (props: Props): MainMenuLayout => {
+export const secondLayout = (props: Props): SecondLayout => {
   const pos = props.pos ?? { x: 0, y: 0 };
   const container = new PIXI.Container();
   container.x = pos.x;

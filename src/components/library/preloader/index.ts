@@ -32,7 +32,8 @@ export const preloader = (props: PreloaderProps): Preloader => {
     // Preload Assets ------------------------------------------------
 
     preloader
-      .add('ui', './assets/sprites-ui.json')
+      .add('main', './assets/example/sprites.json')
+      .add('ui', './assets/example/sprites-ui.json')
 
       .add('Atari-16', './assets/font/Atari-16.fnt')
       .add('Atari-32', './assets/font/Atari-32.fnt')
@@ -50,24 +51,10 @@ export const preloader = (props: PreloaderProps): Preloader => {
     // Sound bits
     const pixiSound = PIXISOUND.default;
     // Load these up on startup...
-    pixiSound.add('good', './assets/sfx/typeGood.mp3');
-    pixiSound.add('bad', './assets/sfx/typeBad.mp3');
-    pixiSound.add('lock', './assets/sfx/typeLockInAlt.mp3');
-    pixiSound.add('round', './assets/sfx/typeRound.mp3');
-    pixiSound.add('perfect', './assets/sfx/typeRoundPerfect.mp3');
-    pixiSound.add('fire', './assets/sfx/typeMissileFire.mp3');
-    pixiSound.add('boom', './assets/sfx/typeBoom.mp3');
-    pixiSound.add('boomFollow', './assets/sfx/typeBoomFollow.mp3');
+    pixiSound.add('good', './assets/example/good.mp3');
 
-    preloader
-      .add('game-fills', './assets/sprites-fills.json')
-      .add('game-outlines', './assets/sprites-outlines.json')
-      .add('Track1', './assets/sfx/OBTSOST_Track1-mono64.mp3')
-      .add('Track2', './assets/sfx/OBTSOST_Track2-mono64.mp3')
-      .add('Track3', './assets/sfx/OBTSOST_Track3-mono64.mp3')
-      .add('Track4', './assets/sfx/OBTSOST_Track4-mono64.mp3')
-      .add('Track5', './assets/sfx/OBTSOST_Track5-mono64.mp3')
-      .add('Track6', './assets/sfx/OBTSOST_Track6-mono64.mp3');
+    preloader.add('MainTheme', './assets/example/example.mp3');
+    //.add('Track2', './assets/sfx/OBTSOST_Track2-mono64.mp3')
     preloader.load(onAssetsLoadedCallback);
   };
 

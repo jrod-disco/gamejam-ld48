@@ -12,7 +12,18 @@
 export { controller } from './controller';
 
 // Example Screen One
-export { mainLayout } from './main/layout';
+export { mainMenuLayout, MainMenuLayout } from './main/layout';
 
 // Example Screen Two
-export { secondLayout } from './second/layout';
+export { secondLayout, SecondLayout } from './second/layout';
+
+
+
+// Types
+import { MainMenuLayout } from './main/layout';
+import { SecondLayout } from './second/layout';
+
+
+export type ScreenLayout =
+  | MainMenuLayout
+  | SecondLayout;

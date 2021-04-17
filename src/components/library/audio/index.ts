@@ -8,12 +8,8 @@ import {
 import { getAppVerShort } from '@src/util/appVer';
 
 export interface Sounds {
-  Track1: PIXI.LoaderResource;
-  Track2: PIXI.LoaderResource;
-  Track3: PIXI.LoaderResource;
-  Track4: PIXI.LoaderResource;
-  Track5: PIXI.LoaderResource;
-  Track6: PIXI.LoaderResource;
+  MainTheme: PIXI.LoaderResource;
+  //Track2: PIXI.LoaderResource;
 }
 export interface AudioLayer {
   music: {
@@ -38,20 +34,12 @@ export interface AudioLayer {
 export const audio = (sounds: Sounds): AudioLayer => {
   // Main Music Track
   const audio = PIXISOUND.default;
-  audio.add('Track1', sounds.Track1);
-  audio.add('Track2', sounds.Track2);
-  audio.add('Track3', sounds.Track3);
-  audio.add('Track4', sounds.Track4);
-  audio.add('Track5', sounds.Track5);
-  audio.add('Track6', sounds.Track6);
+  audio.add('MainTheme', sounds.MainTheme as any);
+  //audio.add('Track2', sounds.Track2);
 
   const trackList = [
-    'Track1',
-    'Track2',
-    'Track3',
-    'Track4',
-    'Track5',
-    'Track6',
+    'MainTheme',
+    //'Track2',
   ];
   let currentTrack = 0;
 
@@ -87,20 +75,16 @@ export const audio = (sounds: Sounds): AudioLayer => {
 
   // Called when we've got all the things...
   const stopAllThemes = (): void => {
-    audio.stop('Track1');
-    audio.stop('Track2');
-    audio.stop('Track3');
-    audio.stop('Track4');
-    audio.stop('Track5');
-    audio.stop('Track6');
+    audio.stop('MainTheme');
+    // audio.stop('Track2');
   };
   const mainTheme = (isPlay): void => {
     stopAllThemes();
-    if (isPlay) audio.play('Track1', { loop: true, volume: mainVolume() });
+    if (isPlay) audio.play('MainTheme', { loop: true, volume: mainVolume() });
   };
   const menuTheme = (isPlay): void => {
     stopAllThemes();
-    if (isPlay) audio.play('Track1', { loop: true, volume: menuVolume() });
+    if (isPlay) audio.play('MainTheme', { loop: true, volume: menuVolume() });
   };
 
   const playNextTrack = (): void => {
