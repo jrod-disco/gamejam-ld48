@@ -1,0 +1,3 @@
+[submodule "dcollage-pixijs-boilerplate"]
+	path = dcollage-pixijs-boilerplate
+	url = https://github.com/JRVisuals/dcollage-pixijs-boilerplate.git
