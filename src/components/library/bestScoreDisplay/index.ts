@@ -1,12 +1,16 @@
 import * as PIXI from 'pixi.js';
 import gsap, { Power0 } from 'gsap';
 import * as PIXIPARTICLES from 'pixi-particles';
+import { zeroPad } from '@src/util/zeroPad';
+import { THEME } from '@src/constants';
+import { tintDisplayObject } from '@src/util/tintMatrix';
 
 export interface BestScoreDisplay {
   container: PIXI.Container;
   reset: () => void;
   setText: (newText: string, isNewPersonalBest: boolean) => void;
   setVisibility: (isVisible: boolean) => void;
+  getVisibility: () => boolean;
   update: (delta: number) => void;
 }
 
@@ -16,14 +20,17 @@ interface BestScoreProps {
 }
 
 /**
- * Displays the user's persona best score after a run
+ * Displays the user's personal best score after a run
  *
  * @param props - Standard component properties.
  *
  * @returns Interface object containing methods that can be called on this module
  */
 export const bestScoreDisplay = (props: BestScoreProps): BestScoreDisplay => {
-  const pos = props.pos ?? { x: 0, y: 0 };
+  const pos = props.pos ?? {
+    x: 0,
+    y: 0,
+  };
   const container = new PIXI.Container();
   container.x = pos.x;
   container.y = pos.y;
@@ -33,115 +40,117 @@ export const bestScoreDisplay = (props: BestScoreProps): BestScoreDisplay => {
   const { particleTextures } = props;
 
   // Text
-  const textStyle = new PIXI.TextStyle({
-    fontFamily: 'Impact, Charcoal, sans-serif',
-    fontSize: 12,
-    fill: ['#ccc'],
-    fillGradientType: 1,
-    fillGradientStops: [0.35],
-    dropShadow: false,
-    dropShadowColor: '#000000',
-    dropShadowBlur: 10,
-    dropShadowDistance: 5,
-    align: 'center',
-  });
 
   // "Personal Best" text
-  const pbText = new PIXI.Text('PERSONAL BEST', textStyle);
-  pbText.anchor.set(0.5);
+  const pbText = new PIXI.BitmapText('PERSONAL BEST', {
+    fontName: `FFFFuego-16`,
+    fontSize: 16,
+    align: 'center',
+  });
+  pbText.anchor.set(0.5, 0);
+  pbText.alpha = 0.8;
+  pbText.tint = THEME.TXT_TITLES_HEX;
   container.addChild(pbText);
 
-  // Actual score text
-  const bigTextStyle = new PIXI.TextStyle({
-    ...textStyle,
-    fontSize: 26,
-    fontWeight: 'bold',
-    fill: ['#999'],
+  const scoreText = new PIXI.BitmapText('0000000', {
+    fontName: `FFFFuego-16-bold`,
+    fontSize: 16,
+    align: 'center',
   });
-
-  const bigTextGoldStyle = new PIXI.TextStyle({
-    ...bigTextStyle,
-    fill: ['#fbc536'],
-  });
-
-  const timeText = new PIXI.Text('0.00', bigTextStyle);
-  timeText.anchor.set(0.5, 0);
-  timeText.y = 5;
-  container.addChild(timeText);
+  scoreText.anchor.set(0.5, 0);
+  scoreText.tint = THEME.TXT_HUD_HEX;
+  scoreText.y = 20;
+  container.addChild(scoreText);
 
   const setText = (newText: string, isNewPersonalBest: boolean): void => {
-    timeText.text = newText;
-    const newTextStyle = isNewPersonalBest ? bigTextGoldStyle : bigTextStyle;
+    scoreText.text = zeroPad(newText, 7);
+    //const newTextStyle = isNewPersonalBest ? bigTextGoldStyle : bigTextStyle;
     emitter.emit = isNewPersonalBest;
     particleContainer.alpha = isNewPersonalBest ? 1 : 0;
-    timeText.style = newTextStyle;
+    //scoreText.style = newTextStyle;
   };
 
   const setVisibility = (isVisible: boolean): void => {
     if (isVisible) {
       container.alpha = 0;
-      gsap.to(container, 0.2, {
-        delay: 1.75,
+      gsap.to(container, {
+        duration: 0.2,
+        delay: 0.5,
         alpha: 1,
         ease: Power0.easeOut,
       });
     } else {
-      gsap.to(container, 0.2, {
+      gsap.to(container, {
+        duration: 0.2,
         alpha: 0,
         ease: Power0.easeIn,
       });
     }
   };
 
+  const getVisibility = (): boolean => container.alpha > 0;
+
   // Emitters for high score celebration
   const particleContainer = new PIXI.Container();
+  particleContainer.name = 'best score particles';
   container.addChild(particleContainer);
+  // Tint Matrix for Color Modes
+  tintDisplayObject(particleContainer, THEME.PARTICLE_HEX);
   particleContainer.alpha = 0;
-  const colorObject = { color: { start: '#fbc536', end: '#fbb336' } };
+  const colorObject = {
+    color: {
+      start: '#aaaaaa',
+      end: '#ffffff',
+    },
+  };
   const emitterConfigBase = {
     alpha: {
-      start: 1,
-      end: 0,
+      start: 0.75,
+      end: 0.5,
     },
     scale: {
-      start: 1,
+      start: 0.5,
       end: 1,
-      minimumScaleMultiplier: 1,
+      //minimumScaleMultiplier: 1,
     },
     speed: {
-      start: 0,
-      end: 0,
-      minimumSpeedMultiplier: 1,
+      start: 100,
+      end: 100,
+      //minimumSpeedMultiplier: 1,
     },
-    acceleration: {
-      x: 0,
-      y: +16,
+    startRotation: {
+      min: 180,
+      max: 360,
     },
-    maxSpeed: 256,
-    noRotation: true,
+    rotationSpeed: {
+      min: 0,
+      max: 20,
+    },
     lifetime: {
-      min: 0.35,
-      max: 1,
+      min: 0.5,
+      max: 1.0,
     },
     blendMode: 'add',
-    frequency: 0.04,
-    emitterLifetime: 500,
-    maxParticles: 128,
+    frequency: 0.02,
+    emitterLifetime: 0,
+    maxParticles: 250,
     pos: {
       x: 0,
       y: 0,
     },
     addAtBack: false,
-    spawnType: 'rect',
-    spawnRect: {
-      x: -32,
-      y: 0,
-      w: 64,
-      h: 32,
+    spawnType: 'circle',
+    spawnCircle: {
+      x: 0,
+      y: 40,
+      r: 10,
     },
   };
 
-  const emitterConfig = { ...emitterConfigBase, ...colorObject };
+  const emitterConfig = {
+    ...emitterConfigBase,
+    ...colorObject,
+  };
   const emitter = new PIXIPARTICLES.Emitter(
     particleContainer,
     particleTextures,
@@ -163,5 +172,12 @@ export const bestScoreDisplay = (props: BestScoreProps): BestScoreDisplay => {
     emitter.emit && emitter.update(delta * 0.025);
   };
 
-  return { container, reset, setText, setVisibility, update };
+  return {
+    container,
+    reset,
+    update,
+    setText,
+    setVisibility,
+    getVisibility,
+  };
 };
