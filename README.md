@@ -38,6 +38,11 @@ DCollage is meant to get you up and running with a PIXI app in minutes. While th
 - `yarn clean` to clean the `/dist` directory
 - `yarn build` to create a distributable bundle in `/dist`
 - `yarn docs` to generate markdown documentation in `/docs`
+- `yarn nwjs-start` to open latest `/dist` in nwjs
+- `yarn nwjs-dist` to build executables in `/dist-nwjs`
+  - check package.json for target options
+  - possible values: `win-x86,win-x64,linux-x86,linux-x64,mac-x64`
+- `yarn all-the-things` to `clean`, `build` and `nwjs-dist`
 
 # Dev Tools for PIXI
 
@@ -53,7 +58,7 @@ TBD
 
   - [ ] clone this repo or spin up a repo via github template
   - [ ] yarn install
-  - [ ] yarn start
+  - [ ] yarn dev
 
 - [ ] Learn how to use it
 
@@ -66,9 +71,9 @@ TBD
 
 ### Completed!
 
-- [ ] Discover DCollage Boilerplate for PIXI.JS
+- [x] Discover DCollage Boilerplate for PIXI.JS
 
-  - [ ] Read the readme
+  - [x] Read the readme
 
 ## Libraries Used
 
@@ -76,6 +81,11 @@ TBD
 - PIXIJS - WebGL renderer with Canvas fallback and so much more [https://github.com/pixijs/pixi.js](https://github.com/pixijs/pixi.js)
 - GSAP - tween animation library [https://greensock.com/docs/v2/Plugins/PixiPlugin](https://greensock.com/docs/v2/Plugins/PixiPlugin)
 - pixi-filters - Collection of community-authored custom display filters for PixiJS [https://github.com/pixijs/pixi-filters](https://github.com/pixijs/pixi-filters) Currently yarn linked to a local version of the repo in order to use the as of yet un-merged changes to the godray filter which add alpha functionality.
+- NW.JS - Builds executables for Mac, PC, and Linux [https://nwjs.io/](https://nwjs.io/)
+  - [https://docs.nwjs.io/en/latest/References/Manifest%20Format/](https://docs.nwjs.io/en/latest/References/Manifest%20Format/)
+  - [https://github.com/evshiron/nwjs-builder-phoenix](https://github.com/evshiron/nwjs-builder-phoenix)
+  - [https://github.com/djmisterjon/nw-parcel-pixi](https://github.com/djmisterjon/nw-parcel-pixi)
+  - [https://medium.com/@wouter.hisschemoller/javascript-desktop-programs-with-nw-js-23cc0d2e1cef](https://medium.com/@wouter.hisschemoller/javascript-desktop-programs-with-nw-js-23cc0d2e1cef)
 
 ## Tools Used
 
@@ -84,6 +94,7 @@ TBD
 - Aesprite
 - Audacity
 - Reason
+- bmGlyph [How to Use for PIXI](https://www.adammarcwilliams.co.uk/creating-bitmap-text-pixi/)
 
 # The Stack
 
@@ -92,3 +103,4 @@ TBD
 - Prettier
 - Rollup
 - TSDoc / TypeDoc
+- NW.JS

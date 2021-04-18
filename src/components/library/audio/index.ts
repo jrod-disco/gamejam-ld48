@@ -1,15 +1,25 @@
 import * as PIXISOUND from 'pixi-sound';
 import gsap, { Power0 } from 'gsap';
-import { MUSIC_VOL_MULT } from '@src/constants';
+import { APP_NAME, MUSIC_VOL_MULT } from '@src/constants';
+import {
+  fetchFromLocalStorage,
+  sendToLocalStorage,
+} from '@src/util/localStorage';
+import { getAppVerShort } from '@src/util/appVer';
 
 export interface Sounds {
-  MainTheme: any; //PIXI.LoaderResource; <- this failed when updating to 6
+  MainTheme: PIXI.LoaderResource;
+  //Track2: PIXI.LoaderResource;
 }
 export interface AudioLayer {
   music: {
-    mainTheme: () => void;
+    mainTheme: (isPlay: boolean) => void;
+    menuTheme: (isPlay: boolean) => void;
+    playRandomTrack: () => void;
+    playTracklist: () => void;
   };
-  muteToggle: (shouldMute: boolean) => void;
+  muteToggle: (shouldMute?: boolean, isTemporary?: boolean) => void;
+  getMutedState: () => boolean;
 }
 
 /**
@@ -24,12 +34,34 @@ export interface AudioLayer {
 export const audio = (sounds: Sounds): AudioLayer => {
   // Main Music Track
   const audio = PIXISOUND.default;
-  audio.add('MainTheme', sounds.MainTheme);
+  audio.add('MainTheme', sounds.MainTheme as any);
+  //audio.add('Track2', sounds.Track2);
+
+  const trackList = [
+    'MainTheme',
+    //'Track2',
+  ];
+  let currentTrack = 0;
+
+  // Fetch and use isMuted state stored in local storage
+  const storedMutedState = fetchFromLocalStorage(
+    `isMuted_${APP_NAME}_v${getAppVerShort()}`
+  );
+  let isMuted = storedMutedState === 'true' ? true : false;
+  // Initial state
+  if (isMuted) {
+    audio.muteAll();
+  } else {
+    audio.unmuteAll();
+  }
+
+  const getMutedState = (): boolean => isMuted;
 
   // Utility Functions
   const fadeSound = ({ sound, time, callback, vol }): void => {
-    console.log('fade sound', sound);
-    gsap.to(sound, time, {
+    //console.log('fade sound', sound);
+    gsap.to(sound, {
+      duration: time,
       volume: vol,
       ease: Power0.easeOut,
       onComplete: () => {
@@ -38,25 +70,70 @@ export const audio = (sounds: Sounds): AudioLayer => {
     });
   };
 
-  const mainVolume = (): number => 0.5 * MUSIC_VOL_MULT;
-  const menuVolume = (): number => 0.65 * MUSIC_VOL_MULT;
+  const mainVolume = (): number => 1.0 * MUSIC_VOL_MULT;
+  const menuVolume = (): number => 0.5 * MUSIC_VOL_MULT;
 
   // Called when we've got all the things...
-  const mainTheme = (): void => {
-    //audio.stop('SomeOtherSound');
-    audio.play('MainTheme', { loop: true, volume: mainVolume() });
+  const stopAllThemes = (): void => {
+    audio.stop('MainTheme');
+    // audio.stop('Track2');
+  };
+  const mainTheme = (isPlay): void => {
+    stopAllThemes();
+    if (isPlay) audio.play('MainTheme', { loop: true, volume: mainVolume() });
+  };
+  const menuTheme = (isPlay): void => {
+    stopAllThemes();
+    if (isPlay) audio.play('MainTheme', { loop: true, volume: menuVolume() });
   };
 
-  const muteToggle = (shouldMute: boolean): void => {
-    if (shouldMute) {
+  const playNextTrack = (): void => {
+    currentTrack++;
+    if (currentTrack > trackList.length - 1) currentTrack = 0;
+    audio.play(trackList[currentTrack], {
+      loop: false,
+      volume: mainVolume(),
+      complete: () => {
+        playNextTrack();
+      },
+    });
+  };
+  const playTracklist = (): void => {
+    stopAllThemes();
+    currentTrack = -1;
+    playNextTrack();
+  };
+
+  const playRandomTrack = (): void => {
+    currentTrack = Math.floor(Math.random() * trackList.length) - 1;
+    stopAllThemes();
+    playNextTrack();
+  };
+
+  const muteToggle = (shouldMute?: boolean, isTemporary = false): void => {
+    if (shouldMute === undefined) {
+      isMuted = !isMuted;
+    } else {
+      isMuted = shouldMute;
+    }
+
+    if (isMuted) {
       audio.muteAll();
     } else {
       audio.unmuteAll();
     }
+
+    // Store muted state as long as it isn't a temporary change
+    !isTemporary &&
+      sendToLocalStorage(
+        `isMuted_${APP_NAME}_v${getAppVerShort()}`,
+        String(isMuted)
+      );
   };
 
   return {
-    music: { mainTheme },
+    music: { mainTheme, menuTheme, playTracklist, playRandomTrack },
     muteToggle,
+    getMutedState,
   };
 };

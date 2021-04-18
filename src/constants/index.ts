@@ -1,19 +1,10 @@
-// App
+// Barrel up constants from various files
+// Note that names must be unique
 
-// Ignoring this to suppress an error with __VERSION__ which will be rewritten with the version number on build.
-// @ts-ignore
-export const APP_VERSION = __VERSION__; // <- populated by rollup replace
-export const APP_NAME = 'dcollage-boilerplate';
-export const APP_HEIGHT = 300;
-export const APP_WIDTH = 400;
+// Default constants - boilerplate / demo
+export * from './default';
 
-// Layer Depths
-// MC = mainContainer
-export const Z_UI = 1;
-export const Z_BASE = 0;
+// Project constants --------------
 
-// Audio
-export const MUSIC_VOL_MULT = 0.5;
-export const SFX_VOL_MULT = 0.5;
-
-// Environment
+// Temporary constants from OBTS -  here while we port in features from OBTS to the boilerplate
+export * from './tempOBTS';

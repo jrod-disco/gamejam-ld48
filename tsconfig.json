@@ -5,16 +5,15 @@
     "esModuleInterop": true,
     "paths": {
       "@src/*": ["src/*"],
-      "mini-signals": [
-        "node_modules/resource-loader/typings/mini-signals.d.ts"
-      ]
+      "mini-signals": ["node_modules/resource-loader/typings/mini-signals.d.ts"]
     },
     "plugins": [
       {
         "transform": "@zerollup/ts-transform-paths",
         "exclude": ["*"]
       }
-    ]
+    ],
+    "allowSyntheticDefaultImports": true
   },
   "typedocOptions": {
     "mode": "modules",
