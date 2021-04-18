@@ -10,18 +10,17 @@ import initPIXI, { PixiConfig } from './pixi';
 import {
   APP_NAME,
   APP_VERSION,
+  DCO_VERSION,
   APP_HEIGHT,
   APP_WIDTH,
   APP_BGCOLOR,
   Z_MC_BASE,
   Z_MC_UI,
-  SFX_VOL_MULT,
 } from './constants';
 import './index.scss';
 
 import * as COMP from './components';
 import * as SCREENS from './screens';
-import { ScreenLayout } from './screens';
 import { Sounds } from './components/library/audio';
 
 declare global {
@@ -68,7 +67,7 @@ const bootstrapApp = (props: {
   jrvascii();
   console.log('Built with the dCollage boilerplate.');
   console.log(`Appplication Name: ${APP_NAME}`);
-  console.log(`Built with the dCollage boilerplate 3.0`);
+  console.log(`Built with the dCollage boilerplate ${DCO_VERSION}`);
   console.log(`Appplication Version: ${APP_VERSION}`);
   console.log('-------------------------------------------');
   // TODO Make distinction between APP_VERSION and DCO_VERSION (dCollage Boilerplate Version)
@@ -186,7 +185,7 @@ const bootstrapApp = (props: {
     // may want to wrap this in a conditional that assures that we should reset
     runtime.reset();
     runtime.start();
-    SCREENS.controller.onViewScreen('secondScreen');
+    SCREENS.controller.onViewScreen(SCREENS.ScreenName.SECOND);
     audioLayer.music.mainTheme();
   };
 
@@ -195,19 +194,19 @@ const bootstrapApp = (props: {
     onSampleButtonPress,
     spriteSheets,
   });
-  SCREENS.controller.addScreenToList('mainMenu', screenMainMenu);
+  SCREENS.controller.addScreenToList(SCREENS.ScreenName.MAIN, screenMainMenu);
 
   uiContainer.addChild(screenMainMenu.container);
 
   // Sample Screen Two - Second Screen
   const screenSecond = SCREENS.secondLayout({});
-  SCREENS.controller.addScreenToList('secondScreen', screenSecond);
+  SCREENS.controller.addScreenToList(SCREENS.ScreenName.SECOND, screenSecond);
 
   uiContainer.addChild(screenSecond.container);
 
   //Operator: Main Screen Turn On...onViewScreen(screenMainMenu);
   SCREENS.controller.setCurrentScreen({
-    name: 'mainMenu',
+    name: SCREENS.ScreenName.MAIN,
     isAnimated: true,
   });
 
@@ -248,7 +247,8 @@ const bootstrapApp = (props: {
 
     // Update this screen only when it is visible
     const currentScreen = SCREENS.controller.getCurrentScreen();
-    if (currentScreen.name === 'screenSecond') currentScreen.ref.update(delta);
+    if (currentScreen.name === SCREENS.ScreenName.SECOND)
+      currentScreen.ref.update(delta);
   });
 
   /**

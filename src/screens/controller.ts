@@ -1,5 +1,6 @@
-// TODO Defined Screen type - using any for now
-export type ScreenName = string;
+import { ScreenName } from '.';
+
+//export type Name = string;
 
 export type Screen = { name: ScreenName; ref: any };
 
@@ -97,10 +98,10 @@ const screenController = ({ initialScreen = null }: Props): SceenController => {
    *
    */
   const onBackFromScreen = (screen: string): void => {
-    setCurrentScreen(screenState.list['mainMenu']);
+    setCurrentScreen(screenState.list[ScreenName.SECOND]);
     //
     // fade in welcome text
-    screenState.list['mainMenu'].setVisibility({
+    screenState.list[ScreenName.MAIN].setVisibility({
       isVisible: true,
       isAnimated: true,
     });
