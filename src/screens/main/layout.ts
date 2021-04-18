@@ -38,10 +38,7 @@ export const mainMenuLayout = (props: Props): MainMenuLayout => {
   container.x = pos.x;
   container.y = pos.y;
 
-  const { 
-    spriteSheets, 
-    onSampleButtonPress 
-  } = props;
+  const { spriteSheets, onSampleButtonPress } = props;
 
   container.name = 'main menu layout';
   const name = (): string => 'MAIN';
@@ -49,7 +46,7 @@ export const mainMenuLayout = (props: Props): MainMenuLayout => {
   // Text
   const textStyle = new PIXI.TextStyle({
     fontFamily: 'Impact, Charcoal, sans-serif',
-    fontSize: 12,
+    fontSize: 32,
     fill: ['#ccc'],
     fillGradientType: 1,
     fillGradientStops: [0.35],
@@ -60,10 +57,10 @@ export const mainMenuLayout = (props: Props): MainMenuLayout => {
     align: 'center',
   });
 
-  const helloWorldText = new PIXI.Text('Hello from Main Screen.', textStyle);
+  const helloWorldText = new PIXI.Text('SIMPLE GAME!', textStyle);
   helloWorldText.anchor.set(0.5);
   helloWorldText.position.x = APP_WIDTH / 2;
-  helloWorldText.position.y = 20;
+  helloWorldText.position.y = 40;
   container.addChild(helloWorldText);
 
   // Interactive Elements --------

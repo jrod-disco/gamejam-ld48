@@ -127,7 +127,7 @@ const bootstrapApp = (props: {
     // Add music as a component
     audioLayer = COMP.LIB.audio(sounds);
     // Play a track
-    audioLayer.music.playRandomTrack();
+    //audioLayer.music.playRandomTrack();
   };
 
   //#region ** EXAMPLES OF COMPONENT USE **
@@ -137,46 +137,10 @@ const bootstrapApp = (props: {
   runtime = COMP.LIB.runtime({ pos: { x: 25, y: 25 } });
   uiContainer.addChild(runtime.container);
 
-  // An example of a component you've created - not from the prebuilt library components
-  // This component's index can be used as a template for new components
-  const sampleComponent = COMP.exampleComponent({
-    pos: { x: APP_WIDTH / 2, y: APP_HEIGHT - 50 },
+  const scoreDisplay = COMP.LIB.scoreDisplay({
+    pos: { x: APP_WIDTH - 100, y: 25 },
   });
-
-  mainContainer.addChild(sampleComponent.container);
-
-  // We can also add a preloaded (or not preloaded PNG) if we wanted to
-
-  // Usually we'll nest these in a component for more flexibility but it's an example
-
-  const backgroundTexture = PIXI.Texture.from(
-    './assets/example/background.png'
-  );
-  const backgroundSprite = new PIXI.Sprite(backgroundTexture);
-  baseContainer.addChild(backgroundSprite);
-
-  const texture = PIXI.Texture.from('./assets/example/example.png');
-  const sampleSprite = new PIXI.Sprite(texture);
-  sampleSprite.anchor.set(0.5);
-  sampleSprite.x = APP_WIDTH / 2;
-  sampleSprite.y = 50;
-  mainContainer.addChild(sampleSprite);
-
-  // We can even use Greensock to animate the resulting sprite
-  gsap.to(sampleSprite, 3, {
-    delay: 1,
-    pixi: {
-      scale: 0.5,
-      angle: 360,
-    },
-    ease: Power0.easeOut,
-    onComplete: () => {
-      // tweens have callbacks too!
-      console.log('tween completed. welcome to pixi with gsap');
-    },
-  });
-
-  //#endregion ** EXAMPLES OF COMPONENT USE **
+  uiContainer.addChild(scoreDisplay.container);
 
   // Screens UI -----------------------------------------
 
@@ -185,7 +149,7 @@ const bootstrapApp = (props: {
     // may want to wrap this in a conditional that assures that we should reset
     runtime.reset();
     runtime.start();
-    SCREENS.controller.onViewScreen(SCREENS.ScreenName.SECOND);
+    SCREENS.controller.onViewScreen(SCREENS.ScreenName.GAME);
     audioLayer.music.mainTheme();
   };
 
@@ -199,10 +163,10 @@ const bootstrapApp = (props: {
   uiContainer.addChild(screenMainMenu.container);
 
   // Sample Screen Two - Second Screen
-  const screenSecond = SCREENS.secondLayout({});
-  SCREENS.controller.addScreenToList(SCREENS.ScreenName.SECOND, screenSecond);
+  const screenGame = SCREENS.gameLayout({});
+  SCREENS.controller.addScreenToList(SCREENS.ScreenName.GAME, screenGame);
 
-  uiContainer.addChild(screenSecond.container);
+  uiContainer.addChild(screenGame.container);
 
   //Operator: Main Screen Turn On...onViewScreen(screenMainMenu);
   SCREENS.controller.setCurrentScreen({
@@ -247,7 +211,7 @@ const bootstrapApp = (props: {
 
     // Update this screen only when it is visible
     const currentScreen = SCREENS.controller.getCurrentScreen();
-    if (currentScreen.name === SCREENS.ScreenName.SECOND)
+    if (currentScreen.name === SCREENS.ScreenName.GAME)
       currentScreen.ref.update(delta);
   });
 

@@ -43,17 +43,31 @@ export const scoreDisplay = (props: Props): ScoreDisplay => {
   const initialState = { ...state };
 
   // Text
+
+  const titleText = new PIXI.BitmapText('SCORE', {
+    fontName: `FFFFuego-16`,
+    fontSize: 16,
+    align: 'right',
+  });
+  titleText.anchor.set(0, 0);
+  titleText.tint = THEME.TXT_TITLES_HEX;
+  titleText.alpha = 0.8;
+
+  container.addChild(titleText);
+
   const scoreString = (): string => {
     return zeroPad(state.currentScore, 7);
   };
 
   const scoreText = new PIXI.BitmapText(scoreString(), {
-    fontName: `Atari-32`,
-    fontSize: 32,
-    align: 'center',
+    fontName: `FFFFuego-16-bold`,
+    fontSize: 16,
+    align: 'right',
   });
   scoreText.tint = THEME.TXT_HUD_HEX;
-  scoreText.anchor.set(0.5, 0);
+  scoreText.anchor.set(0, 0);
+  scoreText.position.y += 20;
+  scoreText.position.x -= 37;
 
   container.addChild(scoreText);
 

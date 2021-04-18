@@ -9,7 +9,7 @@ export type VisibilityConfig = {
   isAnimated: boolean;
   onCompleteCallback?: () => void;
 };
-export interface SecondLayout {
+export interface GameLayout {
   container: PIXI.Container;
   reset: () => void;
   update: (delta: number) => void;
@@ -28,13 +28,13 @@ interface Props {
  *
  * @returns Interface object containing methods that can be called on this module
  */
-export const secondLayout = (props: Props): SecondLayout => {
+export const gameLayout = (props: Props): GameLayout => {
   const pos = props.pos ?? { x: 0, y: 0 };
   const container = new PIXI.Container();
   container.x = pos.x;
   container.y = pos.y;
 
-  container.name = 'second layout';
+  container.name = 'game screen layout';
 
   const reset = (): void => {
     container.removeChildren();
@@ -48,14 +48,14 @@ export const secondLayout = (props: Props): SecondLayout => {
     fillGradientType: 1,
     fillGradientStops: [0.35],
     dropShadow: true,
-    dropShadowColor: '#fda04f',
+    dropShadowColor: '#000000',
     dropShadowBlur: 10,
     dropShadowDistance: 0,
     align: 'center',
   });
 
   const helloWorldText = new PIXI.Text(
-    'Hello World, from Second Screen.',
+    'CLICK ON THE THINGS TO SCORE POINTS.',
     textStyle
   );
   helloWorldText.anchor.set(0.5);
