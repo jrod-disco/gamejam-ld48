@@ -53,7 +53,7 @@ export const scoreDisplay = (props: Props): ScoreDisplay => {
     align: 'center',
   });
   scoreText.tint = THEME.TXT_HUD_HEX;
-  scoreText.anchor = new PIXI.ObservablePoint(null, null, 0.5, 0);
+  scoreText.anchor.set(0.5, 0);
 
   container.addChild(scoreText);
 

@@ -47,7 +47,7 @@ export const bestScoreDisplay = (props: BestScoreProps): BestScoreDisplay => {
     fontSize: 16,
     align: 'center',
   });
-  pbText.anchor = new PIXI.ObservablePoint(null, null, 0.5, 0);
+  pbText.anchor.set(0.5, 0);
   pbText.alpha = 0.8;
   pbText.tint = THEME.TXT_TITLES_HEX;
   container.addChild(pbText);
@@ -57,7 +57,7 @@ export const bestScoreDisplay = (props: BestScoreProps): BestScoreDisplay => {
     fontSize: 16,
     align: 'center',
   });
-  scoreText.anchor = new PIXI.ObservablePoint(null, null, 0.5, 0);
+  scoreText.anchor.set(0.5, 0);
   scoreText.tint = THEME.TXT_HUD_HEX;
   scoreText.y = 20;
   container.addChild(scoreText);
