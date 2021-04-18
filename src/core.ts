@@ -189,7 +189,7 @@ const bootstrapApp = (props: {
 
   uiContainer.addChild(screenGame.container);
 
-  //Operator: Main Screen Turn On...onViewScreen(screenMainMenu);
+  // Set main screen
   SCREENS.controller.setCurrentScreen({
     name: SCREENS.ScreenName.MAIN,
     isAnimated: true,
