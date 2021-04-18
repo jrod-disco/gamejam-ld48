@@ -16,6 +16,7 @@ import {
   APP_BGCOLOR,
   Z_MC_BASE,
   Z_MC_UI,
+  SFX_VOL_MULT,
 } from './constants';
 import './index.scss';
 
@@ -151,11 +152,11 @@ const bootstrapApp = (props: {
   });
   uiContainer.addChild(scoreDisplay.container);
 
-  // Screens UI -----------------------------------------
-
-  // Callback for Sample "Play Again" Button
-  const onSampleButtonPress = (): void => {
-    // may want to wrap this in a conditional that assures that we should reset
+  // Start Game
+  const startGame = (): void => {
+    pixiSound.play('good', {
+      volume: 1 * SFX_VOL_MULT,
+    });
     runtime.reset();
     SCREENS.controller.setCurrentScreen({
       name: SCREENS.ScreenName.GAME,
@@ -168,9 +169,14 @@ const bootstrapApp = (props: {
     audioLayer.music.mainTheme();
   };
 
+  // Screens UI -----------------------------------------
+
+  // Callback for Sample "Play Again" Button
+  const onPlayButtonPress = (): void => startGame();
+
   // Sample Screen One - Main Screen'
   const screenMainMenu = SCREENS.mainMenuLayout({
-    onSampleButtonPress,
+    onPlayButtonPress,
     spriteSheets,
   });
   SCREENS.controller.addScreenToList(SCREENS.ScreenName.MAIN, screenMainMenu);
@@ -193,6 +199,32 @@ const bootstrapApp = (props: {
   const onAudioCycleOptions = (): void => {
     audioLayer.muteToggle();
   };
+
+  // Keyboard Listener for Main
+  const onKeyDownMain = (event: KeyboardEvent): void => {
+    // check for special keys
+    switch (event.code) {
+      case 'Backquote': // toggle audio
+        onAudioCycleOptions();
+        break;
+      case 'Space': // Start
+      case 'Enter': // Start
+        screenMainMenu.showPressedButton();
+        startGame();
+        break;
+    }
+
+    console.log(event.code);
+  };
+
+  const addOnKeyDownMain = (): void => {
+    window.addEventListener('keydown', onKeyDownMain);
+  };
+  const removeOnKeyDownMain = (): void =>
+    window.removeEventListener('keydown', onKeyDownMain);
+
+  // Initially start listening for keyboard events
+  addOnKeyDownMain();
 
   /**
    * This does a second round of initialization once additional assets (spritesheets)

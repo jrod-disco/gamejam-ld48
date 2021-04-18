@@ -19,12 +19,13 @@ export interface MainMenuLayout {
   container: PIXI.Container;
   setVisibility: (config: VisibilityConfig) => void;
   name: () => string;
+  showPressedButton: () => void;
 }
 
 interface Props {
   pos?: { x: number; y: number };
   spriteSheets?: Spritesheets;
-  onSampleButtonPress: () => void;
+  onPlayButtonPress: () => void;
 }
 
 /**
@@ -44,7 +45,7 @@ export const mainMenuLayout = (props: Props): MainMenuLayout => {
   container.x = pos.x;
   container.y = pos.y;
 
-  const { spriteSheets, onSampleButtonPress } = props;
+  const { spriteSheets, onPlayButtonPress } = props;
 
   container.name = 'main menu layout';
   const name = (): string => 'MAIN';
@@ -67,9 +68,6 @@ export const mainMenuLayout = (props: Props): MainMenuLayout => {
 
   // Interactive Elements --------
 
-  // Instance of the sound library (can play any preloaded sound)
-  const pixiSound = PIXISOUND.default;
-
   // Start Button
   const buttonStartTexture = PIXI.Texture.from(
     './assets/buttons/startbutton.png'
@@ -77,15 +75,17 @@ export const mainMenuLayout = (props: Props): MainMenuLayout => {
   const buttonStartTexturePressed = PIXI.Texture.from(
     './assets/buttons/startbutton_pressed.png'
   );
+
+  const showPressedButton = (): void => {
+    buttonStart.setTexture(buttonStartTexturePressed);
+  };
+
   const buttonStart = COMP.LIB.btnSimple({
     pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2 },
     buttonTexture: buttonStartTexture,
     onPress: () => {
-      buttonStart.setTexture(buttonStartTexturePressed);
-      pixiSound.play('good', {
-        volume: 1 * SFX_VOL_MULT,
-      });
-      onSampleButtonPress();
+      showPressedButton();
+      onPlayButtonPress();
     },
   });
   container.addChild(buttonStart.container);
@@ -130,5 +130,6 @@ export const mainMenuLayout = (props: Props): MainMenuLayout => {
     container,
     name,
     setVisibility,
+    showPressedButton,
   };
 };
