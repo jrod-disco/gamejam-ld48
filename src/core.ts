@@ -202,7 +202,7 @@ const bootstrapApp = (props: {
 
   // Keyboard Listener for Main
   const onKeyDownMain = (event: KeyboardEvent): void => {
-    // check for special keys
+    // Using current event.code now that .keycode is deprecated
     switch (event.code) {
       case 'Backquote': // toggle audio
         onAudioCycleOptions();
