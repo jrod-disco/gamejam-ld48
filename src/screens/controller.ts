@@ -98,7 +98,7 @@ const screenController = ({ initialScreen = null }: Props): SceenController => {
    *
    */
   const onBackFromScreen = (screen: string): void => {
-    setCurrentScreen(screenState.list[ScreenName.SECOND]);
+    setCurrentScreen(screenState.pr);
     //
     // fade in welcome text
     screenState.list[ScreenName.MAIN].setVisibility({

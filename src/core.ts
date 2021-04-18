@@ -2,10 +2,11 @@ import * as PIXI from 'pixi.js';
 import gsap, { Power0 } from 'gsap';
 import PixiPlugin from 'gsap/PixiPlugin';
 import * as PIXISOUND from 'pixi-sound';
-import jrvascii from '../lib/dcollage/src/util/jrvascii';
-import { browserVisibility } from './util/browserVisibility';
+import jrvascii from '@dcollage/util/jrvascii';
+import { Sounds } from '@dcollage/components/library/audio';
+import { browserVisibility } from '@dcollage/util/browserVisibility';
 
-import initPIXI, { PixiConfig } from './pixi';
+import initPIXI, { PixiConfig } from '@dcollage/pixi';
 
 import {
   APP_NAME,
@@ -21,7 +22,6 @@ import './index.scss';
 
 import * as COMP from './components';
 import * as SCREENS from './screens';
-import { Sounds } from './components/library/audio';
 
 declare global {
   interface Window {

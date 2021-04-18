@@ -5,6 +5,7 @@
     "esModuleInterop": true,
     "paths": {
       "@src/*": ["src/*"],
+      "@dcollage/*": ["lib/dcollage/src/*"],
       "mini-signals": ["node_modules/resource-loader/typings/mini-signals.d.ts"]
     },
     "plugins": [

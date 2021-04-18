@@ -9,7 +9,7 @@
  */
 
 // Screen Controller
-export { controller } from './controller';
+export { controller } from '@dcollage/screens/controller';
 
 // Example Screen One
 export { mainMenuLayout, MainMenuLayout } from './main/layout';

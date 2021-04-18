@@ -3,7 +3,7 @@
  */
 
 // Prebuilt Components Library
-export * as LIB from './library';
+export * as LIB from '@dcollage/components/library';
 
 // Your Components
 export { exampleComponent } from './exampleComponent';
