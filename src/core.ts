@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js';
 import gsap, { Power0 } from 'gsap';
 import PixiPlugin from 'gsap/PixiPlugin';
 import * as PIXISOUND from 'pixi-sound';
-import jrvascii from './util/jrvascii';
+import jrvascii from '../lib/dcollage/src/util/jrvascii';
 import { browserVisibility } from './util/browserVisibility';
 
 import initPIXI, { PixiConfig } from './pixi';
