@@ -195,7 +195,7 @@ const bootstrapApp = (props: {
     isAnimated: true,
   });
 
-  // Audio Option Cycle
+  // Audio Option Cycle (just a toggle)
   const onAudioCycleOptions = (): void => {
     audioLayer.muteToggle();
   };
