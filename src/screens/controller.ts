@@ -1,4 +1,4 @@
-import { ScreenName } from '.';
+type ScreenName = string;
 
 //export type Name = string;
 
@@ -30,12 +30,15 @@ const screenController = ({ initialScreen = null }: Props): SceenController => {
   const screenState = {
     list: {},
     currentScreen: initialScreen,
+    prevScreen: initialScreen,
   };
 
   const setCurrentScreen = ({ name, isAnimated }): ScreenName => {
-    const prevScreen = screenState.currentScreen;
+    screenState.prevScreen = screenState.currentScreen;
     screenState.currentScreen = screenState.list[name];
-    console.log(`screen transition from ${prevScreen || 'BOOT'} to ${name}`);
+    console.log(
+      `screen transition from ${screenState.prevScreen || 'BOOT'} to ${name}`
+    );
 
     screenState.list[name]?.setVisibility({
       isVisible: true,
@@ -45,7 +48,7 @@ const screenController = ({ initialScreen = null }: Props): SceenController => {
       },
     });
 
-    screenState.list[prevScreen]?.setVisibility({
+    screenState.list[screenState.prevScreen]?.setVisibility({
       isVisible: false,
       isAnimated: true,
       onCompleteCallback: () => {
@@ -53,7 +56,7 @@ const screenController = ({ initialScreen = null }: Props): SceenController => {
       },
     });
 
-    return prevScreen;
+    return screenState.prevScreen;
   };
 
   const getScreen = (screen: ScreenName): Screen => {
@@ -98,15 +101,15 @@ const screenController = ({ initialScreen = null }: Props): SceenController => {
    *
    */
   const onBackFromScreen = (screen: string): void => {
-    setCurrentScreen(screenState.list[ScreenName.SECOND]);
+    setCurrentScreen(screenState.list[screenState.prevScreen]);
     //
-    // fade in welcome text
-    screenState.list[ScreenName.MAIN].setVisibility({
+    // fade in current screen
+    screenState.list[screen].setVisibility({
       isVisible: true,
       isAnimated: true,
     });
-    // fade out leaderboards
-    screenState.list[screen].setVisibility({
+    // fade out previous screen
+    screenState.list[screenState.prevScreen].setVisibility({
       isVisible: false,
       isAnimated: true,
     });
