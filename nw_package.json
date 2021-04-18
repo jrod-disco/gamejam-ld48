@@ -1,0 +1,46 @@
+{
+  "main": "index.html",
+  "name": "EXAMPLE",
+  "description": "Example of a NWJS wrapper package.",
+  "version": "0.1.0",
+  "chromium-args": "--mixed-context --disable-raf-throttling",
+  "window": {
+    "title": "EXAMPLE (Pulled from One-bit Type Shooter)",
+    "icon": "res/icon/icon.png",
+    "toolbar": false,
+    "frame": true,
+    "resizable": false,
+    "position": "center",
+    "no-edit-menu": true,
+    "width": 1050,
+    "height": 800
+  },
+  "build": {
+    "output": "../dist-nwjs/",
+    "appId": "com.jrvisuals.example",
+    "nwVersion": "0.47.3",
+    "packed": true,
+    "targets": ["zip", "nsis7z"],
+    "strippedProperties": ["build"],
+    "outputPattern": "${NAME} ${VERSION} ${PLATFORM} ${ARCH}",
+    "win": {
+      "productName": "EXAMPLE",
+      "companyName": "JRVisuals LLC",
+      "copyright": "Copyright 2020, JRVisuals LLC, All Rights Reserved.",
+      "icon": "./assets/icon/example.ico"
+    },
+    "mac": {
+      "displayName": "EXAMPLE",
+      "copyright": "Copyright 2020, JRVisuals LLC, All Rights Reserved.",
+      "icon": "./assets/icon/example.icns",
+      "plistStrings": {
+        "CFBundleIdentifier": "com.jrvisuals.example",
+        "CFBundleDocumentTypes": []
+      }
+    },
+    "nsis": {
+      "installDirectory": "$PROGRAMFILES\\${_COMPANYNAME}\\${_APPNAME}",
+      "diffUpdaters": true
+    }
+  }
+}
