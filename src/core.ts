@@ -181,88 +181,33 @@ const bootstrapApp = (props: {
 
   // Screens UI -----------------------------------------
 
-  // Screens
-  let screenMainMenu = null;
-  let screenSecond = null;
-
-  // Screen State
-  const screenState = {
-    currentScreen: screenMainMenu,
-  };
-
-  // TODO: Going to need a screen manager - move this all to a /screens/index.ts file
-  const setCurrentScreen = (
-    screen: ScreenLayout | { name: 'GAME' }
-  ): ScreenLayout | { name: 'GAME' } => {
-    const prevScreen = screenState.currentScreen;
-    screenState.currentScreen = screen;
-    // console.log(`from ${prevScreen} to ${screen}`);
-    return prevScreen;
-  };
-
-  /**
-   * Called by any button which switches screens
-   * Usage: `onViewScreen(screenCredits);`
-   *
-   */
-  const onViewScreen = (screen: ScreenLayout): void => {
-    setCurrentScreen(screen);
-    //
-    // fade out welcome text
-    screenMainMenu.setVisibility({
-      isVisible: false,
-      isAnimated: true,
-    });
-    // fade in help
-    screen.setVisibility({
-      isVisible: true,
-      isAnimated: true,
-    });
-  };
-
-  /**
-   * Called by back button
-   * Usage: `onBackFromScreen(screenState.currentScreen);`
-   *
-   */
-  const onBackFromScreen = (screen: ScreenLayout): void => {
-    setCurrentScreen(screenMainMenu);
-    //
-    // fade in welcome text
-    screenMainMenu.setVisibility({
-      isVisible: true,
-      isAnimated: true,
-    });
-    // fade out leaderboards
-    screen.setVisibility({
-      isVisible: false,
-      isAnimated: true,
-    });
-  };
-
   // Callback for Sample "Play Again" Button
   const onSampleButtonPress = (): void => {
     // may want to wrap this in a conditional that assures that we should reset
     runtime.reset();
     runtime.start();
-    onViewScreen(screenSecond);
+    SCREENS.controller.onViewScreen('secondScreen');
     audioLayer.music.mainTheme();
   };
 
-  // Sample Screen One - Main Screen
-  screenMainMenu = SCREENS.mainMenuLayout({
+  // Sample Screen One - Main Screen'
+  const screenMainMenu = SCREENS.mainMenuLayout({
     onSampleButtonPress,
     spriteSheets,
   });
+  SCREENS.controller.addScreenToList('mainMenu', screenMainMenu);
+
   uiContainer.addChild(screenMainMenu.container);
 
   // Sample Screen Two - Second Screen
-  screenSecond = SCREENS.secondLayout({});
+  const screenSecond = SCREENS.secondLayout({});
+  SCREENS.controller.addScreenToList('secondScreen', screenSecond);
+
   uiContainer.addChild(screenSecond.container);
 
   //Operator: Main Screen Turn On...onViewScreen(screenMainMenu);
   SCREENS.controller.setCurrentScreen({
-    screen: screenMainMenu,
+    name: 'mainMenu',
     isAnimated: true,
   });
 
@@ -302,8 +247,8 @@ const bootstrapApp = (props: {
     runtime.update(delta);
 
     // Update this screen only when it is visible
-    if (SCREENS.controller.getCurrentScreen() === screenSecond)
-      screenSecond.update(delta);
+    const currentScreen = SCREENS.controller.getCurrentScreen();
+    if (currentScreen.name === 'screenSecond') currentScreen.ref.update(delta);
   });
 
   /**
