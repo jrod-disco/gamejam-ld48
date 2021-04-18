@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
 import gsap, { Power0 } from 'gsap';
-import { APP_HEIGHT, APP_WIDTH } from '@src/constants';
+import { APP_HEIGHT, APP_WIDTH, TEXT_STYLE } from '@src/constants';
 
 export type ScoreDataObject = { name: string; score: number };
 
@@ -41,37 +41,15 @@ export const gameLayout = (props: Props): GameLayout => {
   };
 
   // Text
-  const textStyle = new PIXI.TextStyle({
-    fontFamily: 'Impact, Charcoal, sans-serif',
-    fontSize: 14,
-    fill: ['#24506a', '#211e3c'],
-    fillGradientType: 1,
-    fillGradientStops: [0.35],
-    dropShadow: true,
-    dropShadowColor: '#000000',
-    dropShadowBlur: 10,
-    dropShadowDistance: 0,
-    align: 'center',
-  });
 
-  const helloWorldText = new PIXI.Text(
+  const promptText = new PIXI.Text(
     'CLICK ON THE THINGS TO SCORE POINTS.',
-    textStyle
+    TEXT_STYLE.GRADIENT_PROMPT
   );
-  helloWorldText.anchor.set(0.5);
-  helloWorldText.position.x = APP_WIDTH / 2;
-  helloWorldText.position.y = APP_HEIGHT - 20;
-  container.addChild(helloWorldText);
-
-  // Graphic Drawing Elements --------
-  const graphicsElement = new PIXI.Graphics();
-  graphicsElement.beginFill(0x79354a);
-  graphicsElement.lineStyle(2, 0xfda04f);
-  graphicsElement.drawRect(APP_WIDTH - 50, 50, 25, 100);
-  // Add it to container
-  container.addChild(graphicsElement);
-  // You can still draw on it
-  graphicsElement.drawCircle(50, 100, 25);
+  promptText.anchor.set(0.5);
+  promptText.position.x = APP_WIDTH / 2;
+  promptText.position.y = APP_HEIGHT - 20;
+  container.addChild(promptText);
 
   // Interactive Elements --------
 
@@ -104,8 +82,7 @@ export const gameLayout = (props: Props): GameLayout => {
   });
 
   const update = (delta: number): void => {
-    graphicsElement.x += 5 * delta; // throttle by delta
-    if (graphicsElement.x > APP_WIDTH) graphicsElement.x = APP_WIDTH * -1;
+    // graphicsElement.x += 5 * delta; // throttle by delta
   };
 
   return { container, update, reset, setVisibility };

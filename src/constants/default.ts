@@ -1,4 +1,8 @@
-// App
+import { _THEMES } from './themes';
+
+// Theming
+// Note Colors are handled in theme.ts
+export const THEME = _THEMES.SOLARIZED;
 
 // Ignoring this to suppress an error with __VERSION__ which will be rewritten with the version number on build.
 // @ts-ignore
@@ -8,7 +12,7 @@ export const DCO_VERSION = __DCOVERSION__; // <- populated by rollup replace
 export const APP_NAME = 'dcollage-boilerplate';
 export const APP_HEIGHT = 600;
 export const APP_WIDTH = 600;
-export const APP_BGCOLOR = 0x555555;
+export const APP_BGCOLOR = THEME.BG_HEX;
 
 // Layer Depths
 // MC = mainContainer

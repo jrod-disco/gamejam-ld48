@@ -4,6 +4,9 @@
 // Default constants - boilerplate / demo
 export * from './default';
 
+// Text Styles
+export * from './textStyles';
+
 // Project constants --------------
 
 // Temporary constants from OBTS -  here while we port in features from OBTS to the boilerplate

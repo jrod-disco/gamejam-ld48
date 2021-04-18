@@ -67,7 +67,7 @@ export const btnSimple = (props: ButtonProps): Button => {
     gsap.killTweensOf(container);
     if (isEnabled) {
       container.alpha = 0;
-      container.y = pos.y + 10;
+      //container.y = pos.y + 10;
       myTween = gsap.to(container, {
         duration: 0.25,
         delay: 0.25,
@@ -84,7 +84,7 @@ export const btnSimple = (props: ButtonProps): Button => {
       myTween = gsap.to(container, {
         duration: 0.2,
         alpha: 0,
-        y: pos.y + 10,
+        // y: pos.y + 10,
         ease: Power0.easeIn,
         onComplete: () => {
           sprite.interactive = false;

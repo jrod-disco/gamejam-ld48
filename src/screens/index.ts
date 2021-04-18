@@ -8,9 +8,6 @@
  * and maybe an index.ts to serve as the controller
  */
 
-// Screen Controller
-export { controller } from './controller';
-
 // Example Screen One
 export { mainMenuLayout, MainMenuLayout } from './main/layout';
 
@@ -27,3 +24,7 @@ export enum ScreenName {
   MAIN = 'mainMenu',
   GAME = 'gameScreen',
 }
+
+// Screen Controller
+import { screenController } from './controller';
+export const controller = screenController({});

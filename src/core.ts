@@ -149,7 +149,10 @@ const bootstrapApp = (props: {
     // may want to wrap this in a conditional that assures that we should reset
     runtime.reset();
     runtime.start();
-    SCREENS.controller.onViewScreen(SCREENS.ScreenName.GAME);
+    SCREENS.controller.setCurrentScreen({
+      name: SCREENS.ScreenName.GAME,
+      isAnimated: true,
+    });
     audioLayer.music.mainTheme();
   };
 
@@ -209,7 +212,7 @@ const bootstrapApp = (props: {
     // Individual components
     runtime.update(delta);
 
-    // Update this screen only when it is visible
+    // Update game screen only when it is visible
     const currentScreen = SCREENS.controller.getCurrentScreen();
     if (currentScreen.name === SCREENS.ScreenName.GAME)
       currentScreen.ref.update(delta);
