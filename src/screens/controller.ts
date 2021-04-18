@@ -4,8 +4,14 @@ type ScreenName = string;
 
 export type Screen = { name: ScreenName; ref: any };
 
+export type SetScreenProps = {
+  name: string;
+  isAnimated: boolean;
+  onComplete?: () => void;
+};
 export interface SceenController {
-  setCurrentScreen: ({ name: ScreenName, isAnimated: boolean }) => ScreenName;
+  setCurrentScreen: (props: SetScreenProps) => ScreenName;
+
   getCurrentScreen: () => Screen;
   addScreenToList: (name: ScreenName, ref: any) => void;
   onViewScreen: (name: ScreenName) => void;
@@ -37,7 +43,13 @@ export const screenController = ({
    *
    * @returns the name of the previous screen
    */
-  const setCurrentScreen = ({ name, isAnimated }): ScreenName => {
+  const setCurrentScreen = (props: SetScreenProps): ScreenName => {
+    const { name, isAnimated } = props;
+    const onComplete = props.onComplete
+      ? props.onComplete
+      : (): void => {
+          /* noop */
+        };
     screenState.prevScreen = screenState.currentScreen;
     screenState.currentScreen = name;
     console.log(
@@ -49,6 +61,7 @@ export const screenController = ({
       isAnimated: true,
       onCompleteCallback: () => {
         // callback for when screen fade on is complete
+        onComplete();
       },
     });
 
@@ -57,6 +70,7 @@ export const screenController = ({
       isAnimated: true,
       onCompleteCallback: () => {
         // callback for when screen fade on is complete
+        onComplete();
       },
     });
 

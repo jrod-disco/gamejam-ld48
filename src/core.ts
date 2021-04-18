@@ -134,7 +134,16 @@ const bootstrapApp = (props: {
   // You may want to strip this all out and do it within other use case specific modules
 
   // Run Time is a simple clock that runs up
-  runtime = COMP.LIB.runtime({ pos: { x: 25, y: 25 } });
+  runtime = COMP.LIB.runtime({
+    pos: { x: 25, y: 25 },
+    timeOverCallback: () => {
+      console.log('TIME RAN OUT!! DO SOMETHING!!');
+      SCREENS.controller.setCurrentScreen({
+        name: SCREENS.ScreenName.MAIN,
+        isAnimated: true,
+      });
+    },
+  });
   uiContainer.addChild(runtime.container);
 
   const scoreDisplay = COMP.LIB.scoreDisplay({
@@ -148,10 +157,13 @@ const bootstrapApp = (props: {
   const onSampleButtonPress = (): void => {
     // may want to wrap this in a conditional that assures that we should reset
     runtime.reset();
-    runtime.start();
     SCREENS.controller.setCurrentScreen({
       name: SCREENS.ScreenName.GAME,
       isAnimated: true,
+      onComplete: () => {
+        // Defer starting the timer until the fade is complete
+        runtime.start();
+      },
     });
     audioLayer.music.mainTheme();
   };

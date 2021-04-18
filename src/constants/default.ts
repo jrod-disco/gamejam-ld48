@@ -24,4 +24,4 @@ export const MUSIC_VOL_MULT = 0.5;
 export const SFX_VOL_MULT = 0.5;
 
 // Environment
-export const TIME_LIMIT_SECONDS = 120;
+export const TIME_LIMIT_SECONDS = 10;

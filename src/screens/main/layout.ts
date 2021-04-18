@@ -115,6 +115,9 @@ export const mainMenuLayout = (props: Props): MainMenuLayout => {
 
     // automaticaly enable or disable the button, this functionality comes from the simple button component
     buttonStart.setEnabled(isVisible);
+
+    // since we're using textures for button state, set it back to up when visible
+    if (isVisible) buttonStart.setTexture(buttonStartTexture);
   };
 
   // Default to hidden
