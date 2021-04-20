@@ -79,9 +79,35 @@ const bootstrapApp = (props: {
 
   const { pixiApp, mainContainer } = initPIXI(pixiConfig, hostDiv);
 
+  // Get our preloader assets
+  let { spriteSheets } = props;
+  let sounds = props?.sounds;
+  let audioLayer = null;
+
+  // Declare component variables in advance when needed
+  let runtime = null;
+
   // Hide Loader GIF
   document.getElementById('loading').style.display = 'none';
   document.getElementById('footer').style.display = 'block';
+
+  /**
+   * This does a second round of initialization once additional assets (spritesheets)
+   * have been loaded up - prior to this call some modules will be null as placeholders
+   * This can be used to pass secondary loaded assets to modules and set their spritesheet referecnes
+   */
+  const initSecondaryModules = (): void => {
+    console.log('initSecondaryModules', spriteSheets);
+  };
+
+  /**
+   * Brings in the secondary load set of sprites
+   * will also need to trigger any module initializations that require these sprites
+   */
+  const setAdditionalSprites = (secondarySprites): void => {
+    spriteSheets = { ...spriteSheets, ...secondarySprites };
+    initSecondaryModules();
+  };
 
   // Check for query params
   //const params = new URLSearchParams(window.location.search);
@@ -105,11 +131,6 @@ const bootstrapApp = (props: {
   // Load these up on startup...
   pixiSound.add('good', './assets/example/good.mp3');
 
-  // Get our preloader assets
-  let { spriteSheets } = props;
-  let sounds = props?.sounds;
-  let audioLayer = null;
-
   // Create empty BASE and UI containers and add them to the mainContainer
   // Use constants for Z-index of these containers
   const baseContainer = mainContainer.addChildAt(
@@ -119,9 +140,6 @@ const bootstrapApp = (props: {
   const uiContainer = mainContainer.addChildAt(new PIXI.Container(), Z_MC_UI);
   baseContainer.name = 'gameContainer';
   uiContainer.name = 'uiContainer';
-
-  // Declare component variables in advance when needed
-  let runtime = null;
 
   const setSounds = (soundsLoaded: Sounds): void => {
     sounds = soundsLoaded;
@@ -158,6 +176,7 @@ const bootstrapApp = (props: {
       volume: 1 * SFX_VOL_MULT,
     });
     runtime.reset();
+    player.reset();
     SCREENS.controller.setCurrentScreen({
       name: SCREENS.ScreenName.GAME,
       isAnimated: true,
@@ -200,8 +219,24 @@ const bootstrapApp = (props: {
     audioLayer.muteToggle();
   };
 
-  // Keyboard Listener for Main
-  const onKeyDownMain = (event: KeyboardEvent): void => {
+  // Simple Player Component
+  const playerTexture = PIXI.Texture.from('./assets/example/whitebox.png');
+  const player = COMP.playerCharacter({
+    pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2 },
+    textures: { playerTexture },
+  });
+  screenGame.container.addChild(player.container);
+
+  // Keyboard Listener
+  const keysDown = {};
+  const onKeyUp = (event: KeyboardEvent): void => {
+    // Store the fact that this key is up
+    keysDown[event.code] = 0;
+  };
+  const onKeyDown = (event: KeyboardEvent): void => {
+    // Store the fact that this key is down
+    keysDown[event.code] = 1;
+
     // Using current event.code now that .keycode is deprecated
     switch (event.code) {
       case 'Backquote': // toggle audio
@@ -213,36 +248,38 @@ const bootstrapApp = (props: {
         startGame();
         break;
     }
-
-    console.log(event.code);
+    //console.log(event.code);
   };
 
-  const addOnKeyDownMain = (): void => {
-    window.addEventListener('keydown', onKeyDownMain);
+  const checkDownKeys = (keysDown): void => {
+    // If nothing is held, stop and bail
+    // console.log('no press', Object.values(keysDown));
+    if (Object.values(keysDown).indexOf(1) === -1) {
+      player.moveStop();
+      return;
+    }
+    // Single cardinal directions
+    keysDown['KeyW'] && player.moveUp();
+    keysDown['KeyS'] && player.moveDown();
+    keysDown['KeyA'] && player.moveLeft();
+    keysDown['KeyD'] && player.moveRight();
   };
-  const removeOnKeyDownMain = (): void =>
-    window.removeEventListener('keydown', onKeyDownMain);
+
+  const addOnKeyUp = (): void => {
+    window.addEventListener('keyup', onKeyUp);
+  };
+  const removeOnKeyUp = (): void =>
+    window.removeEventListener('keyup', onKeyUp);
+
+  const addOnKeyDown = (): void => {
+    window.addEventListener('keydown', onKeyDown);
+  };
+  const removeOnKeyDown = (): void =>
+    window.removeEventListener('keydown', onKeyDown);
 
   // Initially start listening for keyboard events
-  addOnKeyDownMain();
-
-  /**
-   * This does a second round of initialization once additional assets (spritesheets)
-   * have been loaded up - prior to this call some modules will be null as placeholders
-   * This can be used to pass secondary loaded assets to modules and set their spritesheet referecnes
-   */
-  const initSecondaryModules = (): void => {
-    console.log('initSecondaryModules', spriteSheets);
-  };
-
-  /**
-   * Brings in the secondary load set of sprites
-   * will also need to trigger any module initializations that require these sprites
-   */
-  const setAdditionalSprites = (secondarySprites): void => {
-    spriteSheets = { ...spriteSheets, ...secondarySprites };
-    initSecondaryModules();
-  };
+  addOnKeyUp();
+  addOnKeyDown();
 
   // ------------------------------------
   // Register component UPDATE routines
@@ -253,13 +290,19 @@ const bootstrapApp = (props: {
   pixiApp.ticker.add((delta) => {
     // Update All The Things
 
-    // Individual components
-    runtime.update(delta);
+    // Individual components -------------
 
     // Update game screen only when it is visible
     const currentScreen = SCREENS.controller.getCurrentScreen();
-    if (currentScreen.name === SCREENS.ScreenName.GAME)
+    if (currentScreen.name === SCREENS.ScreenName.GAME) {
+      // Timer
+      runtime.update(delta);
+      // Player
+      player.update(delta);
+      // The Screen Itself
       currentScreen.ref.update(delta);
+      checkDownKeys(keysDown);
+    }
   });
 
   /**

@@ -7,3 +7,4 @@ export * as LIB from './library';
 
 // Your Components
 export { exampleComponent } from './exampleComponent';
+export { playerCharacter } from './playerCharacter';
