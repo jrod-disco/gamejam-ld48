@@ -12,7 +12,7 @@ type Score = number;
 export interface PersonalBestScores {
   getPersonalBest: () => Score;
   checkPersonalBest: (score: Score, level: number, mode: number) => boolean;
-  setFireboardStore: (fireboardStore: FireboardStore) => void;
+  setFireboardStore?: (fireboardStore: FireboardStore) => void;
 }
 
 export const personalBestScores = (

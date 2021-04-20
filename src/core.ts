@@ -17,12 +17,17 @@ import {
   Z_MC_BASE,
   Z_MC_UI,
   SFX_VOL_MULT,
+  PLAYER_CONTINOUS_MOVEMENT,
 } from './constants';
 import './index.scss';
 
 import * as COMP from './components';
 import * as SCREENS from './screens';
 import { Sounds } from './components/library/audio';
+import {
+  personalBestScores,
+  PersonalBestScores,
+} from './util/personalBestScore';
 
 declare global {
   interface Window {
@@ -149,9 +154,6 @@ const bootstrapApp = (props: {
     //audioLayer.music.playRandomTrack();
   };
 
-  //#region ** EXAMPLES OF COMPONENT USE **
-  // You may want to strip this all out and do it within other use case specific modules
-
   // Run Time is a simple clock that runs up
   runtime = COMP.LIB.runtime({
     pos: { x: 25, y: 25 },
@@ -165,10 +167,18 @@ const bootstrapApp = (props: {
   });
   uiContainer.addChild(runtime.container);
 
+  // Score Display
   const scoreDisplay = COMP.LIB.scoreDisplay({
     pos: { x: APP_WIDTH - 100, y: 25 },
   });
   uiContainer.addChild(scoreDisplay.container);
+
+  // Best Score Display
+  const bestScore = COMP.LIB.bestScoreDisplay({
+    pos: { x: Math.round(APP_WIDTH * 0.5), y: 55 },
+    particleTextures: null,
+  });
+  uiContainer.addChild(bestScore.container);
 
   // Start Game
   const startGame = (): void => {
@@ -187,6 +197,9 @@ const bootstrapApp = (props: {
     });
     audioLayer.music.mainTheme();
   };
+
+  // High Score Manager
+  const personalBestManager: PersonalBestScores = personalBestScores(() => 0);
 
   // Screens UI -----------------------------------------
 
@@ -217,6 +230,23 @@ const bootstrapApp = (props: {
   // Audio Option Cycle (just a toggle)
   const onAudioCycleOptions = (): void => {
     audioLayer.muteToggle();
+  };
+
+  // Personal Best Scoe
+  const showPersonalBest = (): void => {
+    // check to see if this is a personal best
+    const score = gameLogic.getPlayerScore();
+    const level = gameLogic.getCurrentLevel();
+    const isNewPersonalBest = personalBestManager.checkPersonalBest(
+      score,
+      level,
+      0
+    );
+    bestScore.setText(
+      String(personalBestManager.getPersonalBest()),
+      isNewPersonalBest
+    );
+    bestScore.setVisibility(true);
   };
 
   // Simple Player Component
@@ -254,7 +284,10 @@ const bootstrapApp = (props: {
   const checkDownKeys = (keysDown): void => {
     // If nothing is held, stop and bail
     // console.log('no press', Object.values(keysDown));
-    if (Object.values(keysDown).indexOf(1) === -1) {
+    if (
+      Object.values(keysDown).indexOf(1) === -1 &&
+      !PLAYER_CONTINOUS_MOVEMENT
+    ) {
       player.moveStop();
       return;
     }
@@ -280,6 +313,39 @@ const bootstrapApp = (props: {
   // Initially start listening for keyboard events
   addOnKeyUp();
   addOnKeyDown();
+
+  // Game Logic ----------------------------------------------
+  const gameLogic = COMP.gameLogic({
+    gameContainer: screenGame.container,
+  });
+
+  /**
+   * Game Over sequence
+   */
+  const onGameOver = (): void => {
+    gameLogic.onGameOver();
+    SCREENS.controller.setCurrentScreen({
+      name: SCREENS.ScreenName.MAIN,
+      isAnimated: true,
+    });
+
+    // screenMainMenu.setVisibility({
+    //   isVisible: true,
+    //   isAnimated: true,
+    //   onCompleteCallback: () => {
+    //     // addOnKeyDownMain();
+    //     // audioLayer.music.somber();
+    //     // audioLayer.music.menuTheme(true);
+    //     // audioLayer.music.playRandomTrack();
+    //   },
+    // });
+
+    showPersonalBest();
+  };
+
+  const onTimeOver = (): void => {
+    onGameOver();
+  };
 
   // ------------------------------------
   // Register component UPDATE routines

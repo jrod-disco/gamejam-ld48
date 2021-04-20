@@ -22,15 +22,3 @@ export const Z_MC_BASE = 0;
 // Audio
 export const MUSIC_VOL_MULT = 0.5;
 export const SFX_VOL_MULT = 0.5;
-
-// Environment
-export const TIME_LIMIT_SECONDS = 10;
-
-// Objects
-export enum OBJECT_STATUS {
-  ACTIVE,
-  INACTIVE,
-}
-
-// Player
-export const PLAYER_SPEED = 5;
