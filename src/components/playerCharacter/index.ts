@@ -167,9 +167,9 @@ export const playerCharacter = (
 
   // Reset called by play again and also on init
   const reset = (): void => {
-    state = { ...initialState };
     container.x = state.startPos.x;
     container.y = state.startPos.y;
+    state = { ...initialState };
   };
   reset();
 

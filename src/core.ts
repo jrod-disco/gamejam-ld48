@@ -227,14 +227,6 @@ const bootstrapApp = (props: {
     audioLayer.muteToggle();
   };
 
-  // Simple Player Component
-  const playerTexture = PIXI.Texture.from('./assets/example/whitebox.png');
-  const playerCharacter = COMP.playerCharacter({
-    pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2 },
-    textures: { playerTexture },
-  });
-  screenGame.container.addChild(playerCharacter.container);
-
   // Keyboard Listener
   const onKeyDownMain = (event: KeyboardEvent): void => {
     // Using current event.code now that .keycode is deprecated
@@ -287,7 +279,6 @@ const bootstrapApp = (props: {
   gameLogic.setRefs({
     scoreDisplay,
     spriteSheets,
-    playerCharacter,
     runtime,
     mainOnAudioCycleOptions: onAudioCycleOptions,
     mainOnGameOver: onGameOver,
@@ -301,7 +292,6 @@ const bootstrapApp = (props: {
       volume: 1 * SFX_VOL_MULT,
     });
     runtime.reset();
-    playerCharacter.reset();
     bestScore.setVisibility(false);
     SCREENS.controller.setCurrentScreen({
       name: SCREENS.ScreenName.GAME,
@@ -339,8 +329,6 @@ const bootstrapApp = (props: {
       gameLogic.update(delta);
       // Timer
       runtime.update(delta);
-      // Player
-      playerCharacter.update(delta);
       // The Screen Itself
       currentScreen.ref.update(delta);
     }

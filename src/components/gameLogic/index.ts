@@ -14,6 +14,7 @@ import { PlayerCharacter } from '../playerCharacter';
 import { RunTime } from '../library/runtime';
 import { Spritesheets } from '@src/core';
 import { ScoreDisplay } from '../library/scoreDisplay';
+import { goldSpawner } from './goldSpawner';
 
 type Refs = {
   scoreDisplay?: ScoreDisplay;
@@ -57,6 +58,7 @@ export const gameLogic = (props: Props): GameLogic => {
     isGamePaused: false,
     playerScore: 0,
   };
+  const initialState = { ...state };
 
   // Specific textures can be pulled out once the spritesheet ref is set
   // let targetTextures = { open: null, lock: null };
@@ -66,12 +68,9 @@ export const gameLogic = (props: Props): GameLogic => {
   // This is something that could likely be better served by a simple event bus but for now we live in callback hell
   let scoreDisplayRef: ScoreDisplay = null;
   let spriteSheetsRef: Spritesheets = null;
-  let playerCharacterRef: PlayerCharacter = null;
   let runtimeRef: RunTime = null;
   let mainOnGameOver: () => void = null;
   let mainOnAudioCycleOptions: () => void = null;
-
-  const initialState = { ...state };
 
   const { gameContainer } = props;
 
@@ -99,7 +98,6 @@ export const gameLogic = (props: Props): GameLogic => {
   const setRefs = (refs: Refs): void => {
     if (refs.scoreDisplay) scoreDisplayRef = refs.scoreDisplay;
     if (refs.spriteSheets) spriteSheetsRef = refs.spriteSheets;
-    if (refs.playerCharacter) playerCharacterRef = refs.playerCharacter;
     if (refs.runtime) runtimeRef = refs.runtime;
     if (refs.mainOnGameOver) mainOnGameOver = refs.mainOnGameOver;
     if (refs.mainOnAudioCycleOptions)
@@ -174,7 +172,9 @@ export const gameLogic = (props: Props): GameLogic => {
     removeOnKeyDown();
 
     // Clean Up Component Logic and Sprites
-    // ...call any controller onGameOver or reset as needed...
+    playerCharacter.reset();
+    goldSpawnerRef.reset();
+    cleanUpGold();
 
     // Clean Up Game Logic Remaining
     //...anything within game logic component...
@@ -200,14 +200,14 @@ export const gameLogic = (props: Props): GameLogic => {
       Object.values(keysDown).indexOf(1) === -1 &&
       !PLAYER_CONTINOUS_MOVEMENT
     ) {
-      playerCharacterRef.moveStop();
+      playerCharacter.moveStop();
       return;
     }
     // Single cardinal directions
-    keysDown['KeyW'] && playerCharacterRef.moveUp();
-    keysDown['KeyS'] && playerCharacterRef.moveDown();
-    keysDown['KeyA'] && playerCharacterRef.moveLeft();
-    keysDown['KeyD'] && playerCharacterRef.moveRight();
+    keysDown['KeyW'] && playerCharacter.moveUp();
+    keysDown['KeyS'] && playerCharacter.moveDown();
+    keysDown['KeyA'] && playerCharacter.moveLeft();
+    keysDown['KeyD'] && playerCharacter.moveRight();
   };
 
   const addOnKeyUp = (): void => {
@@ -222,6 +222,50 @@ export const gameLogic = (props: Props): GameLogic => {
   const removeOnKeyDown = (): void =>
     window.removeEventListener('keydown', onKeyDownGame);
 
+  // Gold Spawner
+  const goldSpawnerRef = goldSpawner();
+  const goldContainer = new PIXI.Container();
+  gameContainer.addChild(goldContainer);
+
+  const updateGold = (): void => {
+    const maybeGold = goldSpawnerRef.spawn();
+    maybeGold && goldContainer.addChild(maybeGold.container);
+  };
+  const cleanUpGold = (): void => {
+    goldContainer.removeChildren();
+  };
+
+  // Simple Player Component
+  const playerTexture = PIXI.Texture.from('./assets/example/whitebox.png');
+  const playerCharacter = COMP.playerCharacter({
+    pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2 },
+    textures: { playerTexture },
+  });
+  gameContainer.addChild(playerCharacter.container);
+
+  // Collision Detection
+  const checkCollision = () => {
+    const pX = playerCharacter.container.x;
+    const pY = playerCharacter.container.y;
+    const gold = goldSpawnerRef.getNuggets();
+
+    gold.map((n, i) => {
+      const nX = n.container.x;
+      const nY = n.container.y;
+      // check collision by x/y locations with a buffer
+      const hitBox = 20;
+      //console.log(`checking: p ${pX},${pY} n${i} ${nX},${nY}`);
+      const collided =
+        pX > nX - hitBox &&
+        pX < nX + hitBox &&
+        pY > nY - hitBox &&
+        pY < nY + hitBox;
+      collided && goldSpawnerRef.removeNuggetByIndex(i);
+      collided && goldContainer.removeChildAt(i);
+      collided && console.log('GOLD GET');
+    });
+  };
+
   const update = (delta): boolean => {
     let updateRan = false;
     // Update Gamplay
@@ -229,6 +273,13 @@ export const gameLogic = (props: Props): GameLogic => {
       if (!state.isGamePaused) {
         // Update individual controller refs here
         checkDownKeys(keysDown);
+        // Gold Spawner
+        updateGold();
+        // Player
+        playerCharacter.update(delta);
+        // Collision
+        checkCollision();
+
         updateRan = true;
       } else {
         // Update anything that updates while game is paused
