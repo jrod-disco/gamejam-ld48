@@ -169,6 +169,7 @@ export const gameLogic = (props: Props): GameLogic => {
 
     // Keyboard Events
     // remove game specific key listeners if there are any
+    state.keysDown = [];
     removeOnKeyUp();
     removeOnKeyDown();
 
@@ -195,7 +196,7 @@ export const gameLogic = (props: Props): GameLogic => {
 
   const checkDownKeys = (keysDown): void => {
     // If nothing is held, stop and bail
-    // console.log('no press', Object.values(keysDown));
+    console.log('checkDownKeys', Object.values(keysDown));
     if (
       Object.values(keysDown).indexOf(1) === -1 &&
       !PLAYER_CONTINOUS_MOVEMENT
