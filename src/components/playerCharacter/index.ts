@@ -27,6 +27,7 @@ interface PlayerCharacterProps {
 type PlayerPosition = { x: number; y: number };
 
 enum PLAYER_DIRECTION {
+  NONE,
   UP,
   DOWN,
   LEFT,
@@ -61,7 +62,7 @@ export const playerCharacter = (
   let state = {
     startPos: { ...pos },
     status: OBJECT_STATUS.ACTIVE,
-    direction: PLAYER_DIRECTION.DOWN,
+    direction: PLAYER_DIRECTION.NONE,
     movement: PLAYER_MOVEMENT.IDLE,
     movementSpeed: PLAYER_SPEED,
   };
@@ -89,7 +90,7 @@ export const playerCharacter = (
   ): PlayerPosition => {
     switch (dir) {
       case PLAYER_MOVEMENT.IDLE:
-        return;
+        break;
       case PLAYER_MOVEMENT.WALK_UP:
         return {
           x: currentPos.x,

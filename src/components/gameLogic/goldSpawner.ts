@@ -16,14 +16,14 @@ export const goldSpawner = () => {
 
   const texture = PIXI.Texture.from('./assets/example/goldbox.png');
 
-  const spawn = () => {
+  const spawn = (): GoldNugget => {
     // if (state.lastSpawnTime + GOLD_SPAWN_RATE < Date.now()) return;
 
     if (state.nuggetList.length > GOLD_MAX_SPAWNS - 1) return;
 
     const rX = Math.floor(Math.random() * APP_WIDTH);
     const rY = Math.floor(Math.random() * APP_HEIGHT);
-    console.log(`new nug at ${rX},${rY}`);
+
     const nugget = goldNugget({
       pos: { x: rX, y: rY },
       textures: { nuggetTexture: texture },
@@ -36,7 +36,7 @@ export const goldSpawner = () => {
 
   const getNuggets = (): GoldNugget[] => state.nuggetList;
 
-  const removeNuggetByIndex = (i) => {
+  const removeNuggetByIndex = (i): void => {
     state.nuggetList.splice(i, 1);
   };
 

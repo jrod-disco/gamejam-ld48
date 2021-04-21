@@ -53,6 +53,7 @@ interface Props {
  */
 export const gameLogic = (props: Props): GameLogic => {
   let state = {
+    keysDown: {},
     currentLevel: 0,
     isGameOver: true,
     isGamePaused: false,
@@ -92,7 +93,7 @@ export const gameLogic = (props: Props): GameLogic => {
 
   // Reset called by play again and also on init
   const reset = (): void => {
-    state = { ...initialState };
+    state = { ...initialState, keysDown: {} };
   };
 
   const setRefs = (refs: Refs): void => {
@@ -183,14 +184,13 @@ export const gameLogic = (props: Props): GameLogic => {
   };
 
   // Keyboard Listener
-  const keysDown = {};
   const onKeyUpGame = (event: KeyboardEvent): void => {
     // Store the fact that this key is up
-    keysDown[event.code] = 0;
+    state.keysDown[event.code] = 0;
   };
   const onKeyDownGame = (event: KeyboardEvent): void => {
     // Store the fact that this key is down
-    keysDown[event.code] = 1;
+    state.keysDown[event.code] = 1;
   };
 
   const checkDownKeys = (keysDown): void => {
@@ -262,7 +262,6 @@ export const gameLogic = (props: Props): GameLogic => {
         pY < nY + hitBox;
       collided && goldSpawnerRef.removeNuggetByIndex(i);
       collided && goldContainer.removeChildAt(i);
-      collided && console.log('GOLD GET');
     });
   };
 
@@ -272,7 +271,7 @@ export const gameLogic = (props: Props): GameLogic => {
     if (!state.isGameOver) {
       if (!state.isGamePaused) {
         // Update individual controller refs here
-        checkDownKeys(keysDown);
+        checkDownKeys(state.keysDown);
         // Gold Spawner
         updateGold();
         // Player
