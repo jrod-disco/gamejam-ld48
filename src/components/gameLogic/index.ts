@@ -7,6 +7,7 @@ import {
   SFX_VOL_MULT,
   POINTS_GOLD,
   START_LEVEL,
+  PLAYER_CONTINOUS_MOVEMENT,
 } from '@src/constants';
 import * as COMP from '..';
 import { PlayerCharacter } from '../playerCharacter';
@@ -145,6 +146,7 @@ export const gameLogic = (props: Props): GameLogic => {
   };
 
   const onStartGame = (): void => {
+    console.log('gameLogic: onStartGame');
     //
     state.isGameOver = false;
     state.currentLevel = START_LEVEL;
@@ -153,17 +155,23 @@ export const gameLogic = (props: Props): GameLogic => {
     scoreDisplayRef.reset();
 
     runtimeRef.pause();
-
     //
+
+    // Start listening for keyboard events
+    addOnKeyUp();
+    addOnKeyDown();
   };
 
   const onGameOver = (): void => {
+    console.log('gameLogic: onGameOver');
+
     // Immediately stop timer if a timed game
     // runtimeRef.pause();
 
     // Keyboard Events
     // remove game specific key listeners if there are any
-    // window.removeEventListener('keydown', onKeyDownInGame);
+    removeOnKeyUp();
+    removeOnKeyDown();
 
     // Clean Up Component Logic and Sprites
     // ...call any controller onGameOver or reset as needed...
@@ -174,58 +182,59 @@ export const gameLogic = (props: Props): GameLogic => {
     state.isGameOver = true; // should stop updates
   };
 
+  // Keyboard Listener
+  const keysDown = {};
+  const onKeyUpGame = (event: KeyboardEvent): void => {
+    // Store the fact that this key is up
+    keysDown[event.code] = 0;
+  };
+  const onKeyDownGame = (event: KeyboardEvent): void => {
+    // Store the fact that this key is down
+    keysDown[event.code] = 1;
+  };
+
+  const checkDownKeys = (keysDown): void => {
+    // If nothing is held, stop and bail
+    // console.log('no press', Object.values(keysDown));
+    if (
+      Object.values(keysDown).indexOf(1) === -1 &&
+      !PLAYER_CONTINOUS_MOVEMENT
+    ) {
+      playerCharacterRef.moveStop();
+      return;
+    }
+    // Single cardinal directions
+    keysDown['KeyW'] && playerCharacterRef.moveUp();
+    keysDown['KeyS'] && playerCharacterRef.moveDown();
+    keysDown['KeyA'] && playerCharacterRef.moveLeft();
+    keysDown['KeyD'] && playerCharacterRef.moveRight();
+  };
+
+  const addOnKeyUp = (): void => {
+    window.addEventListener('keyup', onKeyUpGame);
+  };
+  const removeOnKeyUp = (): void =>
+    window.removeEventListener('keyup', onKeyUpGame);
+
+  const addOnKeyDown = (): void => {
+    window.addEventListener('keydown', onKeyDownGame);
+  };
+  const removeOnKeyDown = (): void =>
+    window.removeEventListener('keydown', onKeyDownGame);
+
   const update = (delta): boolean => {
     let updateRan = false;
     // Update Gamplay
     if (!state.isGameOver) {
       if (!state.isGamePaused) {
         // Update individual controller refs here
-
+        checkDownKeys(keysDown);
         updateRan = true;
       } else {
         // Update anything that updates while game is paused
       }
     }
     return updateRan;
-  };
-
-  // This check key is not being used for SIMPLE GAME, just an example
-  const checkKey = (key: string, keyCode: number): void => {
-    // bail if we're not even playing
-    if (state.isGameOver) return;
-    //console.log(keyCode);
-
-    // check for special keys
-    // these keys should work even during no input states
-    switch (keyCode) {
-      // QUIT CURRENT RUN
-      case 27: // Escape
-        pixiSound.play('good', { loop: false, volume: 0.5 * SFX_VOL_MULT });
-        mainOnGameOver();
-        return;
-      // AUDIO OPTION CYCLE (mute/unmute for now)
-      case 220: // Backslash
-        pixiSound.play('good', { loop: false, volume: 0.5 * SFX_VOL_MULT });
-        mainOnAudioCycleOptions();
-        return;
-
-      // PAUSE TOGGLE
-      case 13: // Enter
-        toggleGamePaused();
-        return;
-    }
-
-    // If we're in-game (and not blocking input) let's GO!
-    if (!state.isGamePaused) {
-      //
-    }
-  };
-
-  // TODO: Use event.code instead - https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/code
-  // note: that event.code does not return ascii values
-  const onKeyDownInGame = (event: KeyboardEvent): void => {
-    const { key, keyCode } = event;
-    checkKey(key, keyCode);
   };
 
   return {

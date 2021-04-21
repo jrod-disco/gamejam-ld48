@@ -158,11 +158,7 @@ const bootstrapApp = (props: {
   runtime = COMP.LIB.runtime({
     pos: { x: 25, y: 25 },
     timeOverCallback: () => {
-      console.log('TIME RAN OUT!! DO SOMETHING!!');
-      SCREENS.controller.setCurrentScreen({
-        name: SCREENS.ScreenName.MAIN,
-        isAnimated: true,
-      });
+      onTimeOver();
     },
   });
   uiContainer.addChild(runtime.container);
@@ -173,38 +169,37 @@ const bootstrapApp = (props: {
   });
   uiContainer.addChild(scoreDisplay.container);
 
-  // Best Score Display
+  // Personal Best Score Display
   const bestScore = COMP.LIB.bestScoreDisplay({
-    pos: { x: Math.round(APP_WIDTH * 0.5), y: 55 },
+    pos: { x: Math.round(APP_WIDTH * 0.5), y: 65 },
     particleTextures: null,
   });
   uiContainer.addChild(bestScore.container);
 
-  // Start Game
-  const startGame = (): void => {
-    pixiSound.play('good', {
-      volume: 1 * SFX_VOL_MULT,
-    });
-    runtime.reset();
-    player.reset();
-    SCREENS.controller.setCurrentScreen({
-      name: SCREENS.ScreenName.GAME,
-      isAnimated: true,
-      onComplete: () => {
-        // Defer starting the timer until the fade is complete
-        runtime.start();
-      },
-    });
-    audioLayer.music.mainTheme();
-  };
-
   // High Score Manager
   const personalBestManager: PersonalBestScores = personalBestScores(() => 0);
+
+  // Personal Best Scoe
+  const showPersonalBest = (): void => {
+    // check to see if this is a personal best
+    const score = gameLogic.getPlayerScore();
+    const level = gameLogic.getCurrentLevel();
+    const isNewPersonalBest = personalBestManager.checkPersonalBest(
+      score,
+      level,
+      0
+    );
+    bestScore.setText(
+      String(personalBestManager.getPersonalBest()),
+      isNewPersonalBest
+    );
+    bestScore.setVisibility(true);
+  };
 
   // Screens UI -----------------------------------------
 
   // Callback for Sample "Play Again" Button
-  const onPlayButtonPress = (): void => startGame();
+  const onPlayButtonPress = (): void => onStartGame();
 
   // Sample Screen One - Main Screen'
   const screenMainMenu = SCREENS.mainMenuLayout({
@@ -232,41 +227,16 @@ const bootstrapApp = (props: {
     audioLayer.muteToggle();
   };
 
-  // Personal Best Scoe
-  const showPersonalBest = (): void => {
-    // check to see if this is a personal best
-    const score = gameLogic.getPlayerScore();
-    const level = gameLogic.getCurrentLevel();
-    const isNewPersonalBest = personalBestManager.checkPersonalBest(
-      score,
-      level,
-      0
-    );
-    bestScore.setText(
-      String(personalBestManager.getPersonalBest()),
-      isNewPersonalBest
-    );
-    bestScore.setVisibility(true);
-  };
-
   // Simple Player Component
   const playerTexture = PIXI.Texture.from('./assets/example/whitebox.png');
-  const player = COMP.playerCharacter({
+  const playerCharacter = COMP.playerCharacter({
     pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2 },
     textures: { playerTexture },
   });
-  screenGame.container.addChild(player.container);
+  screenGame.container.addChild(playerCharacter.container);
 
   // Keyboard Listener
-  const keysDown = {};
-  const onKeyUp = (event: KeyboardEvent): void => {
-    // Store the fact that this key is up
-    keysDown[event.code] = 0;
-  };
-  const onKeyDown = (event: KeyboardEvent): void => {
-    // Store the fact that this key is down
-    keysDown[event.code] = 1;
-
+  const onKeyDownMain = (event: KeyboardEvent): void => {
     // Using current event.code now that .keycode is deprecated
     switch (event.code) {
       case 'Backquote': // toggle audio
@@ -275,72 +245,76 @@ const bootstrapApp = (props: {
       case 'Space': // Start
       case 'Enter': // Start
         screenMainMenu.showPressedButton();
-        startGame();
+        onStartGame();
         break;
     }
     //console.log(event.code);
   };
 
-  const checkDownKeys = (keysDown): void => {
-    // If nothing is held, stop and bail
-    // console.log('no press', Object.values(keysDown));
-    if (
-      Object.values(keysDown).indexOf(1) === -1 &&
-      !PLAYER_CONTINOUS_MOVEMENT
-    ) {
-      player.moveStop();
-      return;
-    }
-    // Single cardinal directions
-    keysDown['KeyW'] && player.moveUp();
-    keysDown['KeyS'] && player.moveDown();
-    keysDown['KeyA'] && player.moveLeft();
-    keysDown['KeyD'] && player.moveRight();
-  };
-
-  const addOnKeyUp = (): void => {
-    window.addEventListener('keyup', onKeyUp);
-  };
-  const removeOnKeyUp = (): void =>
-    window.removeEventListener('keyup', onKeyUp);
-
   const addOnKeyDown = (): void => {
-    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keydown', onKeyDownMain);
   };
   const removeOnKeyDown = (): void =>
-    window.removeEventListener('keydown', onKeyDown);
+    window.removeEventListener('keydown', onKeyDownMain);
 
   // Initially start listening for keyboard events
-  addOnKeyUp();
   addOnKeyDown();
+
+  // Game Events
+
+  const onGameOver = (): void => {
+    console.log('core: onGameOver');
+    gameLogic.onGameOver();
+
+    SCREENS.controller.setCurrentScreen({
+      name: SCREENS.ScreenName.MAIN,
+      isAnimated: true,
+      onComplete: () => {
+        showPersonalBest();
+        addOnKeyDown();
+        // audioLayer.music.somber();
+        // audioLayer.music.menuTheme(true);
+        // audioLayer.music.playRandomTrack();
+      },
+    });
+  };
 
   // Game Logic ----------------------------------------------
   const gameLogic = COMP.gameLogic({
     gameContainer: screenGame.container,
   });
 
-  /**
-   * Game Over sequence
-   */
-  const onGameOver = (): void => {
-    gameLogic.onGameOver();
-    SCREENS.controller.setCurrentScreen({
-      name: SCREENS.ScreenName.MAIN,
-      isAnimated: true,
+  gameLogic.setRefs({
+    scoreDisplay,
+    spriteSheets,
+    playerCharacter,
+    runtime,
+    mainOnAudioCycleOptions: onAudioCycleOptions,
+    mainOnGameOver: onGameOver,
+  });
+
+  // Start Game
+  const onStartGame = (): void => {
+    console.log('core: onStartGame');
+    removeOnKeyDown();
+    pixiSound.play('good', {
+      volume: 1 * SFX_VOL_MULT,
     });
-
-    // screenMainMenu.setVisibility({
-    //   isVisible: true,
-    //   isAnimated: true,
-    //   onCompleteCallback: () => {
-    //     // addOnKeyDownMain();
-    //     // audioLayer.music.somber();
-    //     // audioLayer.music.menuTheme(true);
-    //     // audioLayer.music.playRandomTrack();
-    //   },
-    // });
-
-    showPersonalBest();
+    runtime.reset();
+    playerCharacter.reset();
+    bestScore.setVisibility(false);
+    SCREENS.controller.setCurrentScreen({
+      name: SCREENS.ScreenName.GAME,
+      isAnimated: true,
+      onComplete: () => {
+        // Defer starting the timer until the fade is complete
+        runtime.start();
+      },
+    });
+    audioLayer.music.mainTheme();
+    //
+    gameLogic.onStartGame();
+    //
   };
 
   const onTimeOver = (): void => {
@@ -361,13 +335,14 @@ const bootstrapApp = (props: {
     // Update game screen only when it is visible
     const currentScreen = SCREENS.controller.getCurrentScreen();
     if (currentScreen.name === SCREENS.ScreenName.GAME) {
+      // Logic
+      gameLogic.update(delta);
       // Timer
       runtime.update(delta);
       // Player
-      player.update(delta);
+      playerCharacter.update(delta);
       // The Screen Itself
       currentScreen.ref.update(delta);
-      checkDownKeys(keysDown);
     }
   });
 

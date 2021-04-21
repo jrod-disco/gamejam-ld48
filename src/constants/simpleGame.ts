@@ -1,5 +1,5 @@
 // Environment
-export const TIME_LIMIT_SECONDS = 10;
+export const TIME_LIMIT_SECONDS = 3;
 
 // Difficulty
 export const START_LEVEL = 1;
