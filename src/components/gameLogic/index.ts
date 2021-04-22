@@ -265,6 +265,8 @@ export const gameLogic = (props: Props): GameLogic => {
 
   // Collision Detection
   const checkCollision = (): void => {
+    if (state.isGameOver) return;
+
     const pX = playerCharacter.container.x;
     const pY = playerCharacter.container.y;
     const gold = goldSpawnerRef.getNuggets();
@@ -272,9 +274,10 @@ export const gameLogic = (props: Props): GameLogic => {
     gold.map((n, i) => {
       const nX = n.container.x;
       const nY = n.container.y;
-      // check collision by x/y locations with a buffer
+
+      // check collision by x/y locations with a hitbox buffer
       const hitBox = 20 * playerCharacter.getSize();
-      //console.log(`checking: p ${pX},${pY} n${i} ${nX},${nY}`);
+
       const collided =
         pX > nX - hitBox &&
         pX < nX + hitBox &&
@@ -293,26 +296,19 @@ export const gameLogic = (props: Props): GameLogic => {
 
   const update = (delta): boolean => {
     let updateRan = false;
-    // Update Gamplay
-    if (!state.isGameOver) {
-      if (!state.isGamePaused) {
-        // Update individual controller refs here
-        runtime.update(delta);
-        checkDownKeys(state.keysDown);
-        // Gold Spawner
-        updateGold();
-        // Player
-        playerCharacter.update(delta);
-        // Collision
-        checkCollision();
-        // Score
-        IS_SCORE_INCREMENTY && scoreDisplay.update(delta);
 
-        updateRan = true;
-      } else {
-        // Update anything that updates while game is paused
-      }
-    }
+    if (state.isGameOver) return;
+    if (state.isGamePaused) return;
+
+    // Update individual controller refs here
+    runtime.update(delta);
+    checkDownKeys(state.keysDown);
+    updateGold();
+    playerCharacter.update(delta);
+    checkCollision();
+    IS_SCORE_INCREMENTY && scoreDisplay.update(delta);
+    updateRan = true;
+
     return updateRan;
   };
 

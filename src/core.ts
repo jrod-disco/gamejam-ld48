@@ -310,6 +310,8 @@ const bootstrapApp = (props: {
 
   pixiApp.ticker.add((delta) => {
     // Update All The Things
+
+    // Animate the CRT filter
     crtFilter.seed = Math.random();
     crtFilter.time += 0.25;
 
@@ -320,7 +322,6 @@ const bootstrapApp = (props: {
     if (currentScreen.name === SCREENS.ScreenName.GAME) {
       // Logic
       gameLogic.update(delta);
-
       // The Screen Itself
       currentScreen.ref.update(delta);
     }
