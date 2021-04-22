@@ -13,7 +13,7 @@ import * as COMP from '..';
 import { PlayerCharacter } from '../playerCharacter';
 import { RunTime } from '../library/runtime';
 import { Spritesheets } from '@src/core';
-import { ScoreDisplay } from '../library/scoreDisplay';
+import { scoreDisplay, ScoreDisplay } from '../library/scoreDisplay';
 import { goldSpawner } from './goldSpawner';
 
 type Refs = {
@@ -196,7 +196,7 @@ export const gameLogic = (props: Props): GameLogic => {
 
   const checkDownKeys = (keysDown): void => {
     // If nothing is held, stop and bail
-    console.log('checkDownKeys', Object.values(keysDown));
+    //  console.log('checkDownKeys', Object.values(keysDown));
     if (
       Object.values(keysDown).indexOf(1) === -1 &&
       !PLAYER_CONTINOUS_MOVEMENT
@@ -245,7 +245,7 @@ export const gameLogic = (props: Props): GameLogic => {
   gameContainer.addChild(playerCharacter.container);
 
   // Collision Detection
-  const checkCollision = () => {
+  const checkCollision = (): void => {
     const pX = playerCharacter.container.x;
     const pY = playerCharacter.container.y;
     const gold = goldSpawnerRef.getNuggets();
@@ -254,7 +254,7 @@ export const gameLogic = (props: Props): GameLogic => {
       const nX = n.container.x;
       const nY = n.container.y;
       // check collision by x/y locations with a buffer
-      const hitBox = 20;
+      const hitBox = 20 * playerCharacter.getSize();
       //console.log(`checking: p ${pX},${pY} n${i} ${nX},${nY}`);
       const collided =
         pX > nX - hitBox &&
@@ -263,6 +263,12 @@ export const gameLogic = (props: Props): GameLogic => {
         pY < nY + hitBox;
       collided && goldSpawnerRef.removeNuggetByIndex(i);
       collided && goldContainer.removeChildAt(i);
+      collided && playerCharacter.grow();
+      collided && scoreDisplayRef.addToScore(POINTS_GOLD);
+      collided &&
+        pixiSound.play('coin', {
+          volume: 1 * SFX_VOL_MULT,
+        });
     });
   };
 
@@ -279,6 +285,8 @@ export const gameLogic = (props: Props): GameLogic => {
         playerCharacter.update(delta);
         // Collision
         checkCollision();
+        // Score
+        scoreDisplayRef.update(delta);
 
         updateRan = true;
       } else {

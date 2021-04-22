@@ -135,6 +135,7 @@ const bootstrapApp = (props: {
   const pixiSound = PIXISOUND.default; //TODO: deal with persistent loading of soundeffects / also make a soundsprite already
   // Load these up on startup...
   pixiSound.add('good', './assets/example/good.mp3');
+  pixiSound.add('coin', './assets/example/coin.wav');
 
   // Create empty BASE and UI containers and add them to the mainContainer
   // Use constants for Z-index of these containers

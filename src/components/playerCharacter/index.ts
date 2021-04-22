@@ -1,4 +1,6 @@
 import * as PIXI from 'pixi.js';
+import gsap, { Power0, Bounce } from 'gsap';
+import PixiPlugin from 'gsap/PixiPlugin';
 
 import {
   APP_HEIGHT,
@@ -16,6 +18,8 @@ export interface PlayerCharacter {
   moveLeft: () => void;
   moveRight: () => void;
   moveStop: () => void;
+  grow: () => void;
+  getSize: () => number;
 }
 
 interface PlayerCharacterProps {
@@ -57,6 +61,10 @@ export const playerCharacter = (
 
   container.name = 'playerCharacter';
 
+  // Instantiate PIXI
+  PixiPlugin.registerPIXI(PIXI);
+  gsap.registerPlugin(PixiPlugin);
+
   const { anims, textures } = props;
 
   let state = {
@@ -65,6 +73,7 @@ export const playerCharacter = (
     direction: PLAYER_DIRECTION.NONE,
     movement: PLAYER_MOVEMENT.IDLE,
     movementSpeed: PLAYER_SPEED,
+    size: 1,
   };
   const initialState = { ...state };
 
@@ -166,11 +175,30 @@ export const playerCharacter = (
     setMovement(PLAYER_MOVEMENT.WALK_RIGHT);
   };
 
+  const getSize = (): number => state.size;
+
+  const grow = (): void => {
+    state.size += 0.2;
+
+    gsap.killTweensOf(playerSprite);
+
+    const myTween = gsap.to(playerSprite, {
+      duration: 0.5,
+      pixi: { scale: state.size },
+      ease: Bounce.easeOut,
+    });
+  };
+
   // Reset called by play again and also on init
   const reset = (): void => {
     container.x = state.startPos.x;
     container.y = state.startPos.y;
     state = { ...initialState };
+
+    gsap.killTweensOf(playerSprite);
+    playerSprite.scale.set(1);
+
+    console.log('playersprite reset', playerSprite.scale);
   };
   reset();
 
@@ -181,11 +209,15 @@ export const playerCharacter = (
 
   return {
     container,
+
     moveUp,
     moveDown,
     moveLeft,
     moveRight,
     moveStop,
+    grow,
+    getSize,
+
     reset,
     update,
   };

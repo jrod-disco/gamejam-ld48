@@ -9,20 +9,26 @@ import { GoldNugget, goldNugget } from '../goldNugget';
 
 export const goldSpawner = () => {
   let state = {
-    lastSpawnTime: 0,
+    lastSpawnTime: Date.now(),
     nuggetList: [],
   };
   const initialState = { ...state };
 
   const texture = PIXI.Texture.from('./assets/example/goldbox.png');
 
-  const spawn = (): GoldNugget => {
-    // if (state.lastSpawnTime + GOLD_SPAWN_RATE < Date.now()) return;
+  const nuggetBuffer = 50;
 
+  const spawn = (): GoldNugget => {
+    if (state.lastSpawnTime + GOLD_SPAWN_RATE > Date.now()) return;
+
+    state.lastSpawnTime = Date.now();
     if (state.nuggetList.length > GOLD_MAX_SPAWNS - 1) return;
 
-    const rX = Math.floor(Math.random() * APP_WIDTH);
-    const rY = Math.floor(Math.random() * APP_HEIGHT);
+    const rX =
+      nuggetBuffer / 2 + Math.floor(Math.random() * (APP_WIDTH - nuggetBuffer));
+    const rY =
+      nuggetBuffer / 2 +
+      Math.floor(Math.random() * (APP_HEIGHT - nuggetBuffer));
 
     const nugget = goldNugget({
       pos: { x: rX, y: rY },
