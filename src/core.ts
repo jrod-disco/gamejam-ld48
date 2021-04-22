@@ -30,6 +30,7 @@ import {
   personalBestScores,
   PersonalBestScores,
 } from './util/personalBestScore';
+import { runtime } from './components/library';
 
 declare global {
   interface Window {
@@ -98,9 +99,6 @@ const bootstrapApp = (props: {
   let sounds = props?.sounds;
   let audioLayer = null;
 
-  // Declare component variables in advance when needed
-  let runtime = null;
-
   // Hide Loader GIF
   document.getElementById('loading').style.display = 'none';
   document.getElementById('footer').style.display = 'block';
@@ -167,21 +165,6 @@ const bootstrapApp = (props: {
     // Play a track
     //audioLayer.music.playRandomTrack();
   };
-
-  // Run Time is a simple clock that runs up
-  runtime = COMP.LIB.runtime({
-    pos: { x: 25, y: 25 },
-    timeOverCallback: () => {
-      onTimeOver();
-    },
-  });
-  uiContainer.addChild(runtime.container);
-
-  // Score Display
-  const scoreDisplay = COMP.LIB.scoreDisplay({
-    pos: { x: APP_WIDTH - 100, y: 25 },
-  });
-  uiContainer.addChild(scoreDisplay.container);
 
   // Personal Best Score Display
   const bestScore = COMP.LIB.bestScoreDisplay({
@@ -270,7 +253,6 @@ const bootstrapApp = (props: {
 
   const onGameOver = (): void => {
     console.log('core: onGameOver');
-    gameLogic.onGameOver();
 
     SCREENS.controller.setCurrentScreen({
       name: SCREENS.ScreenName.MAIN,
@@ -291,9 +273,8 @@ const bootstrapApp = (props: {
   });
 
   gameLogic.setRefs({
-    scoreDisplay,
     spriteSheets,
-    runtime,
+    uiContainer,
     mainOnAudioCycleOptions: onAudioCycleOptions,
     mainOnGameOver: onGameOver,
   });
@@ -305,24 +286,20 @@ const bootstrapApp = (props: {
     pixiSound.play('good', {
       volume: 1 * SFX_VOL_MULT,
     });
-    runtime.reset();
+
     bestScore.setVisibility(false);
     SCREENS.controller.setCurrentScreen({
       name: SCREENS.ScreenName.GAME,
       isAnimated: true,
       onComplete: () => {
+        console.log('core: screen transition complete');
         // Defer starting the timer until the fade is complete
-        runtime.start();
+        gameLogic.onStartGame();
       },
     });
     audioLayer.music.mainTheme();
     //
-    gameLogic.onStartGame();
     //
-  };
-
-  const onTimeOver = (): void => {
-    onGameOver();
   };
 
   // ------------------------------------
@@ -343,8 +320,7 @@ const bootstrapApp = (props: {
     if (currentScreen.name === SCREENS.ScreenName.GAME) {
       // Logic
       gameLogic.update(delta);
-      // Timer
-      runtime.update(delta);
+
       // The Screen Itself
       currentScreen.ref.update(delta);
     }

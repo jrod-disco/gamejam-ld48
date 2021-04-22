@@ -1,6 +1,5 @@
 import * as PIXI from 'pixi.js';
-
-import { APP_HEIGHT, APP_WIDTH } from '@src/constants';
+import gsap, { Power0, Bounce } from 'gsap';
 
 export interface GoldNugget {
   container: PIXI.Container;
@@ -36,19 +35,39 @@ export const goldNugget = (props: GoldNuggetProps): GoldNugget => {
   };
   const initialState = { ...state };
 
-  const playerContainer = new PIXI.Container();
-  container.addChild(playerContainer);
+  const nuggetContainer = new PIXI.Container();
+  container.addChild(nuggetContainer);
 
   // animated sprite
   // const playerSprite = new PIXI.AnimatedSprite(anims[PLAYER_MOVEMENT.IDLE]);
   // playerContainer.addChild(playerSprite);
 
   // placeholder sprite
-  const playerSprite = new PIXI.Sprite(textures.nuggetTexture);
-  playerSprite.anchor.set(0.5);
-  playerContainer.addChild(playerSprite);
+  const nuggetSprite = new PIXI.Sprite(textures.nuggetTexture);
+  nuggetSprite.anchor.set(0.5);
+  nuggetContainer.addChild(nuggetSprite);
+
+  nuggetSprite.scale.set(50);
+  nuggetSprite.alpha = 0;
 
   const spriteMargin = 20;
+
+  const grow = (): void => {
+    gsap.killTweensOf(nuggetSprite);
+    const myTween = gsap.to(nuggetSprite, {
+      duration: 0.35,
+      pixi: { scale: 1 },
+      ease: Bounce.easeOut,
+    });
+
+    const myTweenAlpha = gsap.to(nuggetSprite, {
+      duration: 0.5,
+      pixi: { alpha: 1 },
+      ease: Power0.easeOut,
+    });
+  };
+
+  grow();
 
   // Reset called by play again and also on init
   const reset = (): void => {

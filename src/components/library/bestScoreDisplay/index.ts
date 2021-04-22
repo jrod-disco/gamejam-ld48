@@ -71,6 +71,7 @@ export const bestScoreDisplay = (props: BestScoreProps): BestScoreDisplay => {
   };
 
   const setVisibility = (isVisible: boolean): void => {
+    gsap.killTweensOf(container);
     if (isVisible) {
       container.alpha = 0;
       gsap.to(container, {

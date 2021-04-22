@@ -10,6 +10,7 @@ import {
   POINTS_GOLD,
   START_LEVEL,
   PLAYER_CONTINOUS_MOVEMENT,
+  IS_SCORE_INCREMENTY,
 } from '@src/constants';
 import * as COMP from '..';
 import { PlayerCharacter } from '../playerCharacter';
@@ -22,7 +23,7 @@ type Refs = {
   scoreDisplay?: ScoreDisplay;
   spriteSheets: Spritesheets;
   playerCharacter?: PlayerCharacter;
-  runtime?: RunTime;
+  uiContainer?: PIXI.Container;
   mainOnAudioCycleOptions?: () => void;
   mainOnGameOver?: () => void;
 };
@@ -69,9 +70,10 @@ export const gameLogic = (props: Props): GameLogic => {
   // Passed in references set by setRefs function
   // The game logic component maintains references and serves as the hub for communication between all other game components
   // This is something that could likely be better served by a simple event bus but for now we live in callback hell
-  let scoreDisplayRef: ScoreDisplay = null;
+  let scoreDisplay: ScoreDisplay = null;
   let spriteSheetsRef: Spritesheets = null;
-  let runtimeRef: RunTime = null;
+  let uiContainerRef: PIXI.Container;
+  let runtime: RunTime = null;
   let mainOnGameOver: () => void = null;
   let mainOnAudioCycleOptions: () => void = null;
 
@@ -98,27 +100,35 @@ export const gameLogic = (props: Props): GameLogic => {
     state = { ...initialState, keysDown: {} };
   };
 
+  // References of components created in core are set here
   const setRefs = (refs: Refs): void => {
-    if (refs.scoreDisplay) scoreDisplayRef = refs.scoreDisplay;
     if (refs.spriteSheets) spriteSheetsRef = refs.spriteSheets;
-    if (refs.runtime) runtimeRef = refs.runtime;
+    if (refs.uiContainer) uiContainerRef = refs.uiContainer;
     if (refs.mainOnGameOver) mainOnGameOver = refs.mainOnGameOver;
     if (refs.mainOnAudioCycleOptions)
       mainOnAudioCycleOptions = refs.mainOnAudioCycleOptions;
 
-    // If we have sprite sheets pull out the specific textures
-    // if (spriteSheetsRef)
-    //   targetTextures = {
-    //     open: spriteSheetsRef.game.textures['targetA_open_00'],
-    //     lock: spriteSheetsRef.game.textures['targetA_lock_00'],
-    //   };
+    // Run Time is a simple clock that runs up
+    runtime = COMP.LIB.runtime({
+      pos: { x: 25, y: 25 },
+      timeOverCallback: () => {
+        onTimeOver();
+      },
+    });
+    uiContainerRef.addChild(runtime.container);
+
+    // Score Display
+    scoreDisplay = COMP.LIB.scoreDisplay({
+      pos: { x: APP_WIDTH - 100, y: 25 },
+    });
+    uiContainerRef.addChild(scoreDisplay.container);
   };
 
   const getIsGameOver = (): boolean => {
     return state.isGameOver;
   };
   const getPlayerScore = (): number => {
-    state.playerScore = scoreDisplayRef.getScore();
+    state.playerScore = scoreDisplay.getScore();
     return state.playerScore;
   };
 
@@ -153,9 +163,10 @@ export const gameLogic = (props: Props): GameLogic => {
     state.currentLevel = START_LEVEL;
     state.playerScore = 0;
     //
-    scoreDisplayRef.reset();
-
-    runtimeRef.pause();
+    scoreDisplay.reset();
+    runtime.reset();
+    runtime.start();
+    playerCharacter.reset();
     //
 
     // Start listening for keyboard events
@@ -163,8 +174,13 @@ export const gameLogic = (props: Props): GameLogic => {
     addOnKeyDown();
   };
 
+  const onTimeOver = (): void => {
+    onGameOver();
+  };
+
   const onGameOver = (): void => {
     console.log('gameLogic: onGameOver');
+    state.isGameOver = true; // should stop updates
 
     // Immediately stop timer if a timed game
     // runtimeRef.pause();
@@ -176,14 +192,13 @@ export const gameLogic = (props: Props): GameLogic => {
     removeOnKeyDown();
 
     // Clean Up Component Logic and Sprites
-    playerCharacter.reset();
     goldSpawnerRef.reset();
     cleanUpGold();
 
     // Clean Up Game Logic Remaining
     //...anything within game logic component...
 
-    state.isGameOver = true; // should stop updates
+    playerCharacter.wither(mainOnGameOver);
   };
 
   // Keyboard Listener
@@ -225,6 +240,14 @@ export const gameLogic = (props: Props): GameLogic => {
   const removeOnKeyDown = (): void =>
     window.removeEventListener('keydown', onKeyDownGame);
 
+  // Simple Player Component
+  const playerTexture = PIXI.Texture.from('./assets/example/whitebox.png');
+  const playerCharacter = COMP.playerCharacter({
+    pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2 },
+    textures: { playerTexture },
+  });
+  gameContainer.addChild(playerCharacter.container);
+
   // Gold Spawner
   const goldSpawnerRef = goldSpawner();
   const goldContainer = new PIXI.Container();
@@ -239,14 +262,6 @@ export const gameLogic = (props: Props): GameLogic => {
   const cleanUpGold = (): void => {
     goldContainer.removeChildren();
   };
-
-  // Simple Player Component
-  const playerTexture = PIXI.Texture.from('./assets/example/whitebox.png');
-  const playerCharacter = COMP.playerCharacter({
-    pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2 },
-    textures: { playerTexture },
-  });
-  gameContainer.addChild(playerCharacter.container);
 
   // Collision Detection
   const checkCollision = (): void => {
@@ -268,7 +283,7 @@ export const gameLogic = (props: Props): GameLogic => {
       collided && goldSpawnerRef.removeNuggetByIndex(i);
       collided && goldContainer.removeChildAt(i);
       collided && playerCharacter.grow();
-      collided && scoreDisplayRef.addToScore(POINTS_GOLD);
+      collided && scoreDisplay.addToScore(POINTS_GOLD);
       collided &&
         pixiSound.play('coin', {
           volume: 1 * SFX_VOL_MULT,
@@ -282,6 +297,7 @@ export const gameLogic = (props: Props): GameLogic => {
     if (!state.isGameOver) {
       if (!state.isGamePaused) {
         // Update individual controller refs here
+        runtime.update(delta);
         checkDownKeys(state.keysDown);
         // Gold Spawner
         updateGold();
@@ -290,7 +306,7 @@ export const gameLogic = (props: Props): GameLogic => {
         // Collision
         checkCollision();
         // Score
-        scoreDisplayRef.update(delta);
+        IS_SCORE_INCREMENTY && scoreDisplay.update(delta);
 
         updateRan = true;
       } else {

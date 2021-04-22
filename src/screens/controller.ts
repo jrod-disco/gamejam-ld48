@@ -45,11 +45,7 @@ export const screenController = ({
    */
   const setCurrentScreen = (props: SetScreenProps): ScreenName => {
     const { name, isAnimated } = props;
-    const onComplete = props.onComplete
-      ? props.onComplete
-      : (): void => {
-          /* noop */
-        };
+    const onComplete = props.onComplete;
     screenState.prevScreen = screenState.currentScreen;
     screenState.currentScreen = name;
     console.log(
@@ -61,17 +57,13 @@ export const screenController = ({
       isAnimated: true,
       onCompleteCallback: () => {
         // callback for when screen fade on is complete
-        onComplete();
+        onComplete && onComplete();
       },
     });
 
     screenState.list[screenState.prevScreen]?.setVisibility({
       isVisible: false,
       isAnimated: true,
-      onCompleteCallback: () => {
-        // callback for when screen fade on is complete
-        onComplete();
-      },
     });
 
     return screenState.prevScreen;

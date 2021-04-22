@@ -14,7 +14,7 @@ export enum OBJECT_STATUS {
 export const IS_SCORE_INCREMENTY = false;
 
 // Player
-export const PLAYER_SPEED = 5;
+export const PLAYER_SPEED = 6;
 export const PLAYER_CONTINOUS_MOVEMENT = true;
 
 // Gold

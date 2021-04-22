@@ -67,7 +67,7 @@ export const scoreDisplay = (props: Props): ScoreDisplay => {
   scoreText.tint = THEME.TXT_HUD_HEX;
   scoreText.anchor.set(0, 0);
   scoreText.position.y += 20;
-  scoreText.position.x -= 37;
+  scoreText.position.x -= 30;
 
   container.addChild(scoreText);
 

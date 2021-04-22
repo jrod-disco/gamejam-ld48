@@ -7,7 +7,14 @@ import {
 import * as PIXI from 'pixi.js';
 import { GoldNugget, goldNugget } from '../goldNugget';
 
-export const goldSpawner = () => {
+export interface GoldSpawner {
+  spawn: () => GoldNugget | null;
+  getNuggets: () => GoldNugget[];
+  removeNuggetByIndex: (index: number) => void;
+  reset: () => void;
+}
+
+export const goldSpawner = (): GoldSpawner => {
   let state = {
     lastSpawnTime: Date.now(),
     nuggetList: [],
@@ -18,7 +25,7 @@ export const goldSpawner = () => {
 
   const nuggetBuffer = 50;
 
-  const spawn = (): GoldNugget => {
+  const spawn = (): GoldNugget | null => {
     if (state.lastSpawnTime + GOLD_SPAWN_RATE > Date.now()) return;
 
     state.lastSpawnTime = Date.now();
@@ -42,8 +49,8 @@ export const goldSpawner = () => {
 
   const getNuggets = (): GoldNugget[] => state.nuggetList;
 
-  const removeNuggetByIndex = (i): void => {
-    state.nuggetList.splice(i, 1);
+  const removeNuggetByIndex = (index: number): void => {
+    state.nuggetList.splice(index, 1);
   };
 
   // Reset called by play again and also on init
@@ -51,7 +58,6 @@ export const goldSpawner = () => {
     console.log('gold spawner reset');
 
     state = { ...initialState, nuggetList: [] };
-    console.log(state);
   };
   //reset();
 

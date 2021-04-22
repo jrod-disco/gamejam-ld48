@@ -20,6 +20,7 @@ export interface PlayerCharacter {
   moveStop: () => void;
   grow: () => void;
   getSize: () => number;
+  wither: (onCompleteCallback: () => void) => void;
 }
 
 interface PlayerCharacterProps {
@@ -88,6 +89,9 @@ export const playerCharacter = (
   const playerSprite = new PIXI.Sprite(textures.playerTexture);
   playerSprite.anchor.set(0.5);
   playerContainer.addChild(playerSprite);
+
+  // start small so we can grow at start
+  playerSprite.scale.set(0);
 
   const spriteMargin = 20;
 
@@ -189,18 +193,46 @@ export const playerCharacter = (
     });
   };
 
+  const sprout = (onCompleteCallback?): void => {
+    console.log('sprout called');
+    gsap.killTweensOf(playerSprite);
+
+    const myTween = gsap.to(playerSprite, {
+      duration: 0.5,
+      pixi: { scale: 1 },
+      ease: Bounce.easeInOut,
+      onComplete: () => {
+        onCompleteCallback && onCompleteCallback();
+      },
+    });
+  };
+
+  const wither = (onCompleteCallback?): void => {
+    console.log('wither called');
+    gsap.killTweensOf(playerSprite);
+
+    const myTween = gsap.to(playerSprite, {
+      duration: 0.5,
+      pixi: { scale: 0 },
+      ease: Bounce.easeIn,
+      onComplete: () => {
+        console.log('wither complete');
+        onCompleteCallback && onCompleteCallback();
+      },
+    });
+  };
+
   // Reset called by play again and also on init
   const reset = (): void => {
+    console.log('playersprite reset', playerSprite.scale);
+
     container.x = state.startPos.x;
     container.y = state.startPos.y;
     state = { ...initialState };
 
-    gsap.killTweensOf(playerSprite);
-    playerSprite.scale.set(1);
-
-    console.log('playersprite reset', playerSprite.scale);
+    playerSprite.scale.set(0);
+    sprout();
   };
-  reset();
 
   const update = (delta): void => {
     // Update called by main
@@ -217,6 +249,7 @@ export const playerCharacter = (
     moveStop,
     grow,
     getSize,
+    wither,
 
     reset,
     update,
