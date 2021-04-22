@@ -43,7 +43,7 @@ export const gameLayout = (props: Props): GameLayout => {
   // Text
 
   const promptText = new PIXI.Text(
-    'CLICK ON THE THINGS TO SCORE POINTS.',
+    'Use W, A, S, D to move your character. Eat and grow.',
     TEXT_STYLE.GRADIENT_PROMPT
   );
   promptText.anchor.set(0.5);

@@ -1,4 +1,6 @@
 import * as PIXI from 'pixi.js';
+import { BloomFilter } from '@pixi/filter-bloom';
+import { CRTFilter } from '@pixi/filter-crt';
 import * as PIXISOUND from 'pixi-sound';
 import gsap, { Power0, Bounce } from 'gsap';
 import {
@@ -227,6 +229,8 @@ export const gameLogic = (props: Props): GameLogic => {
   const goldSpawnerRef = goldSpawner();
   const goldContainer = new PIXI.Container();
   gameContainer.addChild(goldContainer);
+
+  gameContainer.filters = [new BloomFilter(4)];
 
   const updateGold = (): void => {
     const maybeGold = goldSpawnerRef.spawn();

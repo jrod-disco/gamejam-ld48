@@ -10,6 +10,9 @@ export enum OBJECT_STATUS {
   INACTIVE,
 }
 
+// Environment
+export const IS_SCORE_INCREMENTY = false;
+
 // Player
 export const PLAYER_SPEED = 5;
 export const PLAYER_CONTINOUS_MOVEMENT = true;

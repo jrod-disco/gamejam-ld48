@@ -63,7 +63,7 @@ export const mainMenuLayout = (props: Props): MainMenuLayout => {
   );
   promptText.anchor.set(0.5);
   promptText.position.x = APP_WIDTH / 2;
-  promptText.position.y = 200;
+  promptText.position.y = 400;
   container.addChild(promptText);
 
   // Interactive Elements --------
