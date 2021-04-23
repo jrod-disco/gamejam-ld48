@@ -43,6 +43,8 @@
     "typescript": "4.0.2"
   },
   "dependencies": {
+    "@pixi/filter-bloom": "^4.0.0",
+    "@pixi/filter-crt": "^4.0.0",
     "firebase": "^7.18.0",
     "firebaseui": "^4.6.1"
   },
@@ -54,6 +56,6 @@
     "docs": "rimraf docs && npx typedoc --excludeExternals --entryPoint 'main' --stripInternal --readme none",
     "nwjs-start": "run --mac-x64 --mirror https://dl.nwjs.io/ ./dist",
     "nwjs-dist": "rimraf dist-nwjs && build --tasks mac-x64 --mirror https://dl.nwjs.io/ ./dist",
-     "all-the-things": "yarn build && yarn nwjs-dist"
+    "all-the-things": "yarn build && yarn nwjs-dist"
   }
 }

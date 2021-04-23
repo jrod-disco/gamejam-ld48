@@ -8,22 +8,23 @@
  * and maybe an index.ts to serve as the controller
  */
 
-// Screen Controller
-export { controller } from './controller';
-
 // Example Screen One
 export { mainMenuLayout, MainMenuLayout } from './main/layout';
 
 // Example Screen Two
-export { secondLayout, SecondLayout } from './second/layout';
+export { gameLayout, GameLayout as SecondLayout } from './game/layout';
 
 // Types
 import { MainMenuLayout } from './main/layout';
-import { SecondLayout } from './second/layout';
+import { GameLayout } from './game/layout';
 
-export type ScreenLayout = MainMenuLayout | SecondLayout;
+export type ScreenLayout = MainMenuLayout | GameLayout;
 
 export enum ScreenName {
   MAIN = 'mainMenu',
-  SECOND = 'secondScreen',
+  GAME = 'gameScreen',
 }
+
+// Screen Controller
+import { screenController } from './controller';
+export const controller = screenController({});

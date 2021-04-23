@@ -2,6 +2,8 @@ import * as PIXI from 'pixi.js';
 import gsap, { Power0 } from 'gsap';
 import PixiPlugin from 'gsap/PixiPlugin';
 import * as PIXISOUND from 'pixi-sound';
+import { CRTFilter } from '@pixi/filter-crt';
+
 import jrvascii from './util/jrvascii';
 import { browserVisibility } from './util/browserVisibility';
 
@@ -16,12 +18,19 @@ import {
   APP_BGCOLOR,
   Z_MC_BASE,
   Z_MC_UI,
+  SFX_VOL_MULT,
+  PLAYER_CONTINOUS_MOVEMENT,
 } from './constants';
 import './index.scss';
 
 import * as COMP from './components';
 import * as SCREENS from './screens';
 import { Sounds } from './components/library/audio';
+import {
+  personalBestScores,
+  PersonalBestScores,
+} from './util/personalBestScore';
+import { runtime } from './components/library';
 
 declare global {
   interface Window {
@@ -78,9 +87,39 @@ const bootstrapApp = (props: {
 
   const { pixiApp, mainContainer } = initPIXI(pixiConfig, hostDiv);
 
+  const crtFilter = new CRTFilter({
+    curvature: 2,
+    vignetting: 0.2,
+    noise: 0.1,
+  });
+  mainContainer.filters = [crtFilter];
+
+  // Get our preloader assets
+  let { spriteSheets } = props;
+  let sounds = props?.sounds;
+  let audioLayer = null;
+
   // Hide Loader GIF
   document.getElementById('loading').style.display = 'none';
   document.getElementById('footer').style.display = 'block';
+
+  /**
+   * This does a second round of initialization once additional assets (spritesheets)
+   * have been loaded up - prior to this call some modules will be null as placeholders
+   * This can be used to pass secondary loaded assets to modules and set their spritesheet referecnes
+   */
+  const initSecondaryModules = (): void => {
+    console.log('initSecondaryModules', spriteSheets);
+  };
+
+  /**
+   * Brings in the secondary load set of sprites
+   * will also need to trigger any module initializations that require these sprites
+   */
+  const setAdditionalSprites = (secondarySprites): void => {
+    spriteSheets = { ...spriteSheets, ...secondarySprites };
+    initSecondaryModules();
+  };
 
   // Check for query params
   //const params = new URLSearchParams(window.location.search);
@@ -103,11 +142,7 @@ const bootstrapApp = (props: {
   const pixiSound = PIXISOUND.default; //TODO: deal with persistent loading of soundeffects / also make a soundsprite already
   // Load these up on startup...
   pixiSound.add('good', './assets/example/good.mp3');
-
-  // Get our preloader assets
-  let { spriteSheets } = props;
-  let sounds = props?.sounds;
-  let audioLayer = null;
+  pixiSound.add('coin', './assets/example/coin.wav');
 
   // Create empty BASE and UI containers and add them to the mainContainer
   // Use constants for Z-index of these containers
@@ -119,79 +154,53 @@ const bootstrapApp = (props: {
   baseContainer.name = 'gameContainer';
   uiContainer.name = 'uiContainer';
 
-  // Declare component variables in advance when needed
-  let runtime = null;
+  const bgTexture = PIXI.Texture.from('./assets/example/background600x600.png');
+  const bgSprite = new PIXI.Sprite(bgTexture);
+  baseContainer.addChild(bgSprite);
 
   const setSounds = (soundsLoaded: Sounds): void => {
     sounds = soundsLoaded;
     // Add music as a component
     audioLayer = COMP.LIB.audio(sounds);
     // Play a track
-    audioLayer.music.playRandomTrack();
+    //audioLayer.music.playRandomTrack();
   };
 
-  //#region ** EXAMPLES OF COMPONENT USE **
-  // You may want to strip this all out and do it within other use case specific modules
-
-  // Run Time is a simple clock that runs up
-  runtime = COMP.LIB.runtime({ pos: { x: 25, y: 25 } });
-  uiContainer.addChild(runtime.container);
-
-  // An example of a component you've created - not from the prebuilt library components
-  // This component's index can be used as a template for new components
-  const sampleComponent = COMP.exampleComponent({
-    pos: { x: APP_WIDTH / 2, y: APP_HEIGHT - 50 },
+  // Personal Best Score Display
+  const bestScore = COMP.LIB.bestScoreDisplay({
+    pos: { x: Math.round(APP_WIDTH * 0.5), y: 65 },
+    particleTextures: null,
   });
+  uiContainer.addChild(bestScore.container);
 
-  mainContainer.addChild(sampleComponent.container);
+  // High Score Manager
+  const personalBestManager: PersonalBestScores = personalBestScores(() => 0);
 
-  // We can also add a preloaded (or not preloaded PNG) if we wanted to
-
-  // Usually we'll nest these in a component for more flexibility but it's an example
-
-  const backgroundTexture = PIXI.Texture.from(
-    './assets/example/background.png'
-  );
-  const backgroundSprite = new PIXI.Sprite(backgroundTexture);
-  baseContainer.addChild(backgroundSprite);
-
-  const texture = PIXI.Texture.from('./assets/example/example.png');
-  const sampleSprite = new PIXI.Sprite(texture);
-  sampleSprite.anchor.set(0.5);
-  sampleSprite.x = APP_WIDTH / 2;
-  sampleSprite.y = 50;
-  mainContainer.addChild(sampleSprite);
-
-  // We can even use Greensock to animate the resulting sprite
-  gsap.to(sampleSprite, 3, {
-    delay: 1,
-    pixi: {
-      scale: 0.5,
-      angle: 360,
-    },
-    ease: Power0.easeOut,
-    onComplete: () => {
-      // tweens have callbacks too!
-      console.log('tween completed. welcome to pixi with gsap');
-    },
-  });
-
-  //#endregion ** EXAMPLES OF COMPONENT USE **
+  // Personal Best Scoe
+  const showPersonalBest = (): void => {
+    // check to see if this is a personal best
+    const score = gameLogic.getPlayerScore();
+    const level = gameLogic.getCurrentLevel();
+    const isNewPersonalBest = personalBestManager.checkPersonalBest(
+      score,
+      level,
+      0
+    );
+    bestScore.setText(
+      String(personalBestManager.getPersonalBest()),
+      isNewPersonalBest
+    );
+    bestScore.setVisibility(true);
+  };
 
   // Screens UI -----------------------------------------
 
   // Callback for Sample "Play Again" Button
-  const onSampleButtonPress = (): void => {
-    // may want to wrap this in a conditional that assures that we should reset
-    runtime.reset();
-    runtime.start();
-    SCREENS.controller.onViewScreen(SCREENS.ScreenName.SECOND);
-    audioLayer.music.mainTheme();
-  };
+  const onPlayButtonPress = (): void => onStartGame();
 
   // Sample Screen One - Main Screen'
   const screenMainMenu = SCREENS.mainMenuLayout({
-    onSampleButtonPress,
+    onPlayButtonPress,
     spriteSheets,
   });
   SCREENS.controller.addScreenToList(SCREENS.ScreenName.MAIN, screenMainMenu);
@@ -199,38 +208,98 @@ const bootstrapApp = (props: {
   uiContainer.addChild(screenMainMenu.container);
 
   // Sample Screen Two - Second Screen
-  const screenSecond = SCREENS.secondLayout({});
-  SCREENS.controller.addScreenToList(SCREENS.ScreenName.SECOND, screenSecond);
+  const screenGame = SCREENS.gameLayout({});
+  SCREENS.controller.addScreenToList(SCREENS.ScreenName.GAME, screenGame);
 
-  uiContainer.addChild(screenSecond.container);
+  uiContainer.addChild(screenGame.container);
 
-  //Operator: Main Screen Turn On...onViewScreen(screenMainMenu);
+  // Set main screen
   SCREENS.controller.setCurrentScreen({
     name: SCREENS.ScreenName.MAIN,
     isAnimated: true,
   });
 
-  // Audio Option Cycle
+  // Audio Option Cycle (just a toggle)
   const onAudioCycleOptions = (): void => {
     audioLayer.muteToggle();
   };
 
-  /**
-   * This does a second round of initialization once additional assets (spritesheets)
-   * have been loaded up - prior to this call some modules will be null as placeholders
-   * This can be used to pass secondary loaded assets to modules and set their spritesheet referecnes
-   */
-  const initSecondaryModules = (): void => {
-    console.log('initSecondaryModules', spriteSheets);
+  // Keyboard Listener
+  const onKeyDownMain = (event: KeyboardEvent): void => {
+    // Using current event.code now that .keycode is deprecated
+    switch (event.code) {
+      case 'Backquote': // toggle audio
+        onAudioCycleOptions();
+        break;
+      case 'Space': // Start
+      case 'Enter': // Start
+        screenMainMenu.showPressedButton();
+        onStartGame();
+        break;
+    }
+    //console.log(event.code);
   };
 
-  /**
-   * Brings in the secondary load set of sprites
-   * will also need to trigger any module initializations that require these sprites
-   */
-  const setAdditionalSprites = (secondarySprites): void => {
-    spriteSheets = { ...spriteSheets, ...secondarySprites };
-    initSecondaryModules();
+  const addOnKeyDown = (): void => {
+    window.addEventListener('keydown', onKeyDownMain);
+  };
+  const removeOnKeyDown = (): void =>
+    window.removeEventListener('keydown', onKeyDownMain);
+
+  // Initially start listening for keyboard events
+  addOnKeyDown();
+
+  // Game Events
+
+  const onGameOver = (): void => {
+    console.log('core: onGameOver');
+
+    SCREENS.controller.setCurrentScreen({
+      name: SCREENS.ScreenName.MAIN,
+      isAnimated: true,
+      onComplete: () => {
+        showPersonalBest();
+        addOnKeyDown();
+        // audioLayer.music.somber();
+        // audioLayer.music.menuTheme(true);
+        // audioLayer.music.playRandomTrack();
+      },
+    });
+  };
+
+  // Game Logic ----------------------------------------------
+  const gameLogic = COMP.gameLogic({
+    gameContainer: screenGame.container,
+  });
+
+  gameLogic.setRefs({
+    spriteSheets,
+    uiContainer,
+    mainOnAudioCycleOptions: onAudioCycleOptions,
+    mainOnGameOver: onGameOver,
+  });
+
+  // Start Game
+  const onStartGame = (): void => {
+    console.log('core: onStartGame');
+    removeOnKeyDown();
+    pixiSound.play('good', {
+      volume: 1 * SFX_VOL_MULT,
+    });
+
+    bestScore.setVisibility(false);
+    SCREENS.controller.setCurrentScreen({
+      name: SCREENS.ScreenName.GAME,
+      isAnimated: true,
+      onComplete: () => {
+        console.log('core: screen transition complete');
+        // Defer starting the timer until the fade is complete
+        gameLogic.onStartGame();
+      },
+    });
+    audioLayer.music.mainTheme();
+    //
+    //
   };
 
   // ------------------------------------
@@ -242,13 +311,20 @@ const bootstrapApp = (props: {
   pixiApp.ticker.add((delta) => {
     // Update All The Things
 
-    // Individual components
-    runtime.update(delta);
+    // Animate the CRT filter
+    crtFilter.seed = Math.random();
+    crtFilter.time += 0.25;
 
-    // Update this screen only when it is visible
+    // Individual components -------------
+
+    // Update game screen only when it is visible
     const currentScreen = SCREENS.controller.getCurrentScreen();
-    if (currentScreen.name === SCREENS.ScreenName.SECOND)
+    if (currentScreen.name === SCREENS.ScreenName.GAME) {
+      // Logic
+      gameLogic.update(delta);
+      // The Screen Itself
       currentScreen.ref.update(delta);
+    }
   });
 
   /**

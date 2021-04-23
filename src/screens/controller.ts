@@ -4,8 +4,14 @@ type ScreenName = string;
 
 export type Screen = { name: ScreenName; ref: any };
 
+export type SetScreenProps = {
+  name: string;
+  isAnimated: boolean;
+  onComplete?: () => void;
+};
 export interface SceenController {
-  setCurrentScreen: ({ name: ScreenName, isAnimated: boolean }) => ScreenName;
+  setCurrentScreen: (props: SetScreenProps) => ScreenName;
+
   getCurrentScreen: () => Screen;
   addScreenToList: (name: ScreenName, ref: any) => void;
   onViewScreen: (name: ScreenName) => void;
@@ -19,13 +25,11 @@ interface Props {
 /**
  * A very basic controller for screen layouts
  *
- * @param props - Standard component properties.
- *
  * @returns Interface object containing methods that can be called on this module
  */
-const screenController = ({ initialScreen = null }: Props): SceenController => {
-  // Screens
-
+export const screenController = ({
+  initialScreen = '',
+}: Props): SceenController => {
   // Screen State
   const screenState = {
     list: {},
@@ -33,9 +37,19 @@ const screenController = ({ initialScreen = null }: Props): SceenController => {
     prevScreen: initialScreen,
   };
 
-  const setCurrentScreen = ({ name, isAnimated }): ScreenName => {
+
+  /**
+   * Set the current screen.
+   * Tracks screen state and triggers visibility changes on the affected layouts
+   *
+   * @returns the name of the previous screen
+   */
+  const setCurrentScreen = (props: SetScreenProps): ScreenName => {
+    const { name, isAnimated } = props;
+    const onComplete = props.onComplete;
     screenState.prevScreen = screenState.currentScreen;
-    screenState.currentScreen = screenState.list[name];
+    screenState.currentScreen = name;
+
     console.log(
       `screen transition from ${screenState.prevScreen || 'BOOT'} to ${name}`
     );
@@ -45,15 +59,13 @@ const screenController = ({ initialScreen = null }: Props): SceenController => {
       isAnimated: true,
       onCompleteCallback: () => {
         // callback for when screen fade on is complete
+        onComplete && onComplete();
       },
     });
 
     screenState.list[screenState.prevScreen]?.setVisibility({
       isVisible: false,
       isAnimated: true,
-      onCompleteCallback: () => {
-        // callback for when screen fade on is complete
-      },
     });
 
     return screenState.prevScreen;
@@ -63,8 +75,19 @@ const screenController = ({ initialScreen = null }: Props): SceenController => {
     return { name: screen, ref: screenState.list[screen] };
   };
 
+  /**
+   *
+   * @returns the name of the current screen
+   */
   const getCurrentScreen = (): Screen => getScreen(screenState.currentScreen);
 
+  /**
+   * Adds a screen to the list of screens maintained by the controller.
+   * This list is keyed on the screen name string which is used in other operations.
+   *
+   * @param name - a name to refer to this screen by
+   * @param ref - the actual screen object instance
+   */
   const addScreenToList = (name: ScreenName, ref: any): void => {
     if (screenState.list[name]) {
       console.warn(
@@ -75,16 +98,18 @@ const screenController = ({ initialScreen = null }: Props): SceenController => {
       screenState.list[name] = ref;
     }
   };
+
   /**
    * Called by any button which switches screens
-   * Usage: `onViewScreen(screenCredits);`
+   * @example onViewScreen('mainMenu');
    *
    */
   const onViewScreen = (name: ScreenName): void => {
+    console.log('view screen', screenState);
     setCurrentScreen({ name, isAnimated: true });
     //
     // fade out welcome text
-    screenState.list[name].setVisibility({
+    screenState.list[screenState.prevScreen].setVisibility({
       isVisible: false,
       isAnimated: true,
     });
@@ -123,5 +148,3 @@ const screenController = ({ initialScreen = null }: Props): SceenController => {
     onBackFromScreen,
   };
 };
-
-export const controller = screenController({});

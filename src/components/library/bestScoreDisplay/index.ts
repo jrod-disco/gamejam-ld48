@@ -71,6 +71,7 @@ export const bestScoreDisplay = (props: BestScoreProps): BestScoreDisplay => {
   };
 
   const setVisibility = (isVisible: boolean): void => {
+    gsap.killTweensOf(container);
     if (isVisible) {
       container.alpha = 0;
       gsap.to(container, {
@@ -159,7 +160,7 @@ export const bestScoreDisplay = (props: BestScoreProps): BestScoreDisplay => {
 
   // Reset called by play again and also on init
   const reset = (): void => {
-    setVisibility(false);
+    // setVisibility(false);
     particleContainer.alpha = 0;
     emitter.emit = false;
   };

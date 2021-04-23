@@ -12,7 +12,7 @@ type Score = number;
 export interface PersonalBestScores {
   getPersonalBest: () => Score;
   checkPersonalBest: (score: Score, level: number, mode: number) => boolean;
-  setFireboardStore: (fireboardStore: FireboardStore) => void;
+  setFireboardStore?: (fireboardStore: FireboardStore) => void;
 }
 
 export const personalBestScores = (
@@ -26,8 +26,6 @@ export const personalBestScores = (
   const setFireboardStore = (fireboardStore: FireboardStore): void => {
     localFireboardRef = fireboardStore;
   };
-
-  const getPersonalBest = (): Score => fetchPersonalBest();
 
   const fetchPersonalBest = (): Score => {
     // retrieve the best score from wherever
@@ -49,6 +47,8 @@ export const personalBestScores = (
     );
   };
 
+  const getPersonalBest = (): Score => fetchPersonalBest();
+
   currentBest = fetchPersonalBest();
 
   const checkPersonalBest = (score: Score, level = 0, mode = 0): boolean => {
@@ -63,7 +63,7 @@ export const personalBestScores = (
 
     // also check against leaderboards
     // only for authed users
-    const uid = localFireboardRef.getUserInfo().uid;
+    const uid = localFireboardRef?.getUserInfo().uid;
     if (score && localFireboardRef && uid) {
       const playerScore: PlayerScore = {
         uid,
@@ -79,7 +79,7 @@ export const personalBestScores = (
       };
       localFireboardRef.checkHighScore(checkHighScoreProps);
     } else {
-      //console.warn(`checkPersonalBest:${!uid && ' Fireboards UID not found.'}`);
+      console.warn(`checkPersonalBest:${!uid && ' Fireboards UID not found.'}`);
     }
 
     return isNewPersonalBest;
