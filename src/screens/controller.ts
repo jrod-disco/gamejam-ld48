@@ -37,6 +37,7 @@ export const screenController = ({
     prevScreen: initialScreen,
   };
 
+
   /**
    * Set the current screen.
    * Tracks screen state and triggers visibility changes on the affected layouts
@@ -48,6 +49,7 @@ export const screenController = ({
     const onComplete = props.onComplete;
     screenState.prevScreen = screenState.currentScreen;
     screenState.currentScreen = name;
+
     console.log(
       `screen transition from ${screenState.prevScreen || 'BOOT'} to ${name}`
     );
