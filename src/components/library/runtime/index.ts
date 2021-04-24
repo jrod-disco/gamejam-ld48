@@ -68,25 +68,6 @@ export const runtime = (props: Props): RunTime => {
     timeText.text = timeString();
   };
 
-  // const setStartLimit = (newLimit: number): void => {
-  //   //console.log('set start limt', newLimit);
-  //   lastUpdateTime = Date.now();
-  //   state.currentTime = 0;
-  //   limit = newLimit;
-  //   storedLimit = newLimit;
-  //   updateTimeText();
-  // };
-
-  // const setLimit = (newLimit: number): void => {
-  //   //console.log('set  limt', newLimit);
-  //   limit = newLimit;
-  //   updateTimeText();
-  // };
-
-  // const getLimit = (): number => {
-  //   return limit;
-  // };
-
   const getRunTime = (): number => Number(state.currentTime.toFixed(2));
 
   // Reset called by play again and also on init
@@ -112,14 +93,6 @@ export const runtime = (props: Props): RunTime => {
   const pause = (): void => {
     state = { ...state, isOn: false };
   };
-
-  // const checkTimeLimit = (): void => {
-  //   if (!limit) return;
-  //   if (state.currentTime >= limit) {
-  //     pause();
-  //     timeOverCallback();
-  //   }
-  // };
 
   const update = (delta): void => {
     // Update called by main
