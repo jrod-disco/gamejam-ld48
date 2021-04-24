@@ -15,6 +15,7 @@ import {
 import * as COMP from '..';
 import { PlayerCharacter } from '../playerCharacter';
 import { RunTime } from '../library/runtime';
+import { DepthMeter } from "../library/depth";
 import { Spritesheets } from '@src/core';
 import { scoreDisplay, ScoreDisplay } from '../library/scoreDisplay';
 import { goldSpawner } from './goldSpawner';
@@ -58,6 +59,7 @@ export const gameLogic = (props: Props): GameLogic => {
   let state = {
     keysDown: {},
     currentLevel: 0,
+    currentDepth: 0,
     isGameOver: true,
     isGamePaused: false,
     playerScore: 0,
@@ -74,6 +76,7 @@ export const gameLogic = (props: Props): GameLogic => {
   let spriteSheetsRef: Spritesheets = null;
   let uiContainerRef: PIXI.Container;
   let runtime: RunTime = null;
+  let depthMeter: DepthMeter = null;
   let mainOnGameOver: () => void = null;
   let mainOnAudioCycleOptions: () => void = null;
 
@@ -111,11 +114,17 @@ export const gameLogic = (props: Props): GameLogic => {
     // Run Time is a simple clock that runs up
     runtime = COMP.LIB.runtime({
       pos: { x: 25, y: 25 },
-      timeOverCallback: () => {
-        onTimeOver();
-      },
     });
     uiContainerRef.addChild(runtime.container);
+
+    depthMeter = COMP.LIB.depthMeter({
+      pos: { x: 25, y: 75 },
+      depth: 0,
+      maxDepthCallback: () => {
+        onMaxDepthReached();
+      },
+    });
+    uiContainerRef.addChild(depthMeter.container);
 
     // Score Display
     scoreDisplay = COMP.LIB.scoreDisplay({
@@ -166,6 +175,8 @@ export const gameLogic = (props: Props): GameLogic => {
     scoreDisplay.reset();
     runtime.reset();
     runtime.start();
+    depthMeter.reset();
+    depthMeter.start();
     playerCharacter.reset();
     //
 
@@ -174,9 +185,15 @@ export const gameLogic = (props: Props): GameLogic => {
     addOnKeyDown();
   };
 
-  const onTimeOver = (): void => {
+  const onMaxDepthReached = (): void => {
     onGameOver();
   };
+
+
+  // TODO:
+  // - game over, when:
+  // - MAX_DEPTH reached (+ success action?)
+  // - PLAYER.HEALTH reaches 0
 
   const onGameOver = (): void => {
     console.log('gameLogic: onGameOver');
@@ -200,6 +217,12 @@ export const gameLogic = (props: Props): GameLogic => {
 
     playerCharacter.wither(mainOnGameOver);
   };
+
+
+  // TODO:
+  // move listeners to handleInput.ts
+  // - externalize game state so is importable?
+
 
   // Keyboard Listener
   const onKeyUpGame = (event: KeyboardEvent): void => {
@@ -240,6 +263,7 @@ export const gameLogic = (props: Props): GameLogic => {
   const removeOnKeyDown = (): void =>
     window.removeEventListener('keydown', onKeyDownGame);
 
+
   // Simple Player Component
   const playerTexture = PIXI.Texture.from('./assets/example/whitebox.png');
   const playerCharacter = COMP.playerCharacter({
@@ -262,6 +286,9 @@ export const gameLogic = (props: Props): GameLogic => {
   const cleanUpGold = (): void => {
     goldContainer.removeChildren();
   };
+
+  // TODO:
+  // - abstact to class
 
   // Collision Detection
   const checkCollision = (): void => {
@@ -302,6 +329,7 @@ export const gameLogic = (props: Props): GameLogic => {
 
     // Update individual controller refs here
     runtime.update(delta);
+    depthMeter.update(delta);
     checkDownKeys(state.keysDown);
     updateGold();
     playerCharacter.update(delta);

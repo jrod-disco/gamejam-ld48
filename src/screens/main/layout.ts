@@ -58,7 +58,7 @@ export const mainMenuLayout = (props: Props): MainMenuLayout => {
   container.addChild(mainTitle);
 
   const promptText = new PIXI.Text(
-    'This is a very simple game made as an example of the bare bones of what is possibe with pixi and the dcollage boilerplate.',
+    'DELIVER TO THE ABYSS',
     TEXT_STYLE.GRADIENT_PROMPT
   );
   promptText.anchor.set(0.5);

@@ -12,5 +12,5 @@ export * from './textStyles';
 // Temporary constants from OBTS -  here while we port in features from OBTS to the boilerplate
 export * from './tempOBTS';
 
-// Constants for Simple Game example
-export * from './simpleGame';
+// Game constants
+export * from './game';
