@@ -15,7 +15,7 @@ import {
 import * as COMP from '..';
 import { PlayerCharacter } from '../playerCharacter';
 import { RunTime } from '../library/runtime';
-import { DepthMeter } from "../library/depth";
+import { DepthMeter } from '../library/depth';
 import { Spritesheets } from '@src/core';
 import { scoreDisplay, ScoreDisplay } from '../library/scoreDisplay';
 import { goldSpawner } from './goldSpawner';
@@ -34,6 +34,7 @@ export interface GameLogic {
   reset: () => void;
   //
   setRefs: (refs: Refs) => void;
+  setSpriteSheet: (spriteSheets: Spritesheets) => void;
   //
   getPlayerScore: () => number;
   getCurrentLevel: () => number;
@@ -45,6 +46,7 @@ export interface GameLogic {
 
 interface Props {
   gameContainer: PIXI.Container;
+  spriteSheets: Spritesheets;
   pos?: { x: number; y: number };
 }
 
@@ -80,7 +82,7 @@ export const gameLogic = (props: Props): GameLogic => {
   let mainOnGameOver: () => void = null;
   let mainOnAudioCycleOptions: () => void = null;
 
-  const { gameContainer } = props;
+  const { gameContainer, spriteSheets } = props;
 
   // Level Message Text
   const messageText = new PIXI.BitmapText('LEVEL UP!', {
@@ -131,6 +133,10 @@ export const gameLogic = (props: Props): GameLogic => {
       pos: { x: APP_WIDTH - 100, y: 25 },
     });
     uiContainerRef.addChild(scoreDisplay.container);
+  };
+
+  const setSpriteSheet = (spriteSheet: Spritesheets): void => {
+    spriteSheetsRef = { ...spriteSheetsRef, ...spriteSheet };
   };
 
   const getIsGameOver = (): boolean => {
@@ -190,7 +196,6 @@ export const gameLogic = (props: Props): GameLogic => {
     onGameOver();
   };
 
-
   // TODO:
   // - game over, when:
   // - MAX_DEPTH reached (+ success action?)
@@ -219,11 +224,9 @@ export const gameLogic = (props: Props): GameLogic => {
     playerCharacter.wither(mainOnGameOver);
   };
 
-
   // TODO:
   // move listeners to handleInput.ts
   // - externalize game state so is importable?
-
 
   // Keyboard Listener
   const onKeyUpGame = (event: KeyboardEvent): void => {
@@ -246,7 +249,7 @@ export const gameLogic = (props: Props): GameLogic => {
       return;
     }
 
-    // TODO: instead of translating around the view, 
+    // TODO: instead of translating around the view,
     // - playercharacter will stay centered
     // - and display tilt / rotation animation
 
@@ -269,19 +272,20 @@ export const gameLogic = (props: Props): GameLogic => {
   const removeOnKeyDown = (): void =>
     window.removeEventListener('keydown', onKeyDownGame);
 
-
   // PLAYER CRAFT
 
-  // TODO: does this need assignment at this scope?
+  // TODO: does this need assignment at this scope?'
+
+  console.log('and now', spriteSheets);
   const playerTexture = PIXI.Texture.from('./assets/ship/submarine_top.png');
   const playerCharacter = COMP.playerCharacter({
     pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2, rot: 0 },
     textures: { playerTexture },
+    anims: spriteSheets.game.animations,
   });
   gameContainer.addChild(playerCharacter.container);
 
   // ITEMZ
-
 
   // Gold Spawner
   const goldSpawnerRef = goldSpawner();
@@ -355,6 +359,7 @@ export const gameLogic = (props: Props): GameLogic => {
     update,
     reset,
     setRefs,
+    setSpriteSheet,
     //
     getPlayerScore,
     getCurrentLevel,

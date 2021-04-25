@@ -7,7 +7,7 @@ import {
   APP_WIDTH,
   OBJECT_STATUS,
   PLAYER_SPEED,
-  PLAYER_INIT_ROT
+  PLAYER_INIT_ROT,
 } from '@src/constants';
 
 export interface PlayerCharacter {
@@ -25,12 +25,12 @@ export interface PlayerCharacter {
 }
 
 interface PlayerCharacterProps {
-  pos?: { x: number; y: number, rot: number };
+  pos?: { x: number; y: number; rot: number };
   textures?: { playerTexture: PIXI.Texture };
   anims?: { [key: string]: Array<PIXI.Texture> };
 }
 
-type PlayerPosition = { x: number; y: number, rot: number };
+type PlayerPosition = { x: number; y: number; rot: number };
 
 enum PLAYER_DIRECTION {
   NONE,
@@ -49,18 +49,18 @@ enum PLAYER_MOVEMENT {
 }
 
 type PlayerState = {
-  startPos: PlayerPosition,
-  status: OBJECT_STATUS,
-  direction: PLAYER_DIRECTION,
-  movement: PLAYER_MOVEMENT,
-  movementSpeed: number,
-  size: 1,
-  oxygen: number,
-  power: number,
-  structure: number, // TODO: strengh of hull (improved by pickup ?)
-  integrity: number, // TODO: health of hull
-  items: [],  // TODO: ITEM types
-}
+  startPos: PlayerPosition;
+  status: OBJECT_STATUS;
+  direction: PLAYER_DIRECTION;
+  movement: PLAYER_MOVEMENT;
+  movementSpeed: number;
+  size: 1;
+  oxygen: number;
+  power: number;
+  structure: number; // TODO: strengh of hull (improved by pickup ?)
+  integrity: number; // TODO: health of hull
+  items: []; // TODO: ITEM types
+};
 
 /**
  * A simple player character
@@ -69,9 +69,8 @@ type PlayerState = {
  *
  */
 export const playerCharacter = (
-  props: PlayerCharacterProps,
+  props: PlayerCharacterProps
 ): PlayerCharacter => {
-
   const pos = props.pos ?? { x: 0, y: 0, rot: PLAYER_INIT_ROT };
   const container = new PIXI.Container();
   container.x = pos.x;
@@ -92,7 +91,7 @@ export const playerCharacter = (
     movement: PLAYER_MOVEMENT.IDLE,
     movementSpeed: PLAYER_SPEED,
     size: 1,
-    // 
+    //
     oxygen: 100,
     power: 100,
     structure: 100,
@@ -109,7 +108,11 @@ export const playerCharacter = (
   // playerContainer.addChild(playerSprite);
 
   // placeholder sprite
-  const playerSprite = new PIXI.Sprite(textures.playerTexture);
+  //const playerSprite = new PIXI.Sprite(textures.playerTexture);
+  const playerSprite = new PIXI.AnimatedSprite(anims['sub_center']);
+  playerSprite.animationSpeed = 0.6;
+  playerSprite.gotoAndPlay(1);
+  playerSprite.loop = true;
   playerSprite.anchor.set(0.5);
   playerContainer.addChild(playerSprite);
 
@@ -172,7 +175,11 @@ export const playerCharacter = (
 
   //
   const moveUpdate = (delta: number): PlayerPosition => {
-    const currentPos = { x: container.x, y: container.y, rot: container.rotation };
+    const currentPos = {
+      x: container.x,
+      y: container.y,
+      rot: container.rotation,
+    };
 
     if (state.movement === PLAYER_MOVEMENT.IDLE || state.movementSpeed === 0)
       return currentPos;
@@ -215,9 +222,7 @@ export const playerCharacter = (
 
   const grow = (): void => {
     // state.size += 0.2;
-
     // gsap.killTweensOf(playerSprite);
-
     // const myTween = gsap.to(playerSprite, {
     //   duration: 0.5,
     //   pixi: { scale: state.size },
@@ -256,7 +261,6 @@ export const playerCharacter = (
 
   // Reset called by play again and also on init
   const reset = (): void => {
-
     container.x = state.startPos.x;
     container.y = state.startPos.y;
     // container.rotation = state.startPos.rot;
@@ -279,7 +283,7 @@ export const playerCharacter = (
     moveLeft,
     moveRight,
     moveStop,
-    
+
     grow,
     getSize,
     wither,
