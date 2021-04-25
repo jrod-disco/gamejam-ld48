@@ -12,6 +12,7 @@ export const MAX_PRESSURE = 1000; // lbs/sq in
 
 // - Depth effects
 export const MAX_LAYER_SCALE = 2.5;   // % scale of layer at MAX_LAYER_DEPTH
+export const MAX_PICKUP_SCALE = 3;    // % scale of pickup at MAX_LAYER_DEPTH
 export const MAX_LAYER_DEPTH = 32;    // layers of sprite depth
 export const LAYER_SPACING = .075;    // start distance between each layer
 export const LAYER_START_SCALE = .25; // % scale the layer at depth 0
@@ -51,8 +52,8 @@ export enum PICKUP_TYPES {
 }
 
 // PICKUP Generator
-export const PICKUPS_MAX = 3;
-export const PICKUP_SPAWN_RATE = 3500;
+export const PICKUPS_MAX = 6;
+export const PICKUP_SPAWN_RATE = 5000;
 export const PICKUP_OXYGEN_TANK_QUANTITY = 2; // lbs of oxygen
 
 ///////////////////////////////////////////////////////////////////////////////

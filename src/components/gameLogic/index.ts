@@ -340,7 +340,6 @@ export const gameLogic = (props: Props): GameLogic => {
   const updatePickups = (): void => {
     const maybePickup = pickupSpawnerRef.spawn();
     maybePickup && pickupContainer.addChild(maybePickup.container);
-    //console.log(pickupSpawnerRef.getPickups());
   };
   const cleanUpPickups = (): void => {
     pickupContainer.removeChildren();
