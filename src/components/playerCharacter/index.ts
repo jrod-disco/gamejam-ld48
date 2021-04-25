@@ -266,10 +266,23 @@ export const playerCharacter = (
   const getState = () => state;
   //
   const updatePosition = (): void => {
+    const getRotation = () => {
+      var { x, y } = state.movementSpeed;
+      const rad = Math.PI / 2;
+      if (y === 0) {
+        return x < 0 ? -rad : x > 0 ? rad : state.pos.rot;
+      }
+
+      const angle = Math.atan(x / -y);
+
+      return y > 0 ? angle + Math.PI : angle;
+    };
+
     const newPos = {
       ...state.pos,
       x: state.pos.x + state.movementSpeed.x,
       y: state.pos.y + state.movementSpeed.y,
+      rot: getRotation(),
     };
 
     if (checkInBounds(newPos)) {
