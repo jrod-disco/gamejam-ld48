@@ -14,7 +14,7 @@ export const WORLD_HEIGHT = 100;
 
 // Player
 export const PLAYER_MAX_SPEED = 5; // not a constant, move
-export const PLAYER_ACCEL = 0.03; // rate of acceleration when explicitly moving
+export const PLAYER_ACCEL = 0.04; // rate of acceleration when explicitly moving
 export const PLAYER_DECEL = 0.008; // constant rate of deceleration, aka drag
 export const PLAYER_DESCENT_RATE = 0.5; // feet per sec
 export const PLAYER_MAX_OXYGEN = 100; // full tank, init value
