@@ -6,6 +6,8 @@
 export * as LIB from './library';
 
 // Your Components
+export * as UI from './ui';
+
 export { exampleComponent } from './exampleComponent';
 export { gameLogic } from './gameLogic';
 export { playerCharacter } from './playerCharacter';

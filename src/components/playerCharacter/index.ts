@@ -11,6 +11,9 @@ import {
   PLAYER_OXYGEN_CONSUMPTION_RATE,
   PLAYER_ACCEL,
   PLAYER_DECEL,
+  PICKUP_TYPES,
+  Resource,
+  PLAYER_MAX_OXYGEN,
 } from '@src/constants';
 
 type UpdateProps = {
@@ -24,8 +27,9 @@ export interface PlayerCharacter {
   container: PIXI.Container;
   reset: () => void;
   update: (props: UpdateProps) => void;
-  takeDamage: (dmg: number) => void;
   getState: () => PlayerState;
+  takeDamage: (dmg: number) => void;
+  consumeResource: (resource: Resource) => void;
   setMovement: (movement: PlayerMovement) => void;
 }
 
@@ -50,7 +54,7 @@ enum PLAYER_ANIM {
   FORWARD = 'sub_fwd',
 }
 
-type PlayerState = {
+export type PlayerState = {
   startPos: PlayerPosition;
   pos: PlayerPosition;
   status: OBJECT_STATUS;
@@ -257,14 +261,9 @@ export const playerCharacter = (
 
   // OXYGEN
   const consumeOxygen = (delta: number, pressure: number): void => {
-    // as pressure increases, increase rate of consumption
-    // - rate of consumption is .05 lbs (???)
-    // - start w 100 lbs of oygen (???)
-    // state.oxygen = state.oxygen - PLAYER_OXYGEN_CONSUMPTION_RATE;
-
+    // TODO: as pressure increases, increase rate of consumption
     state.oxygen -= PLAYER_OXYGEN_CONSUMPTION_RATE;
 
-    //  console.log('state.oxygen: %o', state.oxygen.toFixed(2));
     if (state.oxygen < 0) {
       console.warn("you've succumbed to oxygen deprivation");
       gameOverHandler();
@@ -278,18 +277,39 @@ export const playerCharacter = (
   // - additional power as a consequence of thrust
 
   // DAMAGE
-  // - collision with cave wall to decrement integrity
+  // - collision with cave wall to reduce integrity
   const takeDamage = (dmg: number): void => {
     state.integrity -= dmg;
 
-    console.log('integrity: %o', state.integrity);
+    // console.log('integrity: %o', state.integrity);
     if (state.integrity < 0) {
       console.warn("you've blown up");
       gameOverHandler();
     }
   };
 
+  //
+  const consumeResource = (resource: Resource): void => {
+    const type = resource.getType();
+    const quantity = resource.getResource();
+
+    switch (type) {
+      case PICKUP_TYPES.OXYGEN:
+        state.oxygen += quantity;
+
+        if (state.oxygen > PLAYER_MAX_OXYGEN) {
+          state.oxygen = PLAYER_MAX_OXYGEN;
+        }
+
+        break;
+      default:
+        console.warn('whats up with this no type havin Resource crap');
+    }
+  };
+
+  //
   const getState = () => state;
+
   //
   const updatePosition = (): void => {
     const getRotation = () => {
@@ -298,9 +318,7 @@ export const playerCharacter = (
       if (y === 0) {
         return x < 0 ? -rad : x > 0 ? rad : state.pos.rot;
       }
-
       const angle = Math.atan(x / -y);
-
       return y > 0 ? angle + Math.PI : angle;
     };
 
@@ -323,8 +341,6 @@ export const playerCharacter = (
     // container.rotation = state.pos.rot;
   };
 
-  const getSize = (): number => state.size;
-
   // Reset called by play again and also on init
   const reset = (): void => {
     state.pos = { ...state.startPos };
@@ -341,20 +357,22 @@ export const playerCharacter = (
       updatePosition();
       updateContainer();
 
+      // attribute updates
       if (Date.now() > state.lastUpdateTime + 500) {
         state.lastUpdateTime = Date.now();
         consumeOxygen(delta, pressure);
+        // resolvePressure
       }
     }
   };
 
   return {
     container,
-
+    //
     setMovement,
-
     takeDamage,
-
+    consumeResource,
+    //
     reset,
     update,
     getState,

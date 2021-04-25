@@ -13,7 +13,6 @@ export { audio } from './audio';
 
 // UI and Display Componentns
 export { btnSimple } from './buttons';
-export { depthMeter } from "./depth";
 export { runtime } from './runtime';
 export { scoreDisplay } from './scoreDisplay';
 export { bestScoreDisplay } from './bestScoreDisplay';

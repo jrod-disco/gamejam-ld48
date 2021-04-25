@@ -14,10 +14,11 @@ import {
 import * as COMP from '..';
 import { PlayerCharacter, PlayerMovement } from '../playerCharacter';
 import { RunTime } from '../library/runtime';
-import { DepthMeter } from '../library/depth';
+import * as UI from '../ui';
 import { Spritesheets } from '@src/core';
 import { scoreDisplay, ScoreDisplay } from '../library/scoreDisplay';
-import { goldSpawner } from './goldSpawner';
+import { pickupSpawner } from './pickupSpawner';
+// import { goldSpawner } from './goldSpawner';
 
 type Refs = {
   scoreDisplay?: ScoreDisplay;
@@ -57,6 +58,8 @@ interface Props {
  * @returns Interface object containing methods that can be called on this module
  */
 export const gameLogic = (props: Props): GameLogic => {
+  ////////////////////////////////////////////////////////////////////////////
+  // STATE
   let state = {
     keysDown: {},
     currentLevel: 0,
@@ -69,15 +72,16 @@ export const gameLogic = (props: Props): GameLogic => {
 
   // Specific textures can be pulled out once the spritesheet ref is set
   // let targetTextures = { open: null, lock: null };
-
-  // Passed in references set by setRefs function
-  // The game logic component maintains references and serves as the hub for communication between all other game components
-  // This is something that could likely be better served by a simple event bus but for now we live in callback hell
   let scoreDisplay: ScoreDisplay = null;
   let spriteSheetsRef: Spritesheets = null;
   let uiContainerRef: PIXI.Container;
   let runtime: RunTime = null;
-  let depthMeter: DepthMeter = null;
+
+  // TODO: move `depth` prop to playerCharacter ?
+  // - add depth guage to guage cluster
+  let depthMeter: UI.DepthMeter = null;
+  let gauges: UI.Gauges = null;
+
   let mainOnGameOver: () => void = null;
   let mainOnAudioCycleOptions: () => void = null;
 
@@ -104,7 +108,10 @@ export const gameLogic = (props: Props): GameLogic => {
     state = { ...initialState, keysDown: {} };
   };
 
-  // References of components created in core are set here
+  ////////////////////////////////////////////////////////////////////////////
+  // UI ELEMENTS
+
+  // - References of components created in core are set here
   const setRefs = (refs: Refs): void => {
     if (refs.spriteSheets) spriteSheetsRef = refs.spriteSheets;
     if (refs.uiContainer) uiContainerRef = refs.uiContainer;
@@ -112,13 +119,14 @@ export const gameLogic = (props: Props): GameLogic => {
     if (refs.mainOnAudioCycleOptions)
       mainOnAudioCycleOptions = refs.mainOnAudioCycleOptions;
 
-    // Run Time is a simple clock that runs up
+    // Time ++
     runtime = COMP.LIB.runtime({
       pos: { x: 25, y: 25 },
     });
     uiContainerRef.addChild(runtime.container);
 
-    depthMeter = COMP.LIB.depthMeter({
+    // Depth
+    depthMeter = COMP.UI.depthMeter({
       pos: { x: 25, y: 75 },
       depth: 0,
       maxDepthCallback: () => {
@@ -126,6 +134,12 @@ export const gameLogic = (props: Props): GameLogic => {
       },
     });
     uiContainerRef.addChild(depthMeter.container);
+
+    // Gauges - oxygen, pressure etc
+    gauges = COMP.UI.gauges({
+      pos: { x: 25, y: APP_HEIGHT - 100 },
+    });
+    uiContainerRef.addChild(gauges.container);
 
     // Score Display
     scoreDisplay = COMP.LIB.scoreDisplay({
@@ -137,6 +151,9 @@ export const gameLogic = (props: Props): GameLogic => {
   const setSpriteSheet = (spriteSheet: Spritesheets): void => {
     spriteSheetsRef = { ...spriteSheetsRef, ...spriteSheet };
   };
+
+  /////////////////////////////////////////////////////////////////////////////
+  // GAME EVENTS
 
   const getIsGameOver = (): boolean => {
     return state.isGameOver;
@@ -171,6 +188,9 @@ export const gameLogic = (props: Props): GameLogic => {
   //   return state.isGamePaused;
   // };
 
+  /////////////////////////////////////////////////////////////////////////////
+  // START GAME
+
   const onStartGame = (): void => {
     console.log('gameLogic: onStartGame');
     //
@@ -191,21 +211,21 @@ export const gameLogic = (props: Props): GameLogic => {
     addOnKeyDown();
   };
 
+  /////////////////////////////////////////////////////////////////////////////
+  // GAME OVER, MAN!!
+
   const onMaxDepthReached = (): void => {
     onGameOver();
   };
 
   // TODO:
-  // - game over, when:
   // - MAX_DEPTH reached (+ success action?)
-  // - PLAYER.HEALTH reaches 0
+  // - playerCharacter.integrity reaches 0
+  // - playerCharacter.oxygen reaches 0
 
   const onGameOver = (): void => {
     console.log('gameLogic: onGameOver');
     state.isGameOver = true; // should stop updates
-
-    // Immediately stop timer if a timed game
-    // runtimeRef.pause();
 
     // Keyboard Events
     // remove game specific key listeners if there are any
@@ -214,20 +234,17 @@ export const gameLogic = (props: Props): GameLogic => {
     removeOnKeyDown();
 
     // Clean Up Component Logic and Sprites
-    goldSpawnerRef.reset();
-    cleanUpGold();
+    pickupSpawnerRef.reset();
+    cleanUpPickups();
 
     // Clean Up Game Logic Remaining
-    //...anything within game logic component...
 
     mainOnGameOver();
   };
 
-  // TODO:
-  // move listeners to handleInput.ts
-  // - externalize game state so is importable?
+  /////////////////////////////////////////////////////////////////////////////
+  // Input Handlers
 
-  // Keyboard Listener
   const onKeyUpGame = (event: KeyboardEvent): void => {
     // Store the fact that this key is up
     state.keysDown[event.code] = 0;
@@ -279,9 +296,8 @@ export const gameLogic = (props: Props): GameLogic => {
   const removeOnKeyDown = (): void =>
     window.removeEventListener('keydown', onKeyDownGame);
 
-  // PLAYER CRAFT
-
-  // TODO: does this need assignment at this scope?'
+  /////////////////////////////////////////////////////////////////////////////
+  // PLAYER / SUB
   const playerCharacter = COMP.playerCharacter({
     pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2, rot: 0 },
     anims: spriteSheets.game.animations,
@@ -291,35 +307,36 @@ export const gameLogic = (props: Props): GameLogic => {
   });
   gameContainer.addChild(playerCharacter.container);
 
+  /////////////////////////////////////////////////////////////////////////////
   // ITEMZ
 
-  // Gold Spawner
-  const goldSpawnerRef = goldSpawner();
-  const goldContainer = new PIXI.Container();
-  gameContainer.addChild(goldContainer);
-
+  // Pickup Spawner
+  const pickupSpawnerRef = pickupSpawner();
+  const pickupContainer = new PIXI.Container();
+  gameContainer.addChild(pickupContainer);
   gameContainer.filters = [new BloomFilter(4)];
 
-  const updateGold = (): void => {
-    const maybeGold = goldSpawnerRef.spawn();
-    maybeGold && goldContainer.addChild(maybeGold.container);
+  const updatePickups = (): void => {
+    const maybePickup = pickupSpawnerRef.spawn();
+    maybePickup && pickupContainer.addChild(maybePickup.container);
   };
-  const cleanUpGold = (): void => {
-    goldContainer.removeChildren();
+  const cleanUpPickups = (): void => {
+    pickupContainer.removeChildren();
   };
 
   // TODO:
-  // - abstact to class
+  // - abstract to class
 
+  /////////////////////////////////////////////////////////////////////////////
   // Collision Detection
   const checkCollision = (): void => {
     if (state.isGameOver) return;
 
     const pX = playerCharacter.container.x;
     const pY = playerCharacter.container.y;
-    const gold = goldSpawnerRef.getNuggets();
+    const pickups = pickupSpawnerRef.getPickups();
 
-    gold.map((n, i) => {
+    pickups.map((n, i) => {
       const nX = n.container.x;
       const nY = n.container.y;
 
@@ -331,16 +348,25 @@ export const gameLogic = (props: Props): GameLogic => {
         pX < nX + hitBox &&
         pY > nY - hitBox &&
         pY < nY + hitBox;
-      collided && goldSpawnerRef.removeNuggetByIndex(i);
-      collided && goldContainer.removeChildAt(i);
-      // collided && playerCharacter.takeDamage(1);
-      collided && scoreDisplay.addToScore(POINTS_GOLD);
-      collided &&
+
+      if (collided) {
+        playerCharacter.consumeResource({
+          getType: n.getType,
+          getResource: n.getResource,
+        });
+        pickupSpawnerRef.removePickupByIndex(i);
+        pickupContainer.removeChildAt(i);
+        scoreDisplay.addToScore(POINTS_GOLD);
+
+        // TODO: pass to pickup
         pixiSound.play('coin', {
           volume: 1 * SFX_VOL_MULT,
         });
+      }
     });
   };
+
+  // UPDATE
 
   const update = (delta): boolean => {
     let updateRan = false;
@@ -348,13 +374,8 @@ export const gameLogic = (props: Props): GameLogic => {
     if (state.isGameOver) return;
     if (state.isGamePaused) return;
 
-    // Update individual controller refs here
-    runtime.update(delta);
-    depthMeter.update(delta);
-
     checkDownKeys(state.keysDown);
-
-    updateGold();
+    updatePickups();
 
     playerCharacter.update({
       delta,
@@ -364,6 +385,11 @@ export const gameLogic = (props: Props): GameLogic => {
     });
 
     checkCollision();
+
+    // Update individual controller refs here
+    runtime.update(delta);
+    depthMeter.update(delta);
+    gauges.update(delta, playerCharacter.getState());
 
     IS_SCORE_INCREMENTY && scoreDisplay.update(delta);
     updateRan = true;
