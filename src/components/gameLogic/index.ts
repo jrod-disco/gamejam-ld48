@@ -301,8 +301,9 @@ export const gameLogic = (props: Props): GameLogic => {
   // CAVE
 
   const caves = [];
-  for (let depth=0; depth<16; depth++) {
-    const cave = COMP.cave({ depth });
+  const MAX_DEPTH = 24;
+  for (let depth=0; depth<MAX_DEPTH; depth++) {
+    const cave = COMP.cave({ depth, maxDepth: MAX_DEPTH });
     cave.sprite.x = APP_WIDTH / 2;
     cave.sprite.y = APP_HEIGHT / 2;
     caves.push(cave);
@@ -329,7 +330,7 @@ export const gameLogic = (props: Props): GameLogic => {
   const pickupSpawnerRef = pickupSpawner();
   const pickupContainer = new PIXI.Container();
   gameContainer.addChild(pickupContainer);
-  gameContainer.filters = [new BloomFilter(4)];
+  //gameContainer.filters = [new BloomFilter(4)];
 
   const updatePickups = (): void => {
     const maybePickup = pickupSpawnerRef.spawn();
