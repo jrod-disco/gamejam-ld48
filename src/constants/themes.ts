@@ -21,7 +21,7 @@ const _COLORS = {
   GAMEBOY_C: 0xafd412,
   GAMEBOY_D: 0xc5eb19,
 
-  SOLAR_A: 198156, //0x002b36,
+  SOLAR_A: 0x204059,
   SOLAR_B: 0x586e75,
   SOLAR_C: 0x93a1a1,
   SOLAR_D: 0xeee8d5,

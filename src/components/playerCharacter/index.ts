@@ -14,6 +14,7 @@ import {
   PICKUP_TYPES,
   Resource,
   PLAYER_MAX_OXYGEN,
+  PLAYER_ROTATE_ON_MOVE,
 } from '@src/constants';
 
 type UpdateProps = {
@@ -83,6 +84,7 @@ export const playerCharacter = (
   props: PlayerCharacterProps
 ): PlayerCharacter => {
   const pos = props.pos ?? { x: 0, y: 0, rot: PLAYER_INIT_ROT };
+  const rotateOnMove = PLAYER_ROTATE_ON_MOVE;
   const container = new PIXI.Container();
   container.x = pos.x;
   container.y = pos.y;
@@ -312,7 +314,7 @@ export const playerCharacter = (
 
   //
   const updatePosition = (): void => {
-    const getRotation = () => {
+    const getTargetRotation = () => {
       var { x, y } = state.movementSpeed;
       const rad = Math.PI / 2;
       if (y === 0) {
@@ -322,12 +324,35 @@ export const playerCharacter = (
       return y > 0 ? angle + Math.PI : angle;
     };
 
+    // this is some real 3am code here...
+    const getRotation = () => {
+      // Check whether it would be a shorter distance to rotate left or right, and
+      // use the shortest rotation amount
+      const target = getTargetRotation();
+      const deltaLeft = target - state.pos.rot;
+      const deltaRight = target - (state.pos.rot + Math.PI * 2);
+
+      var delta: number;
+
+      if (Math.abs(deltaLeft) < Math.abs(deltaRight)) {
+        delta = deltaLeft;
+      } else {
+        delta = deltaRight;
+      }
+
+      // Put a damper on the amount that we rotate by so we don't snap immediately to the target angle
+      return state.pos.rot + delta * 0.03;
+    };
+
     const newPos = {
       ...state.pos,
       x: state.pos.x + state.movementSpeed.x,
       y: state.pos.y + state.movementSpeed.y,
-      rot: getRotation(),
     };
+
+    if (rotateOnMove) {
+      newPos.rot = getRotation();
+    }
 
     if (checkInBounds(newPos)) {
       state.pos = newPos;
@@ -338,7 +363,7 @@ export const playerCharacter = (
   const updateContainer = (): void => {
     container.x = state.pos.x;
     container.y = state.pos.y;
-    // container.rotation = state.pos.rot;
+    container.rotation = state.pos.rot;
   };
 
   // Reset called by play again and also on init
