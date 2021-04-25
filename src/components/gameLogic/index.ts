@@ -356,6 +356,13 @@ export const gameLogic = (props: Props): GameLogic => {
   // Simple Player Component
   const playerCharacter = COMP.playerCharacter({
     pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2, rot: 0 },
+    textures: {
+      frontlightLeft: spriteSheets.game.textures['frontlightLeft.png'],
+      frontlightRight: spriteSheets.game.textures['frontlightRight.png'],
+      rearlightLeft: spriteSheets.game.textures['rearlightLeft.png'],
+      rearlightRight: spriteSheets.game.textures['rearlightRight.png'],
+      underglow: spriteSheets.game.textures['underglow.png'],
+    },
     anims: spriteSheets.game.animations,
     gameOverHandler: () => {
       onGameOver();

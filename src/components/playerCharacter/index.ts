@@ -47,7 +47,7 @@ export interface PlayerCharacter {
 
 interface PlayerCharacterProps {
   pos?: { x: number; y: number; rot: number };
-  textures?: { playerTexture: PIXI.Texture };
+  textures?: { [key: string]: PIXI.Texture };
   anims?: { [key: string]: Array<PIXI.Texture> };
   gameOverHandler?: Function;
   gameContainer: PIXI.Container;
@@ -135,6 +135,15 @@ export const playerCharacter = (
     lastUpdateTime: Date.now(),
   };
   const initialState = { ...state };
+
+  // lights
+  const underLightSprite = new PIXI.Sprite(textures.underglow);
+  underLightSprite.anchor.set(0.5);
+  underLightSprite.x = 0;
+  underLightSprite.y = 0;
+  underLightSprite.alpha = 0.5;
+  underLightSprite.blendMode = PIXI.BLEND_MODES.ADD;
+  container.addChild(underLightSprite);
 
   const playerContainer = new PIXI.Container();
   container.addChild(playerContainer);
@@ -227,6 +236,39 @@ export const playerCharacter = (
         break;
     }
   };
+
+  // lights
+  const frontLightLeftSprite = new PIXI.Sprite(textures.frontlightLeft);
+  frontLightLeftSprite.anchor.set(0.5, 1);
+  frontLightLeftSprite.x = -84;
+  frontLightLeftSprite.y = -20;
+  frontLightLeftSprite.alpha = 0.5;
+  frontLightLeftSprite.blendMode = PIXI.BLEND_MODES.ADD;
+  container.addChild(frontLightLeftSprite);
+
+  const frontLightRightSprite = new PIXI.Sprite(textures.frontlightRight);
+  frontLightRightSprite.anchor.set(0.5, 1);
+  frontLightRightSprite.x = 84;
+  frontLightRightSprite.y = -20;
+  frontLightRightSprite.alpha = 0.5;
+  frontLightRightSprite.blendMode = PIXI.BLEND_MODES.ADD;
+  container.addChild(frontLightRightSprite);
+
+  const rearLightLeftSprite = new PIXI.Sprite(textures.rearlightLeft);
+  rearLightLeftSprite.anchor.set(0.5, 1);
+  rearLightLeftSprite.x = -80;
+  rearLightLeftSprite.y = 125;
+  rearLightLeftSprite.alpha = 0.35;
+  rearLightLeftSprite.blendMode = PIXI.BLEND_MODES.ADD;
+  container.addChild(rearLightLeftSprite);
+
+  const rearLightRightSprite = new PIXI.Sprite(textures.rearlightRight);
+  rearLightRightSprite.anchor.set(0.5, 1);
+  rearLightRightSprite.x = 80;
+  rearLightRightSprite.y = 125;
+  rearLightRightSprite.alpha = 0.35;
+  rearLightRightSprite.blendMode = PIXI.BLEND_MODES.ADD;
+  container.addChild(rearLightRightSprite);
 
   // check distance against center and collision radius
   const checkInBounds = (pos: PlayerPosition): boolean => {
