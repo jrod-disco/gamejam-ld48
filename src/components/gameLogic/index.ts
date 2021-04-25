@@ -10,7 +10,7 @@ import {
   POINTS_GOLD,
   START_LEVEL,
   IS_SCORE_INCREMENTY,
-  MAX_CAVE_DEPTH,
+  MAX_LAYER_DEPTH,
 } from '@src/constants';
 import * as COMP from '..';
 import { PlayerCharacter, PlayerMovement } from '../playerCharacter';
@@ -20,6 +20,8 @@ import { Spritesheets } from '@src/core';
 import { scoreDisplay, ScoreDisplay } from '../library/scoreDisplay';
 import { pickupSpawner } from './pickupSpawner';
 import { stars } from '../stars';
+import { OxygenTank, oxygenTank } from '../pickups';
+import { DisplayObject } from 'pixi.js';
 // import { goldSpawner } from './goldSpawner';
 
 type Refs = {
@@ -306,7 +308,7 @@ export const gameLogic = (props: Props): GameLogic => {
   gameContainer.addChild(caveContainer);
 
   const caves = [];
-  for (let depth = 0; depth < MAX_CAVE_DEPTH; depth++) {
+  for (let depth = 0; depth < MAX_LAYER_DEPTH; depth++) {
     const cave = COMP.cave({ depth });
     caves.push(cave);
     caveContainer.addChild(cave.sprite);
@@ -338,6 +340,7 @@ export const gameLogic = (props: Props): GameLogic => {
   const updatePickups = (): void => {
     const maybePickup = pickupSpawnerRef.spawn();
     maybePickup && pickupContainer.addChild(maybePickup.container);
+    //console.log(pickupSpawnerRef.getPickups());
   };
   const cleanUpPickups = (): void => {
     pickupContainer.removeChildren();
@@ -413,6 +416,10 @@ export const gameLogic = (props: Props): GameLogic => {
 
     checkDownKeys(state.keysDown);
     updatePickups();
+
+    pickupSpawnerRef.getPickups().forEach((pickup: OxygenTank): void => {
+      pickup.update(delta);
+    });
 
     playerCharacter.update({
       delta,

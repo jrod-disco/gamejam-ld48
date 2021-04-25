@@ -7,12 +7,23 @@ export const IS_SCORE_INCREMENTY = false;
 // - for faux ocean floor:
 export const INIT_DEPTH = 0;
 export const MAX_DEPTH = 5_000; // feet
-export const MAX_CAVE_DEPTH = 32; // layers of sprite depth
 export const INIT_PRESSURE = 14; // sea level
 export const MAX_PRESSURE = 1000; // lbs/sq in
 
-// export const WORLD_WIDTH = 100;
-// export const WORLD_HEIGHT = 100;
+// - Depth effects
+export const MAX_LAYER_SCALE = 2.5;   // % scale of layer at MAX_LAYER_DEPTH
+export const MAX_LAYER_DEPTH = 32;    // layers of sprite depth
+export const LAYER_SPACING = .075;    // start distance between each layer
+export const LAYER_START_SCALE = .25; // % scale the layer at depth 0
+export const START_ROT = 5;           // starting rotation degrees for object
+export const ROT_INCREMENT = .001;    // amount of rotation degrees per update()
+
+export const SPEED_CAVE = .001;       // cave scale increase per update()
+export const SPEED_ITEM = .01;        // cave scale increase per update()
+
+// - Normalized world sizes 
+export const WORLD_WIDTH = 100;
+export const WORLD_HEIGHT = 100;
 
 // Player movement
 export const PLAYER_SPRITE_MARGIN = 40; // approx size of player

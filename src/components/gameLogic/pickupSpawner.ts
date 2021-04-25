@@ -45,11 +45,10 @@ export const pickupSpawner = (props: PickupSpawnerProps): PickupSpawner => {
     // TODO:
     // - abstract this so that we can support many pickup types
 
-    const texture = PIXI.Texture.from('./assets/example/goldbox.png');
     const pickup = oxygenTank({
       pos: { x: rX, y: rY },
-      textures: { nuggetTexture: texture },
       anims,
+      depth: 0,
     });
 
     state.pickupList.push(pickup);
