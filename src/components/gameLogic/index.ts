@@ -432,7 +432,7 @@ export const gameLogic = (props: Props): GameLogic => {
     IS_SCORE_INCREMENTY && scoreDisplay.update(delta);
 
     caves.forEach((cave) => {
-      cave.update(delta, 50, 50);
+      cave.update(delta, playerCharacter.getState().pos.x, playerCharacter.getState().pos.y);
     });
 
     starfield.update(delta);
