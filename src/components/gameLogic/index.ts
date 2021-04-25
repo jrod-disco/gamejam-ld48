@@ -9,12 +9,12 @@ import {
   SFX_VOL_MULT,
   POINTS_GOLD,
   START_LEVEL,
-  PLAYER_CONTINOUS_MOVEMENT,
   IS_SCORE_INCREMENTY,
 } from '@src/constants';
 import * as COMP from '..';
-import { PlayerCharacter } from '../playerCharacter';
+import { PlayerCharacter, PlayerMovement } from '../playerCharacter';
 import { RunTime } from '../library/runtime';
+import { DepthMeter } from '../library/depth';
 import { Spritesheets } from '@src/core';
 import { scoreDisplay, ScoreDisplay } from '../library/scoreDisplay';
 import { goldSpawner } from './goldSpawner';
@@ -33,6 +33,7 @@ export interface GameLogic {
   reset: () => void;
   //
   setRefs: (refs: Refs) => void;
+  setSpriteSheet: (spriteSheets: Spritesheets) => void;
   //
   getPlayerScore: () => number;
   getCurrentLevel: () => number;
@@ -44,6 +45,7 @@ export interface GameLogic {
 
 interface Props {
   gameContainer: PIXI.Container;
+  spriteSheets: Spritesheets;
   pos?: { x: number; y: number };
 }
 
@@ -58,6 +60,7 @@ export const gameLogic = (props: Props): GameLogic => {
   let state = {
     keysDown: {},
     currentLevel: 0,
+    currentDepth: 0,
     isGameOver: true,
     isGamePaused: false,
     playerScore: 0,
@@ -74,10 +77,11 @@ export const gameLogic = (props: Props): GameLogic => {
   let spriteSheetsRef: Spritesheets = null;
   let uiContainerRef: PIXI.Container;
   let runtime: RunTime = null;
+  let depthMeter: DepthMeter = null;
   let mainOnGameOver: () => void = null;
   let mainOnAudioCycleOptions: () => void = null;
 
-  const { gameContainer } = props;
+  const { gameContainer, spriteSheets } = props;
 
   // Level Message Text
   const messageText = new PIXI.BitmapText('LEVEL UP!', {
@@ -111,17 +115,27 @@ export const gameLogic = (props: Props): GameLogic => {
     // Run Time is a simple clock that runs up
     runtime = COMP.LIB.runtime({
       pos: { x: 25, y: 25 },
-      timeOverCallback: () => {
-        onTimeOver();
-      },
     });
     uiContainerRef.addChild(runtime.container);
+
+    depthMeter = COMP.LIB.depthMeter({
+      pos: { x: 25, y: 75 },
+      depth: 0,
+      maxDepthCallback: () => {
+        onMaxDepthReached();
+      },
+    });
+    uiContainerRef.addChild(depthMeter.container);
 
     // Score Display
     scoreDisplay = COMP.LIB.scoreDisplay({
       pos: { x: APP_WIDTH - 100, y: 25 },
     });
     uiContainerRef.addChild(scoreDisplay.container);
+  };
+
+  const setSpriteSheet = (spriteSheet: Spritesheets): void => {
+    spriteSheetsRef = { ...spriteSheetsRef, ...spriteSheet };
   };
 
   const getIsGameOver = (): boolean => {
@@ -134,27 +148,28 @@ export const gameLogic = (props: Props): GameLogic => {
 
   const getCurrentLevel = (): number => state.currentLevel;
 
-  const toggleGamePaused = (forceTo?: boolean): boolean => {
-    state.isGamePaused = forceTo != undefined ? forceTo : !state.isGamePaused;
+  // TODO: re-enable
+  // const toggleGamePaused = (forceTo?: boolean): boolean => {
+  //   state.isGamePaused = forceTo != undefined ? forceTo : !state.isGamePaused;
 
-    if (state.isGamePaused) {
-      messageText.text = '* GAME PAUSED *';
-      messageText.alpha = 1;
+  //   if (state.isGamePaused) {
+  //     messageText.text = '* GAME PAUSED *';
+  //     messageText.alpha = 1;
 
-      // force a render before we stop the whole app
-      window.APP.pixiApp.render();
-      window.APP.pixiApp.stop();
-    } else {
-      window.APP.pixiApp.start();
-      gsap.to(messageText, {
-        duration: 0.1,
-        alpha: 0,
-        ease: Power0.easeOut,
-      });
-    }
+  //     // force a render before we stop the whole app
+  //     window.APP.pixiApp.render();
+  //     window.APP.pixiApp.stop();
+  //   } else {
+  //     window.APP.pixiApp.start();
+  //     gsap.to(messageText, {
+  //       duration: 0.1,
+  //       alpha: 0,
+  //       ease: Power0.easeOut,
+  //     });
+  //   }
 
-    return state.isGamePaused;
-  };
+  //   return state.isGamePaused;
+  // };
 
   const onStartGame = (): void => {
     console.log('gameLogic: onStartGame');
@@ -166,6 +181,8 @@ export const gameLogic = (props: Props): GameLogic => {
     scoreDisplay.reset();
     runtime.reset();
     runtime.start();
+    depthMeter.reset();
+    depthMeter.start();
     playerCharacter.reset();
     //
 
@@ -174,9 +191,14 @@ export const gameLogic = (props: Props): GameLogic => {
     addOnKeyDown();
   };
 
-  const onTimeOver = (): void => {
+  const onMaxDepthReached = (): void => {
     onGameOver();
   };
+
+  // TODO:
+  // - game over, when:
+  // - MAX_DEPTH reached (+ success action?)
+  // - PLAYER.HEALTH reaches 0
 
   const onGameOver = (): void => {
     console.log('gameLogic: onGameOver');
@@ -198,8 +220,12 @@ export const gameLogic = (props: Props): GameLogic => {
     // Clean Up Game Logic Remaining
     //...anything within game logic component...
 
-    playerCharacter.wither(mainOnGameOver);
+    mainOnGameOver();
   };
+
+  // TODO:
+  // move listeners to handleInput.ts
+  // - externalize game state so is importable?
 
   // Keyboard Listener
   const onKeyUpGame = (event: KeyboardEvent): void => {
@@ -212,20 +238,33 @@ export const gameLogic = (props: Props): GameLogic => {
   };
 
   const checkDownKeys = (keysDown): void => {
-    // If nothing is held, stop and bail
-    //  console.log('checkDownKeys', Object.values(keysDown));
-    if (
-      Object.values(keysDown).indexOf(1) === -1 &&
-      !PLAYER_CONTINOUS_MOVEMENT
-    ) {
-      playerCharacter.moveStop();
-      return;
+    // TODO: instead of translating around the view,
+    // - playercharacter will stay centered
+    // - and display tilt / rotation animation
+
+    // Map cardinal directions
+    const keys = {
+      left: 'KeyA',
+      right: 'KeyD',
+      up: 'KeyW',
+      down: 'KeyS',
+    };
+
+    const playerMovement: PlayerMovement = { x: 0, y: 0 };
+
+    if (keysDown[keys.left]) {
+      playerMovement.x = -1;
+    } else if (keysDown[keys.right]) {
+      playerMovement.x = 1;
     }
-    // Single cardinal directions
-    keysDown['KeyW'] && playerCharacter.moveUp();
-    keysDown['KeyS'] && playerCharacter.moveDown();
-    keysDown['KeyA'] && playerCharacter.moveLeft();
-    keysDown['KeyD'] && playerCharacter.moveRight();
+
+    if (keysDown[keys.up]) {
+      playerMovement.y = -1;
+    } else if (keysDown[keys.down]) {
+      playerMovement.y = 1;
+    }
+
+    playerCharacter.setMovement(playerMovement);
   };
 
   const addOnKeyUp = (): void => {
@@ -240,13 +279,23 @@ export const gameLogic = (props: Props): GameLogic => {
   const removeOnKeyDown = (): void =>
     window.removeEventListener('keydown', onKeyDownGame);
 
-  // Simple Player Component
-  const playerTexture = PIXI.Texture.from('./assets/example/whitebox.png');
+  // PLAYER CRAFT
+
+  // TODO: does this need assignment at this scope?'
+
+  console.log('and now', spriteSheets);
+  const playerTexture = PIXI.Texture.from('./assets/ship/submarine_top.png');
   const playerCharacter = COMP.playerCharacter({
-    pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2 },
+    pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2, rot: 0 },
     textures: { playerTexture },
+    anims: spriteSheets.game.animations,
+    gameOverHandler: () => {
+      onGameOver();
+    },
   });
   gameContainer.addChild(playerCharacter.container);
+
+  // ITEMZ
 
   // Gold Spawner
   const goldSpawnerRef = goldSpawner();
@@ -263,6 +312,9 @@ export const gameLogic = (props: Props): GameLogic => {
     goldContainer.removeChildren();
   };
 
+  // TODO:
+  // - abstact to class
+
   // Collision Detection
   const checkCollision = (): void => {
     if (state.isGameOver) return;
@@ -276,7 +328,7 @@ export const gameLogic = (props: Props): GameLogic => {
       const nY = n.container.y;
 
       // check collision by x/y locations with a hitbox buffer
-      const hitBox = 20 * playerCharacter.getSize();
+      const hitBox = 20;
 
       const collided =
         pX > nX - hitBox &&
@@ -285,7 +337,7 @@ export const gameLogic = (props: Props): GameLogic => {
         pY < nY + hitBox;
       collided && goldSpawnerRef.removeNuggetByIndex(i);
       collided && goldContainer.removeChildAt(i);
-      collided && playerCharacter.grow();
+      // collided && playerCharacter.takeDamage(1);
       collided && scoreDisplay.addToScore(POINTS_GOLD);
       collided &&
         pixiSound.play('coin', {
@@ -302,10 +354,21 @@ export const gameLogic = (props: Props): GameLogic => {
 
     // Update individual controller refs here
     runtime.update(delta);
+    depthMeter.update(delta);
+
     checkDownKeys(state.keysDown);
+
     updateGold();
-    playerCharacter.update(delta);
+
+    playerCharacter.update({
+      delta,
+      depth: depthMeter.getCurrentDepth(),
+      pressure: depthMeter.getCurrentPressure(),
+      time: runtime.getRunTime(),
+    });
+
     checkCollision();
+
     IS_SCORE_INCREMENTY && scoreDisplay.update(delta);
     updateRan = true;
 
@@ -316,6 +379,7 @@ export const gameLogic = (props: Props): GameLogic => {
     update,
     reset,
     setRefs,
+    setSpriteSheet,
     //
     getPlayerScore,
     getCurrentLevel,

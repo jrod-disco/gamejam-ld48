@@ -19,7 +19,6 @@ import {
   Z_MC_BASE,
   Z_MC_UI,
   SFX_VOL_MULT,
-  PLAYER_CONTINOUS_MOVEMENT,
 } from './constants';
 import './index.scss';
 
@@ -45,6 +44,8 @@ export interface DcollageApp {
 
 export type Spritesheets = {
   main: PIXI.Spritesheet | null;
+  game?: PIXI.Spritesheet | null;
+  ui?: PIXI.Spritesheet | null;
 };
 
 const hostDiv = document.getElementById('canvas');
@@ -92,12 +93,14 @@ const bootstrapApp = (props: {
     vignetting: 0.2,
     noise: 0.1,
   });
-  mainContainer.filters = [crtFilter];
+  //mainContainer.filters = [crtFilter];
 
   // Get our preloader assets
   let { spriteSheets } = props;
   let sounds = props?.sounds;
   let audioLayer = null;
+
+  let gameLogic = null;
 
   // Hide Loader GIF
   document.getElementById('loading').style.display = 'none';
@@ -110,6 +113,19 @@ const bootstrapApp = (props: {
    */
   const initSecondaryModules = (): void => {
     console.log('initSecondaryModules', spriteSheets);
+
+    // Game Logic ----------------------------------------------
+    gameLogic = COMP.gameLogic({
+      gameContainer: screenGame.container,
+      spriteSheets,
+    });
+
+    gameLogic.setRefs({
+      spriteSheets,
+      uiContainer,
+      mainOnAudioCycleOptions: onAudioCycleOptions,
+      mainOnGameOver: onGameOver,
+    });
   };
 
   /**
@@ -179,8 +195,8 @@ const bootstrapApp = (props: {
   // Personal Best Scoe
   const showPersonalBest = (): void => {
     // check to see if this is a personal best
-    const score = gameLogic.getPlayerScore();
-    const level = gameLogic.getCurrentLevel();
+    const score = gameLogic?.getPlayerScore();
+    const level = gameLogic?.getCurrentLevel();
     const isNewPersonalBest = personalBestManager.checkPersonalBest(
       score,
       level,
@@ -266,18 +282,6 @@ const bootstrapApp = (props: {
       },
     });
   };
-
-  // Game Logic ----------------------------------------------
-  const gameLogic = COMP.gameLogic({
-    gameContainer: screenGame.container,
-  });
-
-  gameLogic.setRefs({
-    spriteSheets,
-    uiContainer,
-    mainOnAudioCycleOptions: onAudioCycleOptions,
-    mainOnGameOver: onGameOver,
-  });
 
   // Start Game
   const onStartGame = (): void => {
@@ -373,7 +377,7 @@ const onAssetsLoaded = (): void => {
  */
 const onSecondaryAssetsLoaded = (): void => {
   const additionalSprites = {
-    //game: PIXI.Loader.shared.resources['game'].spritesheet,
+    game: PIXI.Loader.shared.resources['game'].spritesheet,
   };
   const sounds: Sounds = {
     MainTheme: PIXI.Loader.shared.resources['MainTheme'] as any,

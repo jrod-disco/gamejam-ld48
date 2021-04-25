@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import { THEME, TIME_LIMIT_SECONDS } from '@src/constants';
+import { THEME } from '@src/constants';
 
 export interface RunTime {
   container: PIXI.Container;
@@ -9,15 +9,10 @@ export interface RunTime {
   pause: () => void;
   update: (delta: number) => void;
   getRunTime: () => number;
-  getLimit: () => number;
-  setLimit: (newLimit: number) => void;
-  setStartLimit: (newLimit: number) => void;
 }
 
 interface Props {
   pos?: { x: number; y: number };
-  limit?: number;
-  timeOverCallback?: () => void;
 }
 
 /**
@@ -35,10 +30,6 @@ export const runtime = (props: Props): RunTime => {
 
   container.name = 'runtime';
 
-  const { timeOverCallback } = props;
-  let { limit } = props;
-  let storedLimit = TIME_LIMIT_SECONDS;
-
   let state = {
     isOn: false,
     currentTime: 0,
@@ -47,9 +38,7 @@ export const runtime = (props: Props): RunTime => {
   const initialState = { ...state };
 
   const timeString = (): string => {
-    const ts = limit
-      ? Math.max(limit - state.currentTime, 0).toFixed(2)
-      : state.currentTime.toFixed(2);
+    const ts = state.currentTime.toFixed(2);
     return ts;
   };
 
@@ -79,25 +68,6 @@ export const runtime = (props: Props): RunTime => {
     timeText.text = timeString();
   };
 
-  const setStartLimit = (newLimit: number): void => {
-    //console.log('set start limt', newLimit);
-    lastUpdateTime = Date.now();
-    state.currentTime = 0;
-    limit = newLimit;
-    storedLimit = newLimit;
-    updateTimeText();
-  };
-
-  const setLimit = (newLimit: number): void => {
-    //console.log('set  limt', newLimit);
-    limit = newLimit;
-    updateTimeText();
-  };
-
-  const getLimit = (): number => {
-    return limit;
-  };
-
   const getRunTime = (): number => Number(state.currentTime.toFixed(2));
 
   // Reset called by play again and also on init
@@ -105,7 +75,6 @@ export const runtime = (props: Props): RunTime => {
     state = null;
     state = { ...initialState };
     lastUpdateTime = Date.now();
-    limit = storedLimit ? storedLimit : TIME_LIMIT_SECONDS;
     updateTimeText();
   };
   reset();
@@ -125,20 +94,11 @@ export const runtime = (props: Props): RunTime => {
     state = { ...state, isOn: false };
   };
 
-  const checkTimeLimit = (): void => {
-    if (!limit) return;
-    if (state.currentTime >= limit) {
-      pause();
-      timeOverCallback();
-    }
-  };
-
   const update = (delta): void => {
     // Update called by main
 
     if (state.isOn && Date.now() > lastUpdateTime + 10) {
       state.currentTime += 0.01;
-      checkTimeLimit();
       updateTimeText();
       lastUpdateTime = Date.now();
     }
@@ -152,10 +112,6 @@ export const runtime = (props: Props): RunTime => {
     pause,
     update,
     //
-    setLimit,
-    setStartLimit,
-    //
     getRunTime,
-    getLimit,
   };
 };

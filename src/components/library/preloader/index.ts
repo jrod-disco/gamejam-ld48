@@ -53,8 +53,11 @@ export const preloader = (props: PreloaderProps): Preloader => {
     // Load these up on startup...
     pixiSound.add('good', './assets/example/good.mp3');
 
-    preloader.add('MainTheme', './assets/example/example.mp3');
+    preloader
+      .add('MainTheme', './assets/example/example.mp3')
+      .add('game', './assets/deeperSprites.json');
     //.add('Track2', './assets/sfx/OBTSOST_Track2-mono64.mp3')
+
     preloader.load(onAssetsLoadedCallback);
   };
 

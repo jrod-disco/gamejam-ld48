@@ -21,7 +21,7 @@ interface Props {
 }
 
 /**
- * A layout for our main menu to be placed on in the main containeer
+ * A layout for our game screen to be placed on in the main containeer
  * and show/hidden based on UI state
  *
  * @param props - Standard component properties.
@@ -43,7 +43,7 @@ export const gameLayout = (props: Props): GameLayout => {
   // Text
 
   const promptText = new PIXI.Text(
-    'Use W, A, S, D to move your character. Eat and grow.',
+    'Use W, A, S, D to move your character',
     TEXT_STYLE.GRADIENT_PROMPT
   );
   promptText.anchor.set(0.5);
