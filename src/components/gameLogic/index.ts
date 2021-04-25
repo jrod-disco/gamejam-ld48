@@ -410,7 +410,7 @@ export const gameLogic = (props: Props): GameLogic => {
     IS_SCORE_INCREMENTY && scoreDisplay.update(delta);
 
     caves.forEach(cave => {
-      cave.update(delta);
+      cave.update(delta, 0, 0);
     });
 
     updateRan = true;

@@ -10,7 +10,7 @@ Renderer.registerPlugin('extract', Extract);
 export interface Cave {
   sprite: PIXI.Sprite;
   reset: () => void;
-  update: (delta: number) => void;
+  update: (delta: number, x: number, y: number) => void;
 }
 
 interface CaveProps {
@@ -62,7 +62,7 @@ export const cave = (props: CaveProps): Cave => {
     state = { ...initialState };
   };
 
-  const update = (delta: number): void => {
+  const update = (delta: number, x: number, y: number): void => {
     if (state.scale >= MAX_SCALE) {
       state.scale = START_SCALE;
       state.depth = state.lastDepth = 0;
@@ -70,11 +70,11 @@ export const cave = (props: CaveProps): Cave => {
       sprite.parent.setChildIndex(sprite, 0); // move to bottom of stack
       sprite.rotation += ROT_INCREMENT;
     } else {
-      state.depth = Math.floor((state.scale - START_SCALE) / LAYER_SPACING);
-      if (state.depth !== state.lastDepth) {
-        state.lastDepth = state.depth;
+      state.depth = (state.scale - START_SCALE) / LAYER_SPACING;
+      //if (state.depth !== state.lastDepth) {
+        //state.lastDepth = state.depth;
         sprite.tint = getDepthColor();
-      }
+      //}
       state.scale += SCALE_INCREMENT * delta;
     }
     sprite.scale.set(state.scale);
