@@ -15,6 +15,7 @@ import {
   Resource,
   PLAYER_MAX_OXYGEN,
   PLAYER_ROTATE_ON_MOVE,
+  PLAYER_MAX_ROT_CHANGE,
 } from '@src/constants';
 
 type UpdateProps = {
@@ -84,7 +85,10 @@ export const playerCharacter = (
   props: PlayerCharacterProps
 ): PlayerCharacter => {
   const pos = props.pos ?? { x: 0, y: 0, rot: PLAYER_INIT_ROT };
+
   const rotateOnMove = PLAYER_ROTATE_ON_MOVE;
+  const maxRotationDelta = PLAYER_MAX_ROT_CHANGE;
+
   const container = new PIXI.Container();
   container.x = pos.x;
   container.y = pos.y;
@@ -339,9 +343,15 @@ export const playerCharacter = (
       } else {
         delta = deltaRight;
       }
-
       // Put a damper on the amount that we rotate by so we don't snap immediately to the target angle
-      return state.pos.rot + delta * 0.03;
+      delta *= 0.03;
+      if (delta < 0 && delta < -maxRotationDelta) {
+        delta = -maxRotationDelta;
+      } else if (delta > 0 && delta > maxRotationDelta) {
+        delta = maxRotationDelta;
+      }
+
+      return state.pos.rot + delta;
     };
 
     const newPos = {

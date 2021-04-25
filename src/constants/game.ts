@@ -21,7 +21,8 @@ export const PLAYER_MAX_OXYGEN = 100; // full tank, init value
 export const PLAYER_OXYGEN_CONSUMPTION_RATE = 0.6; // lbs per second
 export const PLAYER_INTEGRITY = 2000; // starting integrity (not yet consuming)
 export const PLAYER_INIT_ROT = 0;
-export const PLAYER_ROTATE_ON_MOVE = false;
+export const PLAYER_MAX_ROT_CHANGE = Math.PI / 80;
+export const PLAYER_ROTATE_ON_MOVE = true;
 
 // ITEMS
 export enum PICKUP_TYPES {
