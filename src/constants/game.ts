@@ -9,7 +9,7 @@ export const MAX_PRESSURE = 2000; // lbs/sq in
 export const INIT_PRESSURE = 14; // sea level
 
 // Player
-export const PLAYER_MAX_SPEED = 1.5; // not a constant, move
+export const PLAYER_MAX_SPEED = 5; // not a constant, move
 export const PLAYER_ACCEL = 0.02; // rate of acceleration when explicitly moving
 export const PLAYER_DECEL = 0.008; // constant rate of deceleration, aka drag
 export const PLAYER_DESCENT_RATE = 0.5; // feet per sec
