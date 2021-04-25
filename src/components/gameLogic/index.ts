@@ -298,12 +298,8 @@ export const gameLogic = (props: Props): GameLogic => {
   // PLAYER CRAFT
 
   // TODO: does this need assignment at this scope?'
-
-  console.log('and now', spriteSheets);
-  const playerTexture = PIXI.Texture.from('./assets/ship/submarine_top.png');
   const playerCharacter = COMP.playerCharacter({
     pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2, rot: 0 },
-    textures: { playerTexture },
     anims: spriteSheets.game.animations,
     gameOverHandler: () => {
       onGameOver();

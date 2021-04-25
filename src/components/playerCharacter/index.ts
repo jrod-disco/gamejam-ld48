@@ -43,6 +43,12 @@ export interface PlayerMovement {
   y: -1 | 0 | 1;
 }
 
+enum PLAYER_ANIM {
+  IDLE = 'sub_center',
+  LEFT = 'sub_left',
+  RIGHT = 'sub_right',
+}
+
 export type PlayerState = {
   startPos: PlayerPosition;
   pos: PlayerPosition;
@@ -58,6 +64,7 @@ export type PlayerState = {
   structure: number; // TODO: strengh of hull (improved by pickup ?)
   integrity: number; // TODO: health of hull
   items: []; // TODO: ITEM types
+  lastAnim: PLAYER_ANIM;
   lastUpdateTime: number;
 };
 
@@ -98,6 +105,8 @@ export const playerCharacter = (
     structure: 100,
     integrity: 100,
     items: [],
+    //
+    lastAnim: PLAYER_ANIM.IDLE,
     lastUpdateTime: Date.now(),
   };
   const initialState = { ...state };
@@ -105,18 +114,61 @@ export const playerCharacter = (
   const playerContainer = new PIXI.Container();
   container.addChild(playerContainer);
 
-  // animated sprite
-  // const playerSprite = new PIXI.AnimatedSprite(anims[PLAYER_MOVEMENT.IDLE]);
-  // playerContainer.addChild(playerSprite);
+  // Build up animations
+  const animIdle = new PIXI.AnimatedSprite(anims[PLAYER_ANIM.IDLE]);
+  animIdle.animationSpeed = 0.75;
+  animIdle.loop = true;
+  animIdle.anchor.set(0.5);
+  const animTiltLeft = new PIXI.AnimatedSprite(anims[PLAYER_ANIM.LEFT]);
+  animTiltLeft.animationSpeed = 0.3;
+  animTiltLeft.loop = false;
+  animTiltLeft.anchor.set(0.5);
+  const animTiltRight = new PIXI.AnimatedSprite(anims[PLAYER_ANIM.RIGHT]);
+  animTiltRight.animationSpeed = 0.3;
+  animTiltRight.loop = false;
+  animTiltRight.anchor.set(0.5);
 
-  // placeholder sprite
-  //const playerSprite = new PIXI.Sprite(textures.playerTexture);
-  const playerSprite = new PIXI.AnimatedSprite(anims['sub_center']);
-  playerSprite.animationSpeed = 0.6;
-  playerSprite.gotoAndPlay(1);
-  playerSprite.loop = true;
-  playerSprite.anchor.set(0.5);
-  playerContainer.addChild(playerSprite);
+  state.lastAnim = PLAYER_ANIM.IDLE;
+
+  const animations = {};
+  animations[PLAYER_ANIM.IDLE] = animIdle;
+  animations[PLAYER_ANIM.LEFT] = animTiltLeft;
+  animations[PLAYER_ANIM.RIGHT] = animTiltRight;
+
+  playerContainer.addChild(animations[PLAYER_ANIM.IDLE]);
+  animations[PLAYER_ANIM.IDLE].gotoAndPlay(0);
+
+  const setAnimation = (anim: PLAYER_ANIM, shouldAutoPlay = true) => {
+    if (anim === state.lastAnim) return;
+    // only if this has changed
+    playerContainer.removeChild(animations[state.lastAnim]);
+    const thisAnim = playerContainer.addChild(animations[anim]);
+    state = { ...state, lastAnim: anim };
+
+    shouldAutoPlay && thisAnim.gotoAndPlay(0);
+  };
+
+  const animateTiltOnMovement = (val) => {
+    switch (val.x) {
+      case 0:
+        //  setAnimation(PLAYER_ANIM.IDLE);
+        animations[state.lastAnim].animationSpeed = -0.3;
+        animations[state.lastAnim].play();
+        animations[state.lastAnim].onComplete = () =>
+          setAnimation(PLAYER_ANIM.IDLE);
+        break;
+      case 1:
+        setAnimation(PLAYER_ANIM.RIGHT);
+        animations[state.lastAnim].animationSpeed = 0.3;
+        animations[state.lastAnim].onComplete = null;
+        break;
+      case -1:
+        setAnimation(PLAYER_ANIM.LEFT);
+        animations[state.lastAnim].animationSpeed = 0.25;
+        animations[state.lastAnim].onComplete = null;
+        break;
+    }
+  };
 
   // start small so we can grow at start
   // playerSprite.scale.set(0);
@@ -132,6 +184,8 @@ export const playerCharacter = (
   //
   const setMovement = (val: PlayerMovement): void => {
     state.movement = val;
+
+    animateTiltOnMovement(val);
   };
 
   const updateSpeed = (delta: number): void => {
@@ -178,13 +232,10 @@ export const playerCharacter = (
   // OXYGEN
   const consumeOxygen = (delta: number, pressure: number): void => {
     // as pressure increases, increase rate of consumption
-    // - rate of consumption is .05 lbs (???)
-    // - start w 100 lbs of oygen (???)
-    // state.oxygen = state.oxygen - PLAYER_OXYGEN_CONSUMPTION_RATE;
-
+    // - rate of consumption is .05 lbs
+    // - start w 100 lbs of oygen
     state.oxygen -= PLAYER_OXYGEN_CONSUMPTION_RATE;
 
-    // console.log('state.oxygen: %o', state.oxygen.toFixed(2));
     if (state.oxygen < 0) {
       console.warn("you've succumbed to oxygen deprivation");
       gameOverHandler();
@@ -212,10 +263,21 @@ export const playerCharacter = (
   const getState = () => state;
   //
   const updatePosition = (): void => {
+    const getRotation = () => {
+      var { x, y } = state.movementSpeed;
+      const rad = Math.PI / 2;
+      if (y === 0) {
+        return x < 0 ? -rad : x > 0 ? rad : state.pos.rot;
+      }
+      const angle = Math.atan(x / -y);
+      return y > 0 ? angle + Math.PI : angle;
+    };
+
     const newPos = {
       ...state.pos,
       x: state.pos.x + state.movementSpeed.x,
       y: state.pos.y + state.movementSpeed.y,
+      rot: getRotation(),
     };
 
     if (checkInBounds(newPos)) {
@@ -257,11 +319,10 @@ export const playerCharacter = (
 
   return {
     container,
-
+    //
     setMovement,
-
     takeDamage,
-
+    //
     reset,
     update,
     getState,
