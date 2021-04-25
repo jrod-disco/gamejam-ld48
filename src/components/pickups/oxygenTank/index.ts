@@ -41,12 +41,13 @@ export const oxygenTank = (props: OxygenTankProps): OxygenTank => {
   container.addChild(oxygenTankContainer);
 
   // animated sprite
-  // const playerSprite = new PIXI.AnimatedSprite(anims[PLAYER_MOVEMENT.IDLE]);
-  // playerContainer.addChild(playerSprite);
-
-  // TODO: oxygen tank sprite. this is nugget for now
-  const tankSprite = new PIXI.Sprite(textures.nuggetTexture);
+  // Spin animations
+  const tankSprite = new PIXI.AnimatedSprite(anims['oxy']);
+  tankSprite.animationSpeed = 0.25;
+  tankSprite.loop = true;
   tankSprite.anchor.set(0.5);
+  tankSprite.play();
+
   oxygenTankContainer.addChild(tankSprite);
 
   tankSprite.scale.set(0.5);

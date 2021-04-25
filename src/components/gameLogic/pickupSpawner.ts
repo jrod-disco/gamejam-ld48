@@ -15,12 +15,18 @@ export interface PickupSpawner {
   reset: () => void;
 }
 
-export const pickupSpawner = (): PickupSpawner => {
+interface PickupSpawnerProps {
+  anims?: { [key: string]: Array<PIXI.Texture> };
+}
+
+export const pickupSpawner = (props: PickupSpawnerProps): PickupSpawner => {
   let state = {
     lastSpawnTime: Date.now(),
     pickupList: [],
   };
   const initialState = { ...state };
+
+  const { anims } = props;
 
   const pickupBuffer = 50;
 
@@ -43,6 +49,7 @@ export const pickupSpawner = (): PickupSpawner => {
     const pickup = oxygenTank({
       pos: { x: rX, y: rY },
       textures: { nuggetTexture: texture },
+      anims,
     });
 
     state.pickupList.push(pickup);
