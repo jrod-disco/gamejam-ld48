@@ -29,7 +29,7 @@ export const cave = (props: CaveProps): Cave => {
   const caveTexture = PIXI.Texture.from("./assets/cave/cave.png");
   const sprite = new PIXI.Sprite(caveTexture);
 
-  const MAX_SCALE = 2;
+  const MAX_SCALE = 2.5;
   const WATER_BOT_COLOR = Color('rgb(32, 64, 89)');
   const WATER_TOP_COLOR = Color('rgb(34, 128, 220)');
   const START_SCALE = 0.25;

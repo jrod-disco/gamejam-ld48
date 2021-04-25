@@ -305,8 +305,8 @@ export const gameLogic = (props: Props): GameLogic => {
   gameContainer.addChild(caveContainer);
 
   const caves = [];
-  const MAX_DEPTH = 24;
-  for (let depth = 0; depth < MAX_DEPTH; depth++) {
+  const MAX_DEPTH = 32;
+  for (let depth=0; depth<MAX_DEPTH; depth++) {
     const cave = COMP.cave({ depth, maxDepth: MAX_DEPTH });
     cave.sprite.x = APP_WIDTH / 2;
     cave.sprite.y = APP_HEIGHT / 2;
