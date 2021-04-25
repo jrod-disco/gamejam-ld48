@@ -19,7 +19,6 @@ import {
   Z_MC_BASE,
   Z_MC_UI,
   SFX_VOL_MULT,
-  PLAYER_CONTINOUS_MOVEMENT,
 } from './constants';
 import './index.scss';
 

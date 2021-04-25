@@ -6,46 +6,41 @@ import {
   APP_HEIGHT,
   APP_WIDTH,
   OBJECT_STATUS,
-  PLAYER_SPEED,
+  PLAYER_MAX_SPEED,
   PLAYER_INIT_ROT,
+  PLAYER_OXYGEN_CONSUMPTION_RATE,
+  PLAYER_ACCEL,
+  PLAYER_DECEL,
 } from '@src/constants';
+
+type UpdateProps = {
+  delta: number;
+  depth: number;
+  pressure: number;
+  time: number;
+};
 
 export interface PlayerCharacter {
   container: PIXI.Container;
   reset: () => void;
-  update: (delta: number) => void;
-  moveUp: () => void;
-  moveDown: () => void;
-  moveLeft: () => void;
-  moveRight: () => void;
-  moveStop: () => void;
-  grow: () => void;
-  getSize: () => number;
-  wither: (onCompleteCallback: () => void) => void;
+  update: (props: UpdateProps) => void;
+  takeDamage: (dmg: number) => void;
+  getState: () => PlayerState;
+  setMovement: (movement: PlayerMovement) => void;
 }
 
 interface PlayerCharacterProps {
   pos?: { x: number; y: number; rot: number };
   textures?: { playerTexture: PIXI.Texture };
   anims?: { [key: string]: Array<PIXI.Texture> };
+  gameOverHandler?: Function;
 }
 
 type PlayerPosition = { x: number; y: number; rot: number };
 
-enum PLAYER_DIRECTION {
-  NONE,
-  UP,
-  DOWN,
-  LEFT,
-  RIGHT,
-}
-
-enum PLAYER_MOVEMENT {
-  IDLE = 'idle',
-  WALK_UP = 'walk_up',
-  WALK_DOWN = 'walk_down',
-  WALK_LEFT = 'walk_left',
-  WALK_RIGHT = 'walk_right',
+export interface PlayerMovement {
+  x: -1 | 0 | 1;
+  y: -1 | 0 | 1;
 }
 
 enum PLAYER_ANIM {
@@ -56,10 +51,13 @@ enum PLAYER_ANIM {
 
 type PlayerState = {
   startPos: PlayerPosition;
+  pos: PlayerPosition;
   status: OBJECT_STATUS;
-  direction: PLAYER_DIRECTION;
-  movement: PLAYER_MOVEMENT;
-  movementSpeed: number;
+  movement: PlayerMovement;
+  maxMovementSpeed: number;
+  movementSpeed: { x: number; y: number };
+  movementAcceleration: number;
+  dragDeceleration: number;
   size: 1;
   oxygen: number;
   power: number;
@@ -67,6 +65,7 @@ type PlayerState = {
   integrity: number; // TODO: health of hull
   items: []; // TODO: ITEM types
   lastAnim: PLAYER_ANIM;
+  lastUpdateTime: number;
 };
 
 /**
@@ -82,21 +81,23 @@ export const playerCharacter = (
   const container = new PIXI.Container();
   container.x = pos.x;
   container.y = pos.y;
-
   container.name = 'playerCharacter';
 
   // Instantiate PIXI
   PixiPlugin.registerPIXI(PIXI);
   gsap.registerPlugin(PixiPlugin);
 
-  const { anims, textures } = props;
+  const { anims, textures, gameOverHandler } = props;
 
   let state: PlayerState = {
     startPos: { ...pos },
+    pos: { ...pos },
     status: OBJECT_STATUS.ACTIVE,
-    direction: PLAYER_DIRECTION.NONE,
-    movement: PLAYER_MOVEMENT.IDLE,
-    movementSpeed: PLAYER_SPEED,
+    movement: { x: 0, y: 0 },
+    maxMovementSpeed: PLAYER_MAX_SPEED,
+    movementSpeed: { x: 0, y: 0 },
+    movementAcceleration: PLAYER_ACCEL,
+    dragDeceleration: PLAYER_DECEL,
     size: 1,
     //
     oxygen: 100,
@@ -106,6 +107,7 @@ export const playerCharacter = (
     items: [],
     //
     lastAnim: PLAYER_ANIM.IDLE,
+    lastUpdateTime: Date.now(),
   };
   const initialState = { ...state };
 
@@ -154,42 +156,6 @@ export const playerCharacter = (
   const spriteMargin = 20;
 
   //
-  const calculateMove = (
-    currentPos: PlayerPosition,
-    dir: PLAYER_MOVEMENT,
-    delta: number
-  ): PlayerPosition => {
-    switch (dir) {
-      case PLAYER_MOVEMENT.IDLE:
-        break;
-      case PLAYER_MOVEMENT.WALK_UP:
-        return {
-          x: currentPos.x,
-          y: currentPos.y - state.movementSpeed * delta,
-          rot: PLAYER_INIT_ROT,
-        };
-      case PLAYER_MOVEMENT.WALK_DOWN:
-        return {
-          x: currentPos.x,
-          y: currentPos.y + state.movementSpeed * delta,
-          rot: PLAYER_INIT_ROT,
-        };
-      case PLAYER_MOVEMENT.WALK_LEFT:
-        return {
-          x: currentPos.x - state.movementSpeed * delta,
-          y: currentPos.y,
-          rot: PLAYER_INIT_ROT,
-        };
-      case PLAYER_MOVEMENT.WALK_RIGHT:
-        return {
-          x: currentPos.x + state.movementSpeed * delta,
-          y: currentPos.y,
-          rot: PLAYER_INIT_ROT,
-        };
-    }
-  };
-
-  //
   const checkInBounds = (pos: PlayerPosition): boolean =>
     pos.x < APP_WIDTH - spriteMargin &&
     pos.x > spriteMargin &&
@@ -197,131 +163,140 @@ export const playerCharacter = (
     pos.y > spriteMargin;
 
   //
-  const setDirection = (val: PLAYER_DIRECTION): void => {
-    state.direction = val;
-  };
-
-  //
-  const setMovement = (val: PLAYER_MOVEMENT): void => {
+  const setMovement = (val: PlayerMovement): void => {
     state.movement = val;
   };
 
-  //
-  const moveUpdate = (delta: number): PlayerPosition => {
-    const currentPos = {
-      x: container.x,
-      y: container.y,
-      rot: container.rotation,
+  const updateSpeed = (delta: number): void => {
+    // Apply a constant drag to the movement
+    const applyDeceleration = (speed: number): number => {
+      if (speed < 0) {
+        return Math.min(speed + state.dragDeceleration * delta, 0);
+      } else if (speed > 0) {
+        return Math.max(speed - state.dragDeceleration * delta, 0);
+      } else {
+        return speed;
+      }
     };
 
-    if (state.movement === PLAYER_MOVEMENT.IDLE || state.movementSpeed === 0)
-      return currentPos;
+    // Accelerate if movement is requested
+    const applyAcceleration = (speed: number, move: number): number =>
+      speed + move * state.movementAcceleration * delta;
 
-    const nextPost = calculateMove(currentPos, state.movement, delta);
-    const newPos = checkInBounds(nextPost) ? nextPost : currentPos;
+    // Prevent the speed from exceeding the max
+    const clampSpeed = (speed: number): number => {
+      if (speed < 0 && speed < -state.maxMovementSpeed)
+        return -state.maxMovementSpeed;
+      if (speed > 0 && speed > state.maxMovementSpeed)
+        return state.maxMovementSpeed;
 
-    return newPos;
+      return speed;
+    };
+
+    const calculateNewSpeed = (speed: number, move: number): number => {
+      const withDeceleration = applyDeceleration(speed);
+      const withAcceleration = applyAcceleration(withDeceleration, move);
+
+      return clampSpeed(withAcceleration);
+    };
+
+    const newSpeed = {
+      x: calculateNewSpeed(state.movementSpeed.x, state.movement.x),
+      y: calculateNewSpeed(state.movementSpeed.y, state.movement.y),
+    };
+
+    state.movementSpeed = newSpeed;
+  };
+
+  // OXYGEN
+  const consumeOxygen = (delta: number, pressure: number): void => {
+    // as pressure increases, increase rate of consumption
+    // - rate of consumption is .05 lbs (???)
+    // - start w 100 lbs of oygen (???)
+    // state.oxygen = state.oxygen - PLAYER_OXYGEN_CONSUMPTION_RATE;
+
+    state.oxygen -= PLAYER_OXYGEN_CONSUMPTION_RATE;
+
+    console.log('state.oxygen: %o', state.oxygen.toFixed(2));
+    if (state.oxygen < 0) {
+      console.warn("you've succumbed to oxygen deprivation");
+      gameOverHandler();
+    }
+  };
+
+  // POWER
+
+  // should be a consequence of
+  // - time as a constant drain
+  // - additional power as a consequence of thrust
+
+  // DAMAGE
+  // - collision with cave wall to decrement integrity
+  const takeDamage = (dmg: number): void => {
+    state.integrity -= dmg;
+
+    console.log('integrity: %o', state.integrity);
+    if (state.integrity < 0) {
+      console.warn("you've blown up");
+      gameOverHandler();
+    }
+  };
+
+  const getState = () => state;
+  //
+  const updatePosition = (): void => {
+    const newPos = {
+      ...state.pos,
+      x: state.pos.x + state.movementSpeed.x,
+      y: state.pos.y + state.movementSpeed.y,
+    };
+
+    if (checkInBounds(newPos)) {
+      state.pos = newPos;
+    }
   };
 
   //
-  const updateContainer = (delta: number): void => {
-    const newPos = moveUpdate(delta);
-    container.x = newPos.x;
-    container.y = newPos.y;
-    // container.rotation = newPos.rot;
-  };
-
-  const moveStop = (): void => {
-    setMovement(PLAYER_MOVEMENT.IDLE);
-  };
-  const moveUp = (): void => {
-    setDirection(PLAYER_DIRECTION.UP);
-    setMovement(PLAYER_MOVEMENT.WALK_UP);
-  };
-  const moveDown = (): void => {
-    setDirection(PLAYER_DIRECTION.DOWN);
-    setMovement(PLAYER_MOVEMENT.WALK_DOWN);
-  };
-  const moveLeft = (): void => {
-    setDirection(PLAYER_DIRECTION.LEFT);
-    setMovement(PLAYER_MOVEMENT.WALK_LEFT);
-  };
-  const moveRight = (): void => {
-    setDirection(PLAYER_DIRECTION.RIGHT);
-    setMovement(PLAYER_MOVEMENT.WALK_RIGHT);
+  const updateContainer = (): void => {
+    container.x = state.pos.x;
+    container.y = state.pos.y;
+    // container.rotation = state.pos.rot;
   };
 
   const getSize = (): number => state.size;
 
-  const grow = (): void => {
-    // state.size += 0.2;
-    // gsap.killTweensOf(playerSprite);
-    // const myTween = gsap.to(playerSprite, {
-    //   duration: 0.5,
-    //   pixi: { scale: state.size },
-    //   ease: Bounce.easeOut,
-    // });
-  };
-
-  // const sprout = (onCompleteCallback?): void => {
-  //   console.log('sprout called');
-  //   gsap.killTweensOf(playerSprite);
-
-  //   const myTween = gsap.to(playerSprite, {
-  //     duration: 0.5,
-  //     pixi: { scale: 1 },
-  //     ease: Bounce.easeInOut,
-  //     onComplete: () => {
-  //       onCompleteCallback && onCompleteCallback();
-  //     },
-  //   });
-  // };
-
-  const wither = (onCompleteCallback?): void => {
-    console.log('wither called');
-    gsap.killTweensOf(playerSprite);
-
-    const myTween = gsap.to(playerSprite, {
-      duration: 0.5,
-      pixi: { scale: 0 },
-      ease: Bounce.easeIn,
-      onComplete: () => {
-        console.log('wither complete');
-        onCompleteCallback && onCompleteCallback();
-      },
-    });
-  };
-
   // Reset called by play again and also on init
   const reset = (): void => {
-    container.x = state.startPos.x;
-    container.y = state.startPos.y;
-    // container.rotation = state.startPos.rot;
+    state.pos = { ...state.startPos };
+    updateContainer();
     state = { ...initialState };
-
-    // playerSprite.scale.set(0);
-    // sprout();
   };
 
-  const update = (delta): void => {
+  const update = (props: UpdateProps): void => {
+    const { delta, depth, time, pressure } = props;
+
     // Update called by main
-    state.status === OBJECT_STATUS.ACTIVE && updateContainer(delta);
+    if (state.status === OBJECT_STATUS.ACTIVE) {
+      updateSpeed(delta);
+      updatePosition();
+      updateContainer();
+
+      if (Date.now() > state.lastUpdateTime + 500) {
+        state.lastUpdateTime = Date.now();
+        consumeOxygen(delta, pressure);
+      }
+    }
   };
 
   return {
     container,
 
-    moveUp,
-    moveDown,
-    moveLeft,
-    moveRight,
-    moveStop,
+    setMovement,
 
-    grow,
-    getSize,
-    wither,
+    takeDamage,
 
     reset,
     update,
+    getState,
   };
 };
