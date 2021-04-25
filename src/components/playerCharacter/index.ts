@@ -48,6 +48,12 @@ enum PLAYER_MOVEMENT {
   WALK_RIGHT = 'walk_right',
 }
 
+enum PLAYER_ANIM {
+  IDLE = 'sub_center',
+  LEFT = 'sub_left',
+  RIGHT = 'sub_right',
+}
+
 type PlayerState = {
   startPos: PlayerPosition;
   status: OBJECT_STATUS;
@@ -60,6 +66,7 @@ type PlayerState = {
   structure: number; // TODO: strengh of hull (improved by pickup ?)
   integrity: number; // TODO: health of hull
   items: []; // TODO: ITEM types
+  lastAnim: PLAYER_ANIM;
 };
 
 /**
@@ -97,6 +104,8 @@ export const playerCharacter = (
     structure: 100,
     integrity: 100,
     items: [],
+    //
+    lastAnim: PLAYER_ANIM.IDLE,
   };
   const initialState = { ...state };
 
@@ -109,12 +118,36 @@ export const playerCharacter = (
 
   // placeholder sprite
   //const playerSprite = new PIXI.Sprite(textures.playerTexture);
-  const playerSprite = new PIXI.AnimatedSprite(anims['sub_center']);
+  const playerSprite = new PIXI.AnimatedSprite(anims[PLAYER_ANIM.IDLE]);
   playerSprite.animationSpeed = 0.6;
   playerSprite.gotoAndPlay(1);
   playerSprite.loop = true;
   playerSprite.anchor.set(0.5);
   playerContainer.addChild(playerSprite);
+
+  // Build up animations
+  const animIdle = new PIXI.AnimatedSprite(anims[PLAYER_ANIM.IDLE]);
+  animIdle.animationSpeed = 0.6;
+  animIdle.loop = true;
+  const animTiltLeft = new PIXI.AnimatedSprite(anims[PLAYER_ANIM.LEFT]);
+  animTiltLeft.animationSpeed = 0.4;
+  animTiltLeft.loop = false;
+  const animTiltRight = new PIXI.AnimatedSprite(anims[PLAYER_ANIM.RIGHT]);
+  animTiltRight.animationSpeed = 0.4;
+  animTiltRight.loop = false;
+
+  state.lastAnim = PLAYER_ANIM.IDLE;
+
+  const animations = {};
+  animations[PLAYER_ANIM.IDLE] = animIdle;
+  animations[PLAYER_ANIM.LEFT] = animTiltLeft;
+  animations[PLAYER_ANIM.RIGHT] = animTiltRight;
+
+  const setAnimation = (anim: PLAYER_ANIM) => {
+    playerSprite.removeChild(animations[state.lastAnim]);
+    playerSprite.addChild(animations[anim]);
+    state = { ...state, lastAnim: anim };
+  };
 
   // start small so we can grow at start
   // playerSprite.scale.set(0);

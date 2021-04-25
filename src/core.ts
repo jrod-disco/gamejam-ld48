@@ -113,8 +113,6 @@ const bootstrapApp = (props: {
    * This can be used to pass secondary loaded assets to modules and set their spritesheet referecnes
    */
   const initSecondaryModules = (): void => {
-    console.log('initSecondaryModules', spriteSheets);
-
     // Game Logic ----------------------------------------------
     gameLogic = COMP.gameLogic({
       gameContainer: screenGame.container,
