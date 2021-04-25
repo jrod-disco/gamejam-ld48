@@ -1,16 +1,18 @@
 // Environment
 export const IS_SCORE_INCREMENTY = false;
 
-// - mariana trench is 38k deep,  8000 lbs/sq in
+// - mariana trench is 40k deep,  8000 lbs/sq in
+// - for faux ocean floor:
 export const MAX_DEPTH = 10_000;  // feet
-
-// - roughly 1000 x surface. we'll call this 100 for game purposes
-export const MAX_PRESSURE = 100;
-
+export const INIT_DEPTH = 0;
+export const MAX_PRESSURE = 2000; // lbs/sq in
+export const INIT_PRESSURE = 14; // sea level
 
 // Player
 export const PLAYER_SPEED = 5;  // not a constant, move
-export const PLAYER_DESCENT_RATE = 0.2;  // feet per sec
+export const PLAYER_DESCENT_RATE = 0.5;  // feet per sec
+export const PLAYER_OXYGEN_CONSUMPTION_RATE = 0.01; // lbs per second
+export const PLAYER_INTEGRITY = 2000; // starting integrity (not yet consuming)
 export const PLAYER_CONTINOUS_MOVEMENT = false;
 export const PLAYER_INIT_ROT = 0;
 

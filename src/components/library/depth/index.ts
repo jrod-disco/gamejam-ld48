@@ -1,5 +1,12 @@
 import * as PIXI from 'pixi.js';
-import { THEME, MAX_DEPTH, PLAYER_DESCENT_RATE } from '@src/constants';
+import { 
+  THEME, 
+  MAX_DEPTH, 
+  PLAYER_DESCENT_RATE,
+  INIT_PRESSURE,
+  INIT_DEPTH,
+  MAX_PRESSURE,
+} from '@src/constants';
 
 export interface DepthMeter {
   container: PIXI.Container;
@@ -8,10 +15,10 @@ export interface DepthMeter {
   stop: () => void;
   pause: () => void;
   update: (delta: number) => void;
-  getCurrentDepth: () => number;
   getMaxDepth: () => number;
-  setMaxDepth: (newMaxDepth: number) => void;
-  setStartDepth: (newMaxDepth: number) => void;
+  getCurrentDepth: () => number;
+  getMaxPressure: () => number;  
+  getCurrentPressure: () => number;
 }
 
 interface Props {
@@ -30,18 +37,18 @@ interface Props {
 export const depthMeter = (props: Props): DepthMeter => {
   const pos = props.pos ?? { x: 0, y: 0 };
   const container = new PIXI.Container();
+  
   container.x = pos.x;
   container.y = pos.y;
-
   container.name = 'depthmeter';
-
   const { maxDepthCallback } = props;
+
   let { depth } = props;
-  let storedMaxDepth = MAX_DEPTH;
 
   let state = {
     isOn: false,
-    currentDepth: 0,
+    currentPressure: INIT_PRESSURE,
+    currentDepth: INIT_DEPTH,
   };
 
   const initialState = { ...state };
@@ -77,31 +84,16 @@ export const depthMeter = (props: Props): DepthMeter => {
     depthText.text = depthString();
   };
 
-  const setStartDepth = (newDepth: number): void => {
-    lastUpdateTime = Date.now();
-    state.currentDepth = 0;
-    depth = newDepth;
-    storedMaxDepth = newDepth;
-    updateDepthText();
-  };
-
-  const setMaxDepth = (newMaxDepth: number): void => {
-    depth = newMaxDepth;
-    updateDepthText();
-  };
-
-  const getMaxDepth = (): number => {
-    return depth;
-  };
-
+  const getMaxDepth = (): number => depth;
   const getCurrentDepth = (): number => Number(Math.floor(state.currentDepth));
+  const getMaxPressure = (): number => MAX_PRESSURE;
+  const getCurrentPressure = (): number => Number(Math.floor(state.currentPressure))
 
   // Reset called by play again and also on init
   const reset = (): void => {
     state = null;
     state = { ...initialState };
     lastUpdateTime = Date.now();
-    depth = storedMaxDepth ? storedMaxDepth : MAX_DEPTH;
     updateDepthText();
   };
   reset();
@@ -129,6 +121,7 @@ export const depthMeter = (props: Props): DepthMeter => {
     }
   };
 
+
   // UPDATE
   // - this sets the overall depth of the craft 
   // - mostly this is driven by time + the descent rate const
@@ -137,6 +130,11 @@ export const depthMeter = (props: Props): DepthMeter => {
     // Update called by main
     if (state.isOn && Date.now() > lastUpdateTime + 10) {
       state.currentDepth += PLAYER_DESCENT_RATE;
+
+      // TODO: Pressure = (density x gravity x depth)
+      // - need to introduce gravity / denisty. until then this is approx
+      state.currentPressure += state.currentDepth  / 5;
+
       checkMaxDepth();
       updateDepthText();
       lastUpdateTime = Date.now();
@@ -150,11 +148,11 @@ export const depthMeter = (props: Props): DepthMeter => {
     stop,
     pause,
     update,
-    //
-    setMaxDepth,
-    setStartDepth,
-    //
+
     getCurrentDepth,
     getMaxDepth,
+
+    getCurrentPressure,
+    getMaxPressure,
   };
 };
