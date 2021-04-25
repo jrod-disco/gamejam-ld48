@@ -7,27 +7,35 @@ import {
   APP_WIDTH,
   OBJECT_STATUS,
   PLAYER_SPEED,
-  PLAYER_INIT_ROT
+  PLAYER_INIT_ROT,
+  PLAYER_OXYGEN_CONSUMPTION_RATE
 } from '@src/constants';
+
+type UpdateProps = {
+  delta: number;
+  depth: number;
+  pressure: number;
+  time: number;
+}
 
 export interface PlayerCharacter {
   container: PIXI.Container;
   reset: () => void;
-  update: (delta: number) => void;
+  update: (props: UpdateProps) => void;
   moveUp: () => void;
   moveDown: () => void;
   moveLeft: () => void;
   moveRight: () => void;
   moveStop: () => void;
-  grow: () => void;
-  getSize: () => number;
-  wither: (onCompleteCallback: () => void) => void;
+  takeDamage: (dmg: number) => void;
+  getState: () => PlayerState;
 }
 
 interface PlayerCharacterProps {
   pos?: { x: number; y: number, rot: number };
   textures?: { playerTexture: PIXI.Texture };
   anims?: { [key: string]: Array<PIXI.Texture> };
+  gameOverHandler?: Function;
 }
 
 type PlayerPosition = { x: number; y: number, rot: number };
@@ -59,7 +67,8 @@ type PlayerState = {
   power: number,
   structure: number, // TODO: strengh of hull (improved by pickup ?)
   integrity: number, // TODO: health of hull
-  items: [],  // TODO: ITEM types
+  items: [],  // TODO: ITEM types,
+  lastUpdateTime: number,
 }
 
 /**
@@ -76,14 +85,13 @@ export const playerCharacter = (
   const container = new PIXI.Container();
   container.x = pos.x;
   container.y = pos.y;
-
   container.name = 'playerCharacter';
 
   // Instantiate PIXI
   PixiPlugin.registerPIXI(PIXI);
   gsap.registerPlugin(PixiPlugin);
 
-  const { anims, textures } = props;
+  const { anims, textures, gameOverHandler } = props;
 
   let state: PlayerState = {
     startPos: { ...pos },
@@ -98,6 +106,7 @@ export const playerCharacter = (
     structure: 100,
     integrity: 100,
     items: [],
+    lastUpdateTime: Date.now(),
   };
   const initialState = { ...state };
 
@@ -211,64 +220,68 @@ export const playerCharacter = (
     setMovement(PLAYER_MOVEMENT.WALK_RIGHT);
   };
 
-  const getSize = (): number => state.size;
+  // OXYGEN
+  const consumeOxygen = (delta: number, pressure: number): void => {
+    // as pressure increases, increase rate of consumption 
+    // - rate of consumption is .05 lbs (???)
+    // - start w 100 lbs of oygen (???)
+    // state.oxygen = state.oxygen - PLAYER_OXYGEN_CONSUMPTION_RATE;
 
-  const grow = (): void => {
-    // state.size += 0.2;
+    state.oxygen -= PLAYER_OXYGEN_CONSUMPTION_RATE; 
 
-    // gsap.killTweensOf(playerSprite);
+    console.log("state.oxygen: %o", state.oxygen.toFixed(2) );
+    if (state.oxygen < 0) {
+      console.warn("you've succumbed to oxygen deprivation");
+      gameOverHandler();
+    }
+  }
+ 
+  // POWER
 
-    // const myTween = gsap.to(playerSprite, {
-    //   duration: 0.5,
-    //   pixi: { scale: state.size },
-    //   ease: Bounce.easeOut,
-    // });
-  };
+  // should be a consequence of 
+  // - time as a constant drain
+  // - additional power as a consequence of thrust
 
-  // const sprout = (onCompleteCallback?): void => {
-  //   console.log('sprout called');
-  //   gsap.killTweensOf(playerSprite);
+  // DAMAGE
+  // - collision with cave wall to decrement integrity
+  const takeDamage = (dmg: number): void => {
+    state.integrity -= dmg;
 
-  //   const myTween = gsap.to(playerSprite, {
-  //     duration: 0.5,
-  //     pixi: { scale: 1 },
-  //     ease: Bounce.easeInOut,
-  //     onComplete: () => {
-  //       onCompleteCallback && onCompleteCallback();
-  //     },
-  //   });
-  // };
+    console.log("integrity: %o", state.integrity );
+    if (state.integrity < 0) {
+      console.warn("you've blown up");
+      gameOverHandler();
+    }
+  }
 
-  const wither = (onCompleteCallback?): void => {
-    console.log('wither called');
-    gsap.killTweensOf(playerSprite);
-
-    const myTween = gsap.to(playerSprite, {
-      duration: 0.5,
-      pixi: { scale: 0 },
-      ease: Bounce.easeIn,
-      onComplete: () => {
-        console.log('wither complete');
-        onCompleteCallback && onCompleteCallback();
-      },
-    });
-  };
+  const getState = () => state;
 
   // Reset called by play again and also on init
   const reset = (): void => {
-
     container.x = state.startPos.x;
     container.y = state.startPos.y;
     // container.rotation = state.startPos.rot;
     state = { ...initialState };
-
-    // playerSprite.scale.set(0);
-    // sprout();
   };
 
-  const update = (delta): void => {
+  const update = (props: UpdateProps): void => {
+    const {
+      delta,
+      depth, 
+      time,
+      pressure,
+    } = props;
+
     // Update called by main
-    state.status === OBJECT_STATUS.ACTIVE && updateContainer(delta);
+
+    if (state.status === OBJECT_STATUS.ACTIVE) {
+      updateContainer(delta);
+
+      if (Date.now() > state.lastUpdateTime + 500) {
+        state.lastUpdateTime = Date.now();
+        consumeOxygen(delta, pressure);        
+      }
+    }
   };
 
   return {
@@ -279,12 +292,11 @@ export const playerCharacter = (
     moveLeft,
     moveRight,
     moveStop,
-    
-    grow,
-    getSize,
-    wither,
+
+    takeDamage,
 
     reset,
     update,
+    getState,
   };
 };

@@ -216,7 +216,7 @@ export const gameLogic = (props: Props): GameLogic => {
     // Clean Up Game Logic Remaining
     //...anything within game logic component...
 
-    playerCharacter.wither(mainOnGameOver);
+    mainOnGameOver();
   };
 
 
@@ -277,6 +277,9 @@ export const gameLogic = (props: Props): GameLogic => {
   const playerCharacter = COMP.playerCharacter({
     pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2, rot: 0 },
     textures: { playerTexture },
+    gameOverHandler: () => {
+      onGameOver();
+    },
   });
   gameContainer.addChild(playerCharacter.container);
 
@@ -314,7 +317,7 @@ export const gameLogic = (props: Props): GameLogic => {
       const nY = n.container.y;
 
       // check collision by x/y locations with a hitbox buffer
-      const hitBox = 20 * playerCharacter.getSize();
+      const hitBox = 20;
 
       const collided =
         pX > nX - hitBox &&
@@ -323,7 +326,7 @@ export const gameLogic = (props: Props): GameLogic => {
         pY < nY + hitBox;
       collided && goldSpawnerRef.removeNuggetByIndex(i);
       collided && goldContainer.removeChildAt(i);
-      collided && playerCharacter.grow();
+      // collided && playerCharacter.takeDamage(1);
       collided && scoreDisplay.addToScore(POINTS_GOLD);
       collided &&
         pixiSound.play('coin', {
@@ -341,10 +344,20 @@ export const gameLogic = (props: Props): GameLogic => {
     // Update individual controller refs here
     runtime.update(delta);
     depthMeter.update(delta);
+
     checkDownKeys(state.keysDown);
+    
     updateGold();
-    playerCharacter.update(delta);
+
+    playerCharacter.update({ 
+      delta, 
+      depth: depthMeter.getCurrentDepth(),
+      pressure: depthMeter.getCurrentPressure(),
+      time: runtime.getRunTime(),
+    });
+
     checkCollision();
+
     IS_SCORE_INCREMENTY && scoreDisplay.update(delta);
     updateRan = true;
 
