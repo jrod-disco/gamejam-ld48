@@ -301,6 +301,9 @@ export const gameLogic = (props: Props): GameLogic => {
   /////////////////////////////////////////////////////////////////////////////
   // CAVE
 
+  const caveContainer = new PIXI.Container();
+  gameContainer.addChild(caveContainer);
+
   const caves = [];
   const MAX_DEPTH = 24;
   for (let depth = 0; depth < MAX_DEPTH; depth++) {
@@ -308,17 +311,44 @@ export const gameLogic = (props: Props): GameLogic => {
     cave.sprite.x = APP_WIDTH / 2;
     cave.sprite.y = APP_HEIGHT / 2;
     caves.push(cave);
-    gameContainer.addChild(cave.sprite);
+    caveContainer.addChild(cave.sprite);
   }
 
+  const ambientContainer = new PIXI.Container();
+  gameContainer.addChild(ambientContainer);
+  ambientContainer.filters = [new BloomFilter(10)];
   // Starfield for ambient effect
   const starfield = COMP.stars({
     texture: PIXI.Texture.from('./assets/example/whitebox.png'),
   });
-  gameContainer.addChild(starfield.container);
+  ambientContainer.addChild(starfield.container);
+
+  /////////////////////////////////////////////////////////////////////////////
+  // ITEMZ
+
+  const itemContainer = new PIXI.Container();
+  gameContainer.addChild(itemContainer);
+  itemContainer.filters = [new BloomFilter(6)];
+
+  // Pickup Spawner
+  const pickupSpawnerRef = pickupSpawner();
+  const pickupContainer = new PIXI.Container();
+  itemContainer.addChild(pickupContainer);
+
+  const updatePickups = (): void => {
+    const maybePickup = pickupSpawnerRef.spawn();
+    maybePickup && pickupContainer.addChild(maybePickup.container);
+  };
+  const cleanUpPickups = (): void => {
+    pickupContainer.removeChildren();
+  };
 
   /////////////////////////////////////////////////////////////////////////////
   // PLAYER / SUB
+
+  const subContainer = new PIXI.Container();
+  gameContainer.addChild(subContainer);
+  subContainer.filters = [new BloomFilter(3)];
 
   // Simple Player Component
   const playerCharacter = COMP.playerCharacter({
@@ -328,24 +358,7 @@ export const gameLogic = (props: Props): GameLogic => {
       onGameOver();
     },
   });
-  gameContainer.addChild(playerCharacter.container);
-
-  /////////////////////////////////////////////////////////////////////////////
-  // ITEMZ
-
-  // Pickup Spawner
-  const pickupSpawnerRef = pickupSpawner();
-  const pickupContainer = new PIXI.Container();
-  gameContainer.addChild(pickupContainer);
-  //gameContainer.filters = [new BloomFilter(4)];
-
-  const updatePickups = (): void => {
-    const maybePickup = pickupSpawnerRef.spawn();
-    maybePickup && pickupContainer.addChild(maybePickup.container);
-  };
-  const cleanUpPickups = (): void => {
-    pickupContainer.removeChildren();
-  };
+  subContainer.addChild(playerCharacter.container);
 
   // TODO:
   // - abstract to class
