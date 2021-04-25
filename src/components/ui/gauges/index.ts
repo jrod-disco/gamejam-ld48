@@ -70,12 +70,32 @@ export const gauges = (props: Props): Gauges => {
   oxygen.tint = THEME.TXT_HUD_HEX;
   oxygen.position.y += 18;
   oxygen.position.x += 2;
+  container.addChild(oxygenTitle, oxygen);
 
   // pressure
 
   // integrity
+  const integrityTitle = new PIXI.BitmapText('Integrity', {
+    fontName: `FFFFuego-16`,
+    fontSize: 14,
+    align: 'left',
+  });
+  integrityTitle.anchor.set(0, 0);
+  integrityTitle.tint = THEME.TXT_TITLES_HEX;
+  integrityTitle.alpha = 0.8;
+  integrityTitle.position.y += 40;
 
-  container.addChild(oxygenTitle, oxygen);
+  const integrity = new PIXI.BitmapText('000', {
+    fontName: `FFFFuego-16-bold`,
+    fontSize: 13,
+    align: 'left',
+  });
+  integrity.anchor.set(0, 0);
+  integrity.tint = THEME.TXT_HUD_HEX;
+  integrity.position.y += 58;
+  integrity.position.x += 2;
+
+  container.addChild(integrityTitle, integrity);
 
   const updateState = (playerState: PlayerState) => {
     state.oxygen = playerState.oxygen;
@@ -85,6 +105,7 @@ export const gauges = (props: Props): Gauges => {
 
   const updateCluster = (): void => {
     oxygen.text = state.oxygen.toFixed(2);
+    integrity.text = state.integrity.toFixed(2);
   };
 
   // Reset called by play again and also on init
