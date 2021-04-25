@@ -56,7 +56,6 @@ export const cave = (props: CaveProps): Cave => {
     const yFinal = (y/WORLD_HEIGHT) * APP_HEIGHT;
     sprite.position.x = APP_WIDTH/2 + ((APP_WIDTH/2-xFinal)/props.maxDepth) * state.depth;
     sprite.position.y = APP_HEIGHT/2 + ((APP_HEIGHT/2-yFinal)/props.maxDepth) * state.depth;
-    console.log(props.depth, sprite.position.x, sprite.position.y);
   };
 
   sprite.anchor.set(0.5);
