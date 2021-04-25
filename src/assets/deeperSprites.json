@@ -16,6 +16,30 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
 	"sourceSize": {"w":64,"h":64}
 },
+"sub_fwd0.png":
+{
+	"frame": {"x":67,"y":1,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+"sub_fwd1.png":
+{
+	"frame": {"x":67,"y":67,"w":64,"h":63},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":63},
+	"sourceSize": {"w":64,"h":64}
+},
+"sub_fwd2.png":
+{
+	"frame": {"x":132,"y":132,"w":64,"h":63},
+	"rotated": true,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":1,"w":64,"h":63},
+	"sourceSize": {"w":64,"h":64}
+},
 "sub_left0.png":
 {
 	"frame": {"x":1,"y":1,"w":64,"h":64},
@@ -26,7 +50,7 @@
 },
 "sub_left1.png":
 {
-	"frame": {"x":133,"y":1,"w":64,"h":64},
+	"frame": {"x":1,"y":67,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -34,10 +58,10 @@
 },
 "sub_left2.png":
 {
-	"frame": {"x":265,"y":1,"w":62,"h":64},
+	"frame": {"x":67,"y":132,"w":63,"h":64},
 	"rotated": false,
 	"trimmed": true,
-	"spriteSourceSize": {"x":1,"y":0,"w":62,"h":64},
+	"spriteSourceSize": {"x":1,"y":0,"w":63,"h":64},
 	"sourceSize": {"w":64,"h":64}
 },
 "sub_right0.png":
@@ -50,7 +74,7 @@
 },
 "sub_right1.png":
 {
-	"frame": {"x":199,"y":1,"w":64,"h":64},
+	"frame": {"x":1,"y":133,"w":64,"h":64},
 	"rotated": false,
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
@@ -58,14 +82,15 @@
 },
 "sub_right2.png":
 {
-	"frame": {"x":329,"y":1,"w":61,"h":64},
+	"frame": {"x":133,"y":1,"w":62,"h":64},
 	"rotated": false,
 	"trimmed": true,
-	"spriteSourceSize": {"x":1,"y":0,"w":61,"h":64},
+	"spriteSourceSize": {"x":0,"y":0,"w":62,"h":64},
 	"sourceSize": {"w":64,"h":64}
 }},
 "animations": {
 	"sub_center": ["sub_center0.png","sub_center1.png"],
+	"sub_fwd": ["sub_fwd0.png","sub_fwd1.png","sub_fwd2.png"],
 	"sub_left": ["sub_left0.png","sub_left1.png","sub_left2.png"],
 	"sub_right": ["sub_right0.png","sub_right1.png","sub_right2.png"]
 },
@@ -74,8 +99,8 @@
 	"version": "1.0",
 	"image": "deeperSprites.png",
 	"format": "RGBA8888",
-	"size": {"w":391,"h":66},
+	"size": {"w":196,"h":198},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:66b4b755e95681ec287cfc1598e26cdc:53088953e626b95cce2473a7c47fa926:fd97bea37b249c8cf0f96597d929d16c$"
+	"smartupdate": "$TexturePacker:SmartUpdate:4bdc0aa0a4a5b010f9539742a1bb242e:4cee1973d7fb71c605e2d8c597db90f9:fd97bea37b249c8cf0f96597d929d16c$"
 }
 }
