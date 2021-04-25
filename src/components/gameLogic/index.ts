@@ -18,6 +18,7 @@ import * as UI from '../ui';
 import { Spritesheets } from '@src/core';
 import { scoreDisplay, ScoreDisplay } from '../library/scoreDisplay';
 import { pickupSpawner } from './pickupSpawner';
+import { stars } from '../stars';
 // import { goldSpawner } from './goldSpawner';
 
 type Refs = {
@@ -301,13 +302,19 @@ export const gameLogic = (props: Props): GameLogic => {
   // CAVE
 
   const caves = [];
-  for (let depth=0; depth<16; depth++) {
+  for (let depth = 0; depth < 16; depth++) {
     const cave = COMP.cave({ depth });
     cave.sprite.x = APP_WIDTH / 2;
     cave.sprite.y = APP_HEIGHT / 2;
     caves.push(cave);
     gameContainer.addChild(cave.sprite);
   }
+
+  // Starfield for ambient effect
+  const starfield = COMP.stars({
+    texture: PIXI.Texture.from('./assets/example/whitebox.png'),
+  });
+  gameContainer.addChild(starfield.container);
 
   /////////////////////////////////////////////////////////////////////////////
   // PLAYER / SUB
@@ -408,9 +415,11 @@ export const gameLogic = (props: Props): GameLogic => {
 
     IS_SCORE_INCREMENTY && scoreDisplay.update(delta);
 
-    caves.forEach(cave => {
+    caves.forEach((cave) => {
       cave.update(delta);
     });
+
+    starfield.update(delta);
 
     updateRan = true;
 

@@ -12,3 +12,4 @@ export { exampleComponent } from './exampleComponent';
 export { gameLogic } from './gameLogic';
 export { playerCharacter } from './playerCharacter';
 export { cave } from './cave';
+export { stars } from './stars';
