@@ -75,7 +75,7 @@ export const gauges = (props: Props): Gauges => {
   // pressure
 
   // integrity
-  const integrityTitle = new PIXI.BitmapText('Integrity', {
+  const integrityTitle = new PIXI.BitmapText('Hull Integrity', {
     fontName: `FFFFuego-16`,
     fontSize: 14,
     align: 'left',

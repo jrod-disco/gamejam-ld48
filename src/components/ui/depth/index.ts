@@ -1,4 +1,6 @@
 import * as PIXI from 'pixi.js';
+import { zeroPad } from '@src/util/zeroPad';
+
 import {
   THEME,
   MAX_DEPTH,
@@ -54,14 +56,13 @@ export const depthMeter = (props: Props): DepthMeter => {
   const initialState = { ...state };
 
   const depthString = (): string => {
-    const str = Math.floor(state.currentDepth).toString();
+    const str = zeroPad(Math.floor(state.currentDepth), 4);
     return str;
   };
 
   // Text
   const titleText = new PIXI.BitmapText('DEPTH', {
     fontName: `FFFFuego-16`,
-    fontSize: 16,
     align: 'left',
   });
   titleText.anchor.set(0, 0);
@@ -70,8 +71,6 @@ export const depthMeter = (props: Props): DepthMeter => {
 
   const depthText = new PIXI.BitmapText('0000', {
     fontName: `FFFFuego-16-bold`,
-    fontSize: 16,
-    align: 'left',
   });
   depthText.anchor.set(0, 0);
   depthText.tint = THEME.TXT_HUD_HEX;
@@ -80,13 +79,11 @@ export const depthMeter = (props: Props): DepthMeter => {
 
   const depthMaxText = new PIXI.BitmapText('0000', {
     fontName: `FFFFuego-16-bold`,
-    fontSize: 16,
-    align: 'left',
   });
   depthMaxText.anchor.set(0, 0);
   depthMaxText.tint = THEME.TXT_HUD_HEX;
-  depthMaxText.position.y += 36;
-  depthMaxText.position.x += 2;
+  depthMaxText.position.y += 20;
+  depthMaxText.position.x += 60;
   depthMaxText.text = `/${MAX_DEPTH}`;
 
   container.addChild(titleText, depthText, depthMaxText);
