@@ -71,14 +71,14 @@ export const stars = (props: ComponentProps): Stars => {
     };
     star.sprite.anchor.set(0.5);
 
+    // Tint Matrix for Color Modes
+    tintDisplayObject(star.sprite, 0x55ffaa);
+
     randomizeStar(star, true);
     container.addChild(star.sprite);
 
     stars.push(star);
   }
-
-  // Tint Matrix for Color Modes
-  tintDisplayObject(container, THEME.FILLS_HEX);
 
   // Reset called by play again and also on init
   const reset = (): void => {
@@ -109,7 +109,7 @@ export const stars = (props: ComponentProps): Stars => {
         dxCenter * dxCenter + dyCenter * dyCenter
       );
       const distanceScale = Math.max(0, (2000 - z) / 2000);
-      star.sprite.alpha = 0.25 + distanceScale;
+      star.sprite.alpha = 0 + distanceScale;
       star.sprite.scale.x = distanceScale * starBaseSize;
       // Star is looking towards center so that y axis is towards center.
       // Scale the star depending on how fast we are moving, what the stretchfactor is and depending on how far away it is from the center.
