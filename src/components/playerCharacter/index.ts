@@ -373,6 +373,9 @@ export const playerCharacter = (
 
     if (checkInBounds(newPos)) {
       state.pos = newPos;
+    } else {
+      state.movementSpeed.x *= -0.3;
+      state.movementSpeed.y *= -0.3;
     }
   };
 
