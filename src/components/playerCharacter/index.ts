@@ -325,6 +325,9 @@ export const playerCharacter = (
       duration: 0.25,
       pixi: { tint: 0xffffff },
       ease: Power0.easeOut,
+      onComplete: () => {
+        state = { ...state, isTakingDamage: false };
+      },
     });
 
     screenShaker.shake({
