@@ -7,6 +7,7 @@ import {
   APP_WIDTH,
   OBJECT_STATUS,
   PLAYER_SPEED,
+  PLAYER_INIT_ROT
 } from '@src/constants';
 
 export interface PlayerCharacter {
@@ -24,12 +25,12 @@ export interface PlayerCharacter {
 }
 
 interface PlayerCharacterProps {
-  pos?: { x: number; y: number };
+  pos?: { x: number; y: number, rot: number };
   textures?: { playerTexture: PIXI.Texture };
   anims?: { [key: string]: Array<PIXI.Texture> };
 }
 
-type PlayerPosition = { x: number; y: number };
+type PlayerPosition = { x: number; y: number, rot: number };
 
 enum PLAYER_DIRECTION {
   NONE,
@@ -38,12 +39,27 @@ enum PLAYER_DIRECTION {
   LEFT,
   RIGHT,
 }
+
 enum PLAYER_MOVEMENT {
   IDLE = 'idle',
   WALK_UP = 'walk_up',
   WALK_DOWN = 'walk_down',
   WALK_LEFT = 'walk_left',
   WALK_RIGHT = 'walk_right',
+}
+
+type PlayerState = {
+  startPos: PlayerPosition,
+  status: OBJECT_STATUS,
+  direction: PLAYER_DIRECTION,
+  movement: PLAYER_MOVEMENT,
+  movementSpeed: number,
+  size: 1,
+  oxygen: number,
+  power: number,
+  structure: number, // TODO: strengh of hull (improved by pickup ?)
+  integrity: number, // TODO: health of hull
+  items: [],  // TODO: ITEM types
 }
 
 /**
@@ -53,9 +69,10 @@ enum PLAYER_MOVEMENT {
  *
  */
 export const playerCharacter = (
-  props: PlayerCharacterProps
+  props: PlayerCharacterProps,
 ): PlayerCharacter => {
-  const pos = props.pos ?? { x: 0, y: 0 };
+
+  const pos = props.pos ?? { x: 0, y: 0, rot: PLAYER_INIT_ROT };
   const container = new PIXI.Container();
   container.x = pos.x;
   container.y = pos.y;
@@ -68,13 +85,19 @@ export const playerCharacter = (
 
   const { anims, textures } = props;
 
-  let state = {
+  let state: PlayerState = {
     startPos: { ...pos },
     status: OBJECT_STATUS.ACTIVE,
     direction: PLAYER_DIRECTION.NONE,
     movement: PLAYER_MOVEMENT.IDLE,
     movementSpeed: PLAYER_SPEED,
     size: 1,
+    // 
+    oxygen: 100,
+    power: 100,
+    structure: 100,
+    integrity: 100,
+    items: [],
   };
   const initialState = { ...state };
 
@@ -91,8 +114,7 @@ export const playerCharacter = (
   playerContainer.addChild(playerSprite);
 
   // start small so we can grow at start
-  playerSprite.scale.set(0);
-
+  // playerSprite.scale.set(0);
   const spriteMargin = 20;
 
   //
@@ -108,41 +130,49 @@ export const playerCharacter = (
         return {
           x: currentPos.x,
           y: currentPos.y - state.movementSpeed * delta,
+          rot: PLAYER_INIT_ROT,
         };
       case PLAYER_MOVEMENT.WALK_DOWN:
         return {
           x: currentPos.x,
           y: currentPos.y + state.movementSpeed * delta,
+          rot: PLAYER_INIT_ROT,
         };
       case PLAYER_MOVEMENT.WALK_LEFT:
         return {
           x: currentPos.x - state.movementSpeed * delta,
           y: currentPos.y,
+          rot: PLAYER_INIT_ROT,
         };
       case PLAYER_MOVEMENT.WALK_RIGHT:
         return {
           x: currentPos.x + state.movementSpeed * delta,
           y: currentPos.y,
+          rot: PLAYER_INIT_ROT,
         };
     }
   };
+
   //
   const checkInBounds = (pos: PlayerPosition): boolean =>
     pos.x < APP_WIDTH - spriteMargin &&
     pos.x > spriteMargin &&
     pos.y < APP_HEIGHT - spriteMargin &&
     pos.y > spriteMargin;
+
   //
   const setDirection = (val: PLAYER_DIRECTION): void => {
     state.direction = val;
   };
+
   //
   const setMovement = (val: PLAYER_MOVEMENT): void => {
     state.movement = val;
   };
+
   //
   const moveUpdate = (delta: number): PlayerPosition => {
-    const currentPos = { x: container.x, y: container.y };
+    const currentPos = { x: container.x, y: container.y, rot: container.rotation };
 
     if (state.movement === PLAYER_MOVEMENT.IDLE || state.movementSpeed === 0)
       return currentPos;
@@ -152,11 +182,13 @@ export const playerCharacter = (
 
     return newPos;
   };
+
   //
   const updateContainer = (delta: number): void => {
     const newPos = moveUpdate(delta);
     container.x = newPos.x;
     container.y = newPos.y;
+    // container.rotation = newPos.rot;
   };
 
   const moveStop = (): void => {
@@ -182,30 +214,30 @@ export const playerCharacter = (
   const getSize = (): number => state.size;
 
   const grow = (): void => {
-    state.size += 0.2;
+    // state.size += 0.2;
 
-    gsap.killTweensOf(playerSprite);
+    // gsap.killTweensOf(playerSprite);
 
-    const myTween = gsap.to(playerSprite, {
-      duration: 0.5,
-      pixi: { scale: state.size },
-      ease: Bounce.easeOut,
-    });
+    // const myTween = gsap.to(playerSprite, {
+    //   duration: 0.5,
+    //   pixi: { scale: state.size },
+    //   ease: Bounce.easeOut,
+    // });
   };
 
-  const sprout = (onCompleteCallback?): void => {
-    console.log('sprout called');
-    gsap.killTweensOf(playerSprite);
+  // const sprout = (onCompleteCallback?): void => {
+  //   console.log('sprout called');
+  //   gsap.killTweensOf(playerSprite);
 
-    const myTween = gsap.to(playerSprite, {
-      duration: 0.5,
-      pixi: { scale: 1 },
-      ease: Bounce.easeInOut,
-      onComplete: () => {
-        onCompleteCallback && onCompleteCallback();
-      },
-    });
-  };
+  //   const myTween = gsap.to(playerSprite, {
+  //     duration: 0.5,
+  //     pixi: { scale: 1 },
+  //     ease: Bounce.easeInOut,
+  //     onComplete: () => {
+  //       onCompleteCallback && onCompleteCallback();
+  //     },
+  //   });
+  // };
 
   const wither = (onCompleteCallback?): void => {
     console.log('wither called');
@@ -224,14 +256,14 @@ export const playerCharacter = (
 
   // Reset called by play again and also on init
   const reset = (): void => {
-    console.log('playersprite reset', playerSprite.scale);
 
     container.x = state.startPos.x;
     container.y = state.startPos.y;
+    // container.rotation = state.startPos.rot;
     state = { ...initialState };
 
-    playerSprite.scale.set(0);
-    sprout();
+    // playerSprite.scale.set(0);
+    // sprout();
   };
 
   const update = (delta): void => {

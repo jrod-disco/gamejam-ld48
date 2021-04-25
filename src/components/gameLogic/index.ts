@@ -143,27 +143,28 @@ export const gameLogic = (props: Props): GameLogic => {
 
   const getCurrentLevel = (): number => state.currentLevel;
 
-  const toggleGamePaused = (forceTo?: boolean): boolean => {
-    state.isGamePaused = forceTo != undefined ? forceTo : !state.isGamePaused;
+  // TODO: re-enable
+  // const toggleGamePaused = (forceTo?: boolean): boolean => {
+  //   state.isGamePaused = forceTo != undefined ? forceTo : !state.isGamePaused;
 
-    if (state.isGamePaused) {
-      messageText.text = '* GAME PAUSED *';
-      messageText.alpha = 1;
+  //   if (state.isGamePaused) {
+  //     messageText.text = '* GAME PAUSED *';
+  //     messageText.alpha = 1;
 
-      // force a render before we stop the whole app
-      window.APP.pixiApp.render();
-      window.APP.pixiApp.stop();
-    } else {
-      window.APP.pixiApp.start();
-      gsap.to(messageText, {
-        duration: 0.1,
-        alpha: 0,
-        ease: Power0.easeOut,
-      });
-    }
+  //     // force a render before we stop the whole app
+  //     window.APP.pixiApp.render();
+  //     window.APP.pixiApp.stop();
+  //   } else {
+  //     window.APP.pixiApp.start();
+  //     gsap.to(messageText, {
+  //       duration: 0.1,
+  //       alpha: 0,
+  //       ease: Power0.easeOut,
+  //     });
+  //   }
 
-    return state.isGamePaused;
-  };
+  //   return state.isGamePaused;
+  // };
 
   const onStartGame = (): void => {
     console.log('gameLogic: onStartGame');
@@ -244,6 +245,11 @@ export const gameLogic = (props: Props): GameLogic => {
       playerCharacter.moveStop();
       return;
     }
+
+    // TODO: instead of translating around the view, 
+    // - playercharacter will stay centered
+    // - and display tilt / rotation animation
+
     // Single cardinal directions
     keysDown['KeyW'] && playerCharacter.moveUp();
     keysDown['KeyS'] && playerCharacter.moveDown();
@@ -264,13 +270,18 @@ export const gameLogic = (props: Props): GameLogic => {
     window.removeEventListener('keydown', onKeyDownGame);
 
 
-  // Simple Player Component
-  const playerTexture = PIXI.Texture.from('./assets/example/whitebox.png');
+  // PLAYER CRAFT
+
+  // TODO: does this need assignment at this scope?
+  const playerTexture = PIXI.Texture.from('./assets/ship/submarine_top.png');
   const playerCharacter = COMP.playerCharacter({
-    pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2 },
+    pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2, rot: 0 },
     textures: { playerTexture },
   });
   gameContainer.addChild(playerCharacter.container);
+
+  // ITEMZ
+
 
   // Gold Spawner
   const goldSpawnerRef = goldSpawner();
