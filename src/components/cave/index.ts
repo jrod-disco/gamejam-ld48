@@ -1,6 +1,9 @@
 import * as PIXI from 'pixi.js';
 import { Extract } from '@pixi/extract';
-import { Renderer } from '@pixi/core';
+import { Renderer, State } from '@pixi/core';
+import { THEME } from '@src/constants';
+
+import Color from 'color';
 
 Renderer.registerPlugin('extract', Extract);
 
@@ -11,7 +14,8 @@ export interface Cave {
 }
 
 interface CaveProps {
-  depth: number
+  depth: number;
+  maxDepth: number;
 }
 
 /**
@@ -26,10 +30,10 @@ export const cave = (props: CaveProps): Cave => {
   const sprite = new PIXI.Sprite(caveTexture);
 
   const MAX_SCALE = 2;
-  const MAX_DEPTH = 16;
-  const DEEP_BLUE = 198156;
+  const WATER_BOT_COLOR = Color('rgb(32, 64, 89)');
+  const WATER_TOP_COLOR = Color('rgb(34, 128, 220)');
   const START_SCALE = 0.25;
-  const LAYER_SPACING = .1;
+  const LAYER_SPACING = .075;
   const SCALE_INCREMENT = .001;
   const ROT_INCREMENT = 3;
 
@@ -40,9 +44,16 @@ export const cave = (props: CaveProps): Cave => {
   };
   const initialState = { ...state };
 
+  const getDepthColor = (): number => {
+    return WATER_BOT_COLOR.mix(
+      WATER_TOP_COLOR,
+      state.depth / props.maxDepth
+    ).rgbNumber();
+  };
+
   sprite.anchor.set(0.5);
   sprite.pivot.set(0.5);
-  sprite.tint = DEEP_BLUE * props.depth;
+  sprite.tint = getDepthColor();
   sprite.scale.set(state.scale);
   sprite.rotation = state.depth * ROT_INCREMENT;
   
@@ -51,22 +62,21 @@ export const cave = (props: CaveProps): Cave => {
     state = { ...initialState };
   };
 
-  const update = (delta:number): void => {
+  const update = (delta: number): void => {
     if (state.scale >= MAX_SCALE) {
       state.scale = START_SCALE;
       state.depth = state.lastDepth = 0;
-      sprite.tint = DEEP_BLUE;
-      sprite.parent.setChildIndex(sprite, 0);
+      sprite.tint = getDepthColor();
+      sprite.parent.setChildIndex(sprite, 0); // move to bottom of stack
       sprite.rotation += ROT_INCREMENT;
+    } else {
+      state.depth = Math.floor((state.scale - START_SCALE) / LAYER_SPACING);
+      if (state.depth !== state.lastDepth) {
+        state.lastDepth = state.depth;
+        sprite.tint = getDepthColor();
+      }
+      state.scale += SCALE_INCREMENT * delta;
     }
-
-    state.depth = Math.floor(state.scale / (MAX_SCALE / MAX_DEPTH));
-    if (state.depth !== state.lastDepth) {
-      state.lastDepth = state.depth;
-      sprite.tint = DEEP_BLUE * state.depth;
-    }
-
-    state.scale += SCALE_INCREMENT * delta;
     sprite.scale.set(state.scale);
   };
 
