@@ -43,7 +43,7 @@ export interface PlayerMovement {
   y: -1 | 0 | 1;
 }
 
-type PlayerState = {
+export type PlayerState = {
   startPos: PlayerPosition;
   pos: PlayerPosition;
   status: OBJECT_STATUS;
@@ -184,7 +184,7 @@ export const playerCharacter = (
 
     state.oxygen -= PLAYER_OXYGEN_CONSUMPTION_RATE;
 
-    console.log('state.oxygen: %o', state.oxygen.toFixed(2));
+    // console.log('state.oxygen: %o', state.oxygen.toFixed(2));
     if (state.oxygen < 0) {
       console.warn("you've succumbed to oxygen deprivation");
       gameOverHandler();
@@ -202,7 +202,7 @@ export const playerCharacter = (
   const takeDamage = (dmg: number): void => {
     state.integrity -= dmg;
 
-    console.log('integrity: %o', state.integrity);
+    // console.log('integrity: %o', state.integrity);
     if (state.integrity < 0) {
       console.warn("you've blown up");
       gameOverHandler();

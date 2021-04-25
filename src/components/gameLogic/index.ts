@@ -14,7 +14,7 @@ import {
 import * as COMP from '..';
 import { PlayerCharacter, PlayerMovement } from '../playerCharacter';
 import { RunTime } from '../library/runtime';
-import { DepthMeter } from '../library/depth';
+import * as UI from '../ui';
 import { Spritesheets } from '@src/core';
 import { scoreDisplay, ScoreDisplay } from '../library/scoreDisplay';
 import { goldSpawner } from './goldSpawner';
@@ -77,7 +77,12 @@ export const gameLogic = (props: Props): GameLogic => {
   let spriteSheetsRef: Spritesheets = null;
   let uiContainerRef: PIXI.Container;
   let runtime: RunTime = null;
-  let depthMeter: DepthMeter = null;
+
+  // TODO: move `depth` prop to playerCharacter ?
+  // - add depth guage to guage cluster
+  let depthMeter: UI.DepthMeter = null;
+  let gauges: UI.Gauges = null;
+
   let mainOnGameOver: () => void = null;
   let mainOnAudioCycleOptions: () => void = null;
 
@@ -104,7 +109,8 @@ export const gameLogic = (props: Props): GameLogic => {
     state = { ...initialState, keysDown: {} };
   };
 
-  // References of components created in core are set here
+  // UI
+  // - References of components created in core are set here
   const setRefs = (refs: Refs): void => {
     if (refs.spriteSheets) spriteSheetsRef = refs.spriteSheets;
     if (refs.uiContainer) uiContainerRef = refs.uiContainer;
@@ -112,13 +118,14 @@ export const gameLogic = (props: Props): GameLogic => {
     if (refs.mainOnAudioCycleOptions)
       mainOnAudioCycleOptions = refs.mainOnAudioCycleOptions;
 
-    // Run Time is a simple clock that runs up
+    // Time ++
     runtime = COMP.LIB.runtime({
       pos: { x: 25, y: 25 },
     });
     uiContainerRef.addChild(runtime.container);
 
-    depthMeter = COMP.LIB.depthMeter({
+    // Depth
+    depthMeter = COMP.UI.depthMeter({
       pos: { x: 25, y: 75 },
       depth: 0,
       maxDepthCallback: () => {
@@ -126,6 +133,15 @@ export const gameLogic = (props: Props): GameLogic => {
       },
     });
     uiContainerRef.addChild(depthMeter.container);
+
+    // Gauges - oxygen, pressure etc
+    // - lower left corner
+    // TODO:
+    // - dial pixels for guages with rotating arms
+    gauges = COMP.UI.gauges({
+      pos: { x: 25, y: APP_HEIGHT - 100 },
+    });
+    uiContainerRef.addChild(gauges.container);
 
     // Score Display
     scoreDisplay = COMP.LIB.scoreDisplay({
@@ -313,7 +329,7 @@ export const gameLogic = (props: Props): GameLogic => {
   };
 
   // TODO:
-  // - abstact to class
+  // - abstract to class
 
   // Collision Detection
   const checkCollision = (): void => {
@@ -346,15 +362,13 @@ export const gameLogic = (props: Props): GameLogic => {
     });
   };
 
+  // UPDATE
+
   const update = (delta): boolean => {
     let updateRan = false;
 
     if (state.isGameOver) return;
     if (state.isGamePaused) return;
-
-    // Update individual controller refs here
-    runtime.update(delta);
-    depthMeter.update(delta);
 
     checkDownKeys(state.keysDown);
 
@@ -368,6 +382,11 @@ export const gameLogic = (props: Props): GameLogic => {
     });
 
     checkCollision();
+
+    // Update individual controller refs here
+    runtime.update(delta);
+    depthMeter.update(delta);
+    gauges.update(delta, playerCharacter.getState());
 
     IS_SCORE_INCREMENTY && scoreDisplay.update(delta);
     updateRan = true;
