@@ -19,6 +19,7 @@ export interface OxygenTank {
   getType: () => PICKUP_TYPES;
   reset: () => void;
   update: (delta: number) => void;
+  getScale: () => number;
 }
 
 interface OxygenTankProps {
@@ -122,11 +123,14 @@ export const oxygenTank = (props: OxygenTankProps): OxygenTank => {
     }
   };
 
+  const getScale = (): number => state.scale;
+
   return {
     container,
     reset,
     update,
     getResource,
     getType,
+    getScale,
   };
 };
