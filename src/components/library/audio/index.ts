@@ -34,8 +34,8 @@ export interface AudioLayer {
 export const audio = (sounds: Sounds): AudioLayer => {
   // Main Music Track
   const audio = PIXISOUND.default;
-  audio.add('MainTheme', sounds.MainTheme as any);
-  //audio.add('Track2', sounds.Track2);
+  audio.add('MainTheme', './assets/audio/title_mix.wav');
+  // audio.add('Track2', sounds.Track2);
 
   const trackList = [
     'MainTheme',
@@ -84,7 +84,7 @@ export const audio = (sounds: Sounds): AudioLayer => {
   };
   const menuTheme = (isPlay): void => {
     stopAllThemes();
-    if (isPlay) audio.play('MainTheme', { loop: true, volume: menuVolume() });
+    if (isPlay) audio.play('MenuTheme', { loop: true, volume: menuVolume() });
   };
 
   const playNextTrack = (): void => {

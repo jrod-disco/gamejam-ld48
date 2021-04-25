@@ -177,7 +177,7 @@ const bootstrapApp = (props: {
     // Add music as a component
     audioLayer = COMP.LIB.audio(sounds);
     // Play a track
-    //audioLayer.music.playRandomTrack();
+    audioLayer.music.mainTheme(true);
   };
 
   // Personal Best Score Display

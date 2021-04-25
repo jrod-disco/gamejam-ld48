@@ -51,14 +51,14 @@ export const mainMenuLayout = (props: Props): MainMenuLayout => {
   const name = (): string => 'MAIN';
 
   // Text
-  const mainTitle = new PIXI.Text('SIMPLE GAME!', TEXT_STYLE.TITLE_WHITE);
+  const mainTitle = new PIXI.Text('DEEPER AND DEEPER', TEXT_STYLE.TITLE_WHITE);
   mainTitle.anchor.set(0.5);
   mainTitle.position.x = APP_WIDTH / 2;
   mainTitle.position.y = 40;
   container.addChild(mainTitle);
 
   const promptText = new PIXI.Text(
-    'DELIVER TO THE ABYSS',
+    'into the abyss',
     TEXT_STYLE.GRADIENT_PROMPT
   );
   promptText.anchor.set(0.5);
