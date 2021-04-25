@@ -17,6 +17,7 @@ import { RunTime } from '../library/runtime';
 import * as UI from '../ui';
 import { Spritesheets } from '@src/core';
 import { scoreDisplay, ScoreDisplay } from '../library/scoreDisplay';
+
 import { goldSpawner } from './goldSpawner';
 
 type Refs = {
@@ -57,6 +58,8 @@ interface Props {
  * @returns Interface object containing methods that can be called on this module
  */
 export const gameLogic = (props: Props): GameLogic => {
+  ////////////////////////////////////////////////////////////////////////////
+  // STATE
   let state = {
     keysDown: {},
     currentLevel: 0,
@@ -69,10 +72,6 @@ export const gameLogic = (props: Props): GameLogic => {
 
   // Specific textures can be pulled out once the spritesheet ref is set
   // let targetTextures = { open: null, lock: null };
-
-  // Passed in references set by setRefs function
-  // The game logic component maintains references and serves as the hub for communication between all other game components
-  // This is something that could likely be better served by a simple event bus but for now we live in callback hell
   let scoreDisplay: ScoreDisplay = null;
   let spriteSheetsRef: Spritesheets = null;
   let uiContainerRef: PIXI.Container;
@@ -109,7 +108,9 @@ export const gameLogic = (props: Props): GameLogic => {
     state = { ...initialState, keysDown: {} };
   };
 
-  // UI
+  ////////////////////////////////////////////////////////////////////////////
+  // UI ELEMENTS
+
   // - References of components created in core are set here
   const setRefs = (refs: Refs): void => {
     if (refs.spriteSheets) spriteSheetsRef = refs.spriteSheets;
@@ -135,9 +136,6 @@ export const gameLogic = (props: Props): GameLogic => {
     uiContainerRef.addChild(depthMeter.container);
 
     // Gauges - oxygen, pressure etc
-    // - lower left corner
-    // TODO:
-    // - dial pixels for guages with rotating arms
     gauges = COMP.UI.gauges({
       pos: { x: 25, y: APP_HEIGHT - 100 },
     });
@@ -153,6 +151,9 @@ export const gameLogic = (props: Props): GameLogic => {
   const setSpriteSheet = (spriteSheet: Spritesheets): void => {
     spriteSheetsRef = { ...spriteSheetsRef, ...spriteSheet };
   };
+
+  /////////////////////////////////////////////////////////////////////////////
+  // GAME EVENTS
 
   const getIsGameOver = (): boolean => {
     return state.isGameOver;
@@ -187,6 +188,9 @@ export const gameLogic = (props: Props): GameLogic => {
   //   return state.isGamePaused;
   // };
 
+  /////////////////////////////////////////////////////////////////////////////
+  // START GAME
+
   const onStartGame = (): void => {
     console.log('gameLogic: onStartGame');
     //
@@ -207,21 +211,21 @@ export const gameLogic = (props: Props): GameLogic => {
     addOnKeyDown();
   };
 
+  /////////////////////////////////////////////////////////////////////////////
+  // GAME OVER, MAN!!
+
   const onMaxDepthReached = (): void => {
     onGameOver();
   };
 
   // TODO:
-  // - game over, when:
   // - MAX_DEPTH reached (+ success action?)
-  // - PLAYER.HEALTH reaches 0
+  // - playerCharacter.integrity reaches 0
+  // - playerCharacter.oxygen reaches 0
 
   const onGameOver = (): void => {
     console.log('gameLogic: onGameOver');
     state.isGameOver = true; // should stop updates
-
-    // Immediately stop timer if a timed game
-    // runtimeRef.pause();
 
     // Keyboard Events
     // remove game specific key listeners if there are any
@@ -234,16 +238,13 @@ export const gameLogic = (props: Props): GameLogic => {
     cleanUpGold();
 
     // Clean Up Game Logic Remaining
-    //...anything within game logic component...
 
     mainOnGameOver();
   };
 
-  // TODO:
-  // move listeners to handleInput.ts
-  // - externalize game state so is importable?
+  /////////////////////////////////////////////////////////////////////////////
+  // Input Handlers
 
-  // Keyboard Listener
   const onKeyUpGame = (event: KeyboardEvent): void => {
     // Store the fact that this key is up
     state.keysDown[event.code] = 0;
@@ -295,9 +296,8 @@ export const gameLogic = (props: Props): GameLogic => {
   const removeOnKeyDown = (): void =>
     window.removeEventListener('keydown', onKeyDownGame);
 
-  // PLAYER CRAFT
-
-  // TODO: does this need assignment at this scope?'
+  /////////////////////////////////////////////////////////////////////////////
+  // PLAYER / SUB
   const playerCharacter = COMP.playerCharacter({
     pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2, rot: 0 },
     anims: spriteSheets.game.animations,
@@ -307,6 +307,7 @@ export const gameLogic = (props: Props): GameLogic => {
   });
   gameContainer.addChild(playerCharacter.container);
 
+  /////////////////////////////////////////////////////////////////////////////
   // ITEMZ
 
   // Gold Spawner
@@ -327,6 +328,7 @@ export const gameLogic = (props: Props): GameLogic => {
   // TODO:
   // - abstract to class
 
+  /////////////////////////////////////////////////////////////////////////////
   // Collision Detection
   const checkCollision = (): void => {
     if (state.isGameOver) return;
