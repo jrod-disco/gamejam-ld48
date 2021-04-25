@@ -8,6 +8,9 @@ export const INIT_DEPTH = 0;
 export const MAX_PRESSURE = 1000; // lbs/sq in
 export const INIT_PRESSURE = 14; // sea level
 
+export const WORLD_WIDTH = 100;
+export const WORLD_HEIGHT = 100;
+
 // Player
 export const PLAYER_MAX_SPEED = 5; // not a constant, move
 export const PLAYER_ACCEL = 0.02; // rate of acceleration when explicitly moving

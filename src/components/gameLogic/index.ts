@@ -305,11 +305,11 @@ export const gameLogic = (props: Props): GameLogic => {
   gameContainer.addChild(caveContainer);
 
   const caves = [];
-  const MAX_DEPTH = 32;
-  for (let depth = 0; depth < MAX_DEPTH; depth++) {
-    const cave = COMP.cave({ depth, maxDepth: MAX_DEPTH });
-    cave.sprite.x = APP_WIDTH / 2;
-    cave.sprite.y = APP_HEIGHT / 2;
+  const maxDepth = 32;
+  for (let depth = 0; depth < maxDepth; depth++) {
+    const cave = COMP.cave({ depth, maxDepth });
+    // cave.sprite.x = APP_WIDTH / 2;
+    // cave.sprite.y = APP_HEIGHT / 2;
     caves.push(cave);
     caveContainer.addChild(cave.sprite);
   }
@@ -432,7 +432,7 @@ export const gameLogic = (props: Props): GameLogic => {
     IS_SCORE_INCREMENTY && scoreDisplay.update(delta);
 
     caves.forEach((cave) => {
-      cave.update(delta, 0, 0);
+      cave.update(delta, 50, 50);
     });
 
     starfield.update(delta);

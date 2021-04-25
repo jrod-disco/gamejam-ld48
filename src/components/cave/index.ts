@@ -1,9 +1,9 @@
 import * as PIXI from 'pixi.js';
 import { Extract } from '@pixi/extract';
-import { Renderer, State } from '@pixi/core';
-import { THEME } from '@src/constants';
+import { Renderer } from '@pixi/core';
 
 import Color from 'color';
+import { APP_HEIGHT, APP_WIDTH, WORLD_WIDTH, WORLD_HEIGHT } from '@src/constants';
 
 Renderer.registerPlugin('extract', Extract);
 
@@ -51,12 +51,20 @@ export const cave = (props: CaveProps): Cave => {
     ).rgbNumber();
   };
 
+  const setPosition = (x: number, y: number): void => {
+    const xFinal = (x/WORLD_WIDTH) * APP_WIDTH;
+    const yFinal = (y/WORLD_HEIGHT) * APP_HEIGHT;
+    sprite.position.x = APP_WIDTH/2 + ((APP_WIDTH/2-xFinal)/props.maxDepth) * state.depth;
+    sprite.position.y = APP_HEIGHT/2 + ((APP_HEIGHT/2-yFinal)/props.maxDepth) * state.depth;
+  };
+
   sprite.anchor.set(0.5);
   sprite.pivot.set(0.5);
   sprite.tint = getDepthColor();
   sprite.scale.set(state.scale);
   sprite.rotation = state.depth * ROT_INCREMENT;
-  
+  setPosition(0, 0);
+
   // Reset called by play again and also on init
   const reset = (): void => {
     state = { ...initialState };
@@ -66,17 +74,14 @@ export const cave = (props: CaveProps): Cave => {
     if (state.scale >= MAX_SCALE) {
       state.scale = START_SCALE;
       state.depth = state.lastDepth = 0;
-      sprite.tint = getDepthColor();
       sprite.parent.setChildIndex(sprite, 0); // move to bottom of stack
       sprite.rotation += ROT_INCREMENT;
     } else {
-      state.depth = (state.scale - START_SCALE) / LAYER_SPACING;
-      //if (state.depth !== state.lastDepth) {
-        //state.lastDepth = state.depth;
-        sprite.tint = getDepthColor();
-      //}
       state.scale += SCALE_INCREMENT * delta;
+      state.depth = (state.scale - START_SCALE) / LAYER_SPACING;
     }
+    setPosition(x, y);
+    sprite.tint = getDepthColor();
     sprite.scale.set(state.scale);
   };
 
