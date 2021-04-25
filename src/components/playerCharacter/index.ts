@@ -14,6 +14,7 @@ import {
   PICKUP_TYPES,
   Resource,
   PLAYER_MAX_OXYGEN,
+  PLAYER_ROTATE_ON_MOVE,
 } from '@src/constants';
 
 type UpdateProps = {
@@ -83,6 +84,7 @@ export const playerCharacter = (
   props: PlayerCharacterProps
 ): PlayerCharacter => {
   const pos = props.pos ?? { x: 0, y: 0, rot: PLAYER_INIT_ROT };
+  const rotateOnMove = PLAYER_ROTATE_ON_MOVE;
   const container = new PIXI.Container();
   container.x = pos.x;
   container.y = pos.y;
@@ -346,8 +348,11 @@ export const playerCharacter = (
       ...state.pos,
       x: state.pos.x + state.movementSpeed.x,
       y: state.pos.y + state.movementSpeed.y,
-      rot: getRotation(),
     };
+
+    if (rotateOnMove) {
+      newPos.rot = getRotation();
+    }
 
     if (checkInBounds(newPos)) {
       state.pos = newPos;
