@@ -14,3 +14,6 @@ export * from './tempOBTS';
 
 // Game constants
 export * from './game';
+
+// types etc
+export * from './types';

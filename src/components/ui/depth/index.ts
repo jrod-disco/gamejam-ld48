@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js';
-import { 
-  THEME, 
-  MAX_DEPTH, 
+import {
+  THEME,
+  MAX_DEPTH,
   PLAYER_DESCENT_RATE,
   INIT_PRESSURE,
   INIT_DEPTH,
@@ -17,7 +17,7 @@ export interface DepthMeter {
   update: (delta: number) => void;
   getMaxDepth: () => number;
   getCurrentDepth: () => number;
-  getMaxPressure: () => number;  
+  getMaxPressure: () => number;
   getCurrentPressure: () => number;
 }
 
@@ -37,7 +37,7 @@ interface Props {
 export const depthMeter = (props: Props): DepthMeter => {
   const pos = props.pos ?? { x: 0, y: 0 };
   const container = new PIXI.Container();
-  
+
   container.x = pos.x;
   container.y = pos.y;
   container.name = 'depthmeter';
@@ -78,7 +78,18 @@ export const depthMeter = (props: Props): DepthMeter => {
   depthText.position.y += 20;
   depthText.position.x += 2;
 
-  container.addChild(titleText, depthText);
+  const depthMaxText = new PIXI.BitmapText('0000', {
+    fontName: `FFFFuego-16-bold`,
+    fontSize: 16,
+    align: 'left',
+  });
+  depthMaxText.anchor.set(0, 0);
+  depthMaxText.tint = THEME.TXT_HUD_HEX;
+  depthMaxText.position.y += 36;
+  depthMaxText.position.x += 2;
+  depthMaxText.text = `/${MAX_DEPTH}`;
+
+  container.addChild(titleText, depthText, depthMaxText);
 
   const updateDepthText = (): void => {
     depthText.text = depthString();
@@ -87,7 +98,8 @@ export const depthMeter = (props: Props): DepthMeter => {
   const getMaxDepth = (): number => depth;
   const getCurrentDepth = (): number => Number(Math.floor(state.currentDepth));
   const getMaxPressure = (): number => MAX_PRESSURE;
-  const getCurrentPressure = (): number => Number(Math.floor(state.currentPressure))
+  const getCurrentPressure = (): number =>
+    Number(Math.floor(state.currentPressure));
 
   // Reset called by play again and also on init
   const reset = (): void => {
@@ -121,9 +133,8 @@ export const depthMeter = (props: Props): DepthMeter => {
     }
   };
 
-
   // UPDATE
-  // - this sets the overall depth of the craft 
+  // - this sets the overall depth of the craft
   // - mostly this is driven by time + the descent rate const
   // - TODO: dynamically set descent rate based on power / damage etc
   const update = (delta): void => {
@@ -133,7 +144,7 @@ export const depthMeter = (props: Props): DepthMeter => {
 
       // TODO: Pressure = (density x gravity x depth)
       // - need to introduce gravity / denisty. until then this is approx
-      state.currentPressure += state.currentDepth  / 5;
+      state.currentPressure += state.currentDepth / 5;
 
       checkMaxDepth();
       updateDepthText();

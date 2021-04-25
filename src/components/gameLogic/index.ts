@@ -17,8 +17,8 @@ import { RunTime } from '../library/runtime';
 import * as UI from '../ui';
 import { Spritesheets } from '@src/core';
 import { scoreDisplay, ScoreDisplay } from '../library/scoreDisplay';
-
-import { goldSpawner } from './goldSpawner';
+import { pickupSpawner } from './pickupSpawner';
+// import { goldSpawner } from './goldSpawner';
 
 type Refs = {
   scoreDisplay?: ScoreDisplay;
@@ -234,8 +234,8 @@ export const gameLogic = (props: Props): GameLogic => {
     removeOnKeyDown();
 
     // Clean Up Component Logic and Sprites
-    goldSpawnerRef.reset();
-    cleanUpGold();
+    pickupSpawnerRef.reset();
+    cleanUpPickups();
 
     // Clean Up Game Logic Remaining
 
@@ -310,19 +310,18 @@ export const gameLogic = (props: Props): GameLogic => {
   /////////////////////////////////////////////////////////////////////////////
   // ITEMZ
 
-  // Gold Spawner
-  const goldSpawnerRef = goldSpawner();
-  const goldContainer = new PIXI.Container();
-  gameContainer.addChild(goldContainer);
-
+  // Pickup Spawner
+  const pickupSpawnerRef = pickupSpawner();
+  const pickupContainer = new PIXI.Container();
+  gameContainer.addChild(pickupContainer);
   gameContainer.filters = [new BloomFilter(4)];
 
-  const updateGold = (): void => {
-    const maybeGold = goldSpawnerRef.spawn();
-    maybeGold && goldContainer.addChild(maybeGold.container);
+  const updatePickups = (): void => {
+    const maybePickup = pickupSpawnerRef.spawn();
+    maybePickup && pickupContainer.addChild(maybePickup.container);
   };
-  const cleanUpGold = (): void => {
-    goldContainer.removeChildren();
+  const cleanUpPickups = (): void => {
+    pickupContainer.removeChildren();
   };
 
   // TODO:
@@ -335,9 +334,9 @@ export const gameLogic = (props: Props): GameLogic => {
 
     const pX = playerCharacter.container.x;
     const pY = playerCharacter.container.y;
-    const gold = goldSpawnerRef.getNuggets();
+    const pickups = pickupSpawnerRef.getPickups();
 
-    gold.map((n, i) => {
+    pickups.map((n, i) => {
       const nX = n.container.x;
       const nY = n.container.y;
 
@@ -349,14 +348,21 @@ export const gameLogic = (props: Props): GameLogic => {
         pX < nX + hitBox &&
         pY > nY - hitBox &&
         pY < nY + hitBox;
-      collided && goldSpawnerRef.removeNuggetByIndex(i);
-      collided && goldContainer.removeChildAt(i);
-      // collided && playerCharacter.takeDamage(1);
-      collided && scoreDisplay.addToScore(POINTS_GOLD);
-      collided &&
+
+      if (collided) {
+        playerCharacter.consumeResource({
+          getType: n.getType,
+          getResource: n.getResource,
+        });
+        pickupSpawnerRef.removePickupByIndex(i);
+        pickupContainer.removeChildAt(i);
+        scoreDisplay.addToScore(POINTS_GOLD);
+
+        // TODO: pass to pickup
         pixiSound.play('coin', {
           volume: 1 * SFX_VOL_MULT,
         });
+      }
     });
   };
 
@@ -369,8 +375,7 @@ export const gameLogic = (props: Props): GameLogic => {
     if (state.isGamePaused) return;
 
     checkDownKeys(state.keysDown);
-
-    updateGold();
+    updatePickups();
 
     playerCharacter.update({
       delta,
