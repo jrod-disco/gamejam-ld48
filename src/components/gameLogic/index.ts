@@ -86,6 +86,7 @@ export const gameLogic = (props: Props): GameLogic => {
   let mainOnAudioCycleOptions: () => void = null;
 
   const { gameContainer, spriteSheets } = props;
+  gameContainer.sortableChildren = true;
 
   // Level Message Text
   const messageText = new PIXI.BitmapText('LEVEL UP!', {
@@ -297,7 +298,21 @@ export const gameLogic = (props: Props): GameLogic => {
     window.removeEventListener('keydown', onKeyDownGame);
 
   /////////////////////////////////////////////////////////////////////////////
+  // CAVE
+
+  const caves = [];
+  for (let depth=0; depth<16; depth++) {
+    const cave = COMP.cave({ depth });
+    cave.sprite.x = APP_WIDTH / 2;
+    cave.sprite.y = APP_HEIGHT / 2;
+    caves.push(cave);
+    gameContainer.addChild(cave.sprite);
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
   // PLAYER / SUB
+
+  // Simple Player Component
   const playerCharacter = COMP.playerCharacter({
     pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2, rot: 0 },
     anims: spriteSheets.game.animations,
@@ -392,6 +407,11 @@ export const gameLogic = (props: Props): GameLogic => {
     gauges.update(delta, playerCharacter.getState());
 
     IS_SCORE_INCREMENTY && scoreDisplay.update(delta);
+
+    caves.forEach(cave => {
+      cave.update(delta);
+    });
+
     updateRan = true;
 
     return updateRan;
