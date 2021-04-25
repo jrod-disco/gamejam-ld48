@@ -279,6 +279,7 @@ export const playerCharacter = (
     moveLeft,
     moveRight,
     moveStop,
+    
     grow,
     getSize,
     wither,

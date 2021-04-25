@@ -11,7 +11,7 @@ export const MAX_PRESSURE = 100;
 // Player
 export const PLAYER_SPEED = 5;  // not a constant, move
 export const PLAYER_DESCENT_RATE = 0.2;  // feet per sec
-export const PLAYER_CONTINOUS_MOVEMENT = true;
+export const PLAYER_CONTINOUS_MOVEMENT = false;
 export const PLAYER_INIT_ROT = 0;
 
 // Item Generator
