@@ -51,6 +51,7 @@ enum PLAYER_ANIM {
   IDLE = 'sub_center',
   LEFT = 'sub_left',
   RIGHT = 'sub_right',
+  FORWARD = 'sub_fwd',
 }
 
 export type PlayerState = {
@@ -131,6 +132,10 @@ export const playerCharacter = (
   animTiltRight.animationSpeed = 0.3;
   animTiltRight.loop = false;
   animTiltRight.anchor.set(0.5);
+  const animTiltForward = new PIXI.AnimatedSprite(anims[PLAYER_ANIM.FORWARD]);
+  animTiltForward.animationSpeed = 0.3;
+  animTiltForward.loop = false;
+  animTiltForward.anchor.set(0.5);
 
   state.lastAnim = PLAYER_ANIM.IDLE;
 
@@ -138,6 +143,7 @@ export const playerCharacter = (
   animations[PLAYER_ANIM.IDLE] = animIdle;
   animations[PLAYER_ANIM.LEFT] = animTiltLeft;
   animations[PLAYER_ANIM.RIGHT] = animTiltRight;
+  animations[PLAYER_ANIM.FORWARD] = animTiltForward;
 
   playerContainer.addChild(animations[PLAYER_ANIM.IDLE]);
   animations[PLAYER_ANIM.IDLE].gotoAndPlay(0);
@@ -168,7 +174,27 @@ export const playerCharacter = (
         break;
       case -1:
         setAnimation(PLAYER_ANIM.LEFT);
-        animations[state.lastAnim].animationSpeed = 0.25;
+        animations[state.lastAnim].animationSpeed = 0.3;
+        animations[state.lastAnim].onComplete = null;
+        break;
+    }
+
+    switch (val.y) {
+      case 0:
+        //  setAnimation(PLAYER_ANIM.IDLE);
+        // animations[state.lastAnim].animationSpeed = -0.3;
+        // animations[state.lastAnim].play();
+        // animations[state.lastAnim].onComplete = () =>
+        //   setAnimation(PLAYER_ANIM.IDLE);
+        break;
+      // case 1:
+      //   setAnimation(PLAYER_ANIM.RIGHT);
+      //   animations[state.lastAnim].animationSpeed = 0.3;
+      //   animations[state.lastAnim].onComplete = null;
+      //   break;
+      case -1:
+        setAnimation(PLAYER_ANIM.FORWARD);
+        animations[state.lastAnim].animationSpeed = 0.3;
         animations[state.lastAnim].onComplete = null;
         break;
     }
