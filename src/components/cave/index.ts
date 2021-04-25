@@ -26,7 +26,8 @@ interface CaveProps {
  * @returns Interface object containing methods that can be called on this module
  */
 export const cave = (props: CaveProps): Cave => {
-  const caveTexture = PIXI.Texture.from("./assets/cave/cave.png");
+  const num = Math.round(Math.random() * 2) + 1;
+  const caveTexture = PIXI.Texture.from(`./assets/cave/cave${num}.png`);
   const sprite = new PIXI.Sprite(caveTexture);
 
   const MAX_SCALE = 2.5;
@@ -35,7 +36,7 @@ export const cave = (props: CaveProps): Cave => {
   const START_SCALE = 0.25;
   const LAYER_SPACING = .075;
   const SCALE_INCREMENT = .001;
-  const ROT_INCREMENT = 3;
+  const ROT_INCREMENT = 5;
 
   let state = {
     scale: START_SCALE + (props.depth * LAYER_SPACING),
@@ -60,7 +61,7 @@ export const cave = (props: CaveProps): Cave => {
   sprite.pivot.set(0.5);
   sprite.tint = getDepthColor();
   sprite.scale.set(state.scale);
-  sprite.rotation = state.depth * ROT_INCREMENT;
+  sprite.rotation = Math.random() * 360;
   setPosition(0, 0);
 
   // Reset called by play again and also on init
@@ -77,6 +78,7 @@ export const cave = (props: CaveProps): Cave => {
     } else {
       state.scale += SCALE_INCREMENT * delta;
       state.depth = (state.scale - START_SCALE) / LAYER_SPACING;
+      sprite.rotation += SCALE_INCREMENT;
     }
     setPosition(x, y);
     sprite.tint = getDepthColor();
