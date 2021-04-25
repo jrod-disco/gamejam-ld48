@@ -9,11 +9,10 @@ import {
   SFX_VOL_MULT,
   POINTS_GOLD,
   START_LEVEL,
-  PLAYER_CONTINOUS_MOVEMENT,
   IS_SCORE_INCREMENTY,
 } from '@src/constants';
 import * as COMP from '..';
-import { PlayerCharacter } from '../playerCharacter';
+import { PlayerCharacter, PlayerMovement } from '../playerCharacter';
 import { RunTime } from '../library/runtime';
 import { DepthMeter } from '../library/depth';
 import { Spritesheets } from '@src/core';
@@ -239,25 +238,33 @@ export const gameLogic = (props: Props): GameLogic => {
   };
 
   const checkDownKeys = (keysDown): void => {
-    // If nothing is held, stop and bail
-    //  console.log('checkDownKeys', Object.values(keysDown));
-    if (
-      Object.values(keysDown).indexOf(1) === -1 &&
-      !PLAYER_CONTINOUS_MOVEMENT
-    ) {
-      playerCharacter.moveStop();
-      return;
-    }
-
     // TODO: instead of translating around the view,
     // - playercharacter will stay centered
     // - and display tilt / rotation animation
 
-    // Single cardinal directions
-    keysDown['KeyW'] && playerCharacter.moveUp();
-    keysDown['KeyS'] && playerCharacter.moveDown();
-    keysDown['KeyA'] && playerCharacter.moveLeft();
-    keysDown['KeyD'] && playerCharacter.moveRight();
+    // Map cardinal directions
+    const keys = {
+      left: 'KeyA',
+      right: 'KeyD',
+      up: 'KeyW',
+      down: 'KeyS',
+    };
+
+    const playerMovement: PlayerMovement = { x: 0, y: 0 };
+
+    if (keysDown[keys.left]) {
+      playerMovement.x = -1;
+    } else if (keysDown[keys.right]) {
+      playerMovement.x = 1;
+    }
+
+    if (keysDown[keys.up]) {
+      playerMovement.y = -1;
+    } else if (keysDown[keys.down]) {
+      playerMovement.y = 1;
+    }
+
+    playerCharacter.setMovement(playerMovement);
   };
 
   const addOnKeyUp = (): void => {
@@ -350,11 +357,11 @@ export const gameLogic = (props: Props): GameLogic => {
     depthMeter.update(delta);
 
     checkDownKeys(state.keysDown);
-    
+
     updateGold();
 
-    playerCharacter.update({ 
-      delta, 
+    playerCharacter.update({
+      delta,
       depth: depthMeter.getCurrentDepth(),
       pressure: depthMeter.getCurrentPressure(),
       time: runtime.getRunTime(),
