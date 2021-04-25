@@ -54,6 +54,7 @@ enum PLAYER_ANIM {
   LEFT = 'sub_left',
   RIGHT = 'sub_right',
   FORWARD = 'sub_fwd',
+  BACK = 'sub_back',
 }
 
 export type PlayerState = {
@@ -126,22 +127,27 @@ export const playerCharacter = (
   container.addChild(playerContainer);
 
   // Build up animations
+  const PLAYER_ANIM_TILT_SPEED = 0.3;
   const animIdle = new PIXI.AnimatedSprite(anims[PLAYER_ANIM.IDLE]);
   animIdle.animationSpeed = 0.75;
   animIdle.loop = true;
   animIdle.anchor.set(0.5);
   const animTiltLeft = new PIXI.AnimatedSprite(anims[PLAYER_ANIM.LEFT]);
-  animTiltLeft.animationSpeed = 0.3;
+  animTiltLeft.animationSpeed = PLAYER_ANIM_TILT_SPEED;
   animTiltLeft.loop = false;
   animTiltLeft.anchor.set(0.5);
   const animTiltRight = new PIXI.AnimatedSprite(anims[PLAYER_ANIM.RIGHT]);
-  animTiltRight.animationSpeed = 0.3;
+  animTiltRight.animationSpeed = PLAYER_ANIM_TILT_SPEED;
   animTiltRight.loop = false;
   animTiltRight.anchor.set(0.5);
   const animTiltForward = new PIXI.AnimatedSprite(anims[PLAYER_ANIM.FORWARD]);
-  animTiltForward.animationSpeed = 0.3;
+  animTiltForward.animationSpeed = PLAYER_ANIM_TILT_SPEED;
   animTiltForward.loop = false;
   animTiltForward.anchor.set(0.5);
+  const animTiltBackward = new PIXI.AnimatedSprite(anims[PLAYER_ANIM.BACK]);
+  animTiltBackward.animationSpeed = PLAYER_ANIM_TILT_SPEED;
+  animTiltBackward.loop = false;
+  animTiltBackward.anchor.set(0.5);
 
   state.lastAnim = PLAYER_ANIM.IDLE;
 
@@ -150,6 +156,7 @@ export const playerCharacter = (
   animations[PLAYER_ANIM.LEFT] = animTiltLeft;
   animations[PLAYER_ANIM.RIGHT] = animTiltRight;
   animations[PLAYER_ANIM.FORWARD] = animTiltForward;
+  animations[PLAYER_ANIM.BACK] = animTiltBackward;
 
   playerContainer.addChild(animations[PLAYER_ANIM.IDLE]);
   animations[PLAYER_ANIM.IDLE].gotoAndPlay(0);
@@ -164,7 +171,7 @@ export const playerCharacter = (
     shouldAutoPlay && thisAnim.gotoAndPlay(0);
   };
 
-  const animateTiltOnMovement = (val) => {
+  const animateTiltOnMovement = (val: PlayerMovement) => {
     switch (val.x) {
       case 0:
         //  setAnimation(PLAYER_ANIM.IDLE);
@@ -193,11 +200,11 @@ export const playerCharacter = (
         // animations[state.lastAnim].onComplete = () =>
         //   setAnimation(PLAYER_ANIM.IDLE);
         break;
-      // case 1:
-      //   setAnimation(PLAYER_ANIM.RIGHT);
-      //   animations[state.lastAnim].animationSpeed = 0.3;
-      //   animations[state.lastAnim].onComplete = null;
-      //   break;
+      case 1:
+        setAnimation(PLAYER_ANIM.BACK);
+        animations[state.lastAnim].animationSpeed = 0.3;
+        animations[state.lastAnim].onComplete = null;
+        break;
       case -1:
         setAnimation(PLAYER_ANIM.FORWARD);
         animations[state.lastAnim].animationSpeed = 0.3;
