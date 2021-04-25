@@ -3,6 +3,7 @@ import gsap, { Power0, Bounce } from 'gsap';
 import PixiPlugin from 'gsap/PixiPlugin';
 
 import { distanceTo2D } from '@src/util/distanceTo';
+import { newShaker } from '@src/util/shakerFactory';
 
 import {
   // consts
@@ -49,6 +50,7 @@ interface PlayerCharacterProps {
   textures?: { playerTexture: PIXI.Texture };
   anims?: { [key: string]: Array<PIXI.Texture> };
   gameOverHandler?: Function;
+  gameContainer: PIXI.Container;
 }
 
 type PlayerPosition = { x: number; y: number; rot: number };
@@ -82,6 +84,7 @@ export type PlayerState = {
   integrity: number; // TODO: health of hull
   items: []; // TODO: ITEM types
   lastAnim: PLAYER_ANIM;
+  isTakingDamage: boolean;
   lastUpdateTime: number;
 };
 
@@ -108,7 +111,7 @@ export const playerCharacter = (
   PixiPlugin.registerPIXI(PIXI);
   gsap.registerPlugin(PixiPlugin);
 
-  const { anims, textures, gameOverHandler } = props;
+  const { anims, textures, gameOverHandler, gameContainer } = props;
 
   let state: PlayerState = {
     startPos: { ...pos },
@@ -128,6 +131,7 @@ export const playerCharacter = (
     items: [],
     //
     lastAnim: PLAYER_ANIM.IDLE,
+    isTakingDamage: false,
     lastUpdateTime: Date.now(),
   };
   const initialState = { ...state };
@@ -181,6 +185,8 @@ export const playerCharacter = (
   };
 
   const animateTiltOnMovement = (val: PlayerMovement) => {
+    if (state.isTakingDamage) return;
+
     switch (val.x) {
       case 0:
         //  setAnimation(PLAYER_ANIM.IDLE);
@@ -301,7 +307,33 @@ export const playerCharacter = (
 
   // DAMAGE
   // - collision with cave wall to reduce integrity
+  const screenShaker = newShaker({
+    shakeAmount: 7,
+    shakeCountMax: 50,
+    shakeDelay: 30,
+    isBidirectional: true,
+    target: [gameContainer],
+  });
+
   const takeDamage = (dmg: number): void => {
+    // animate damage
+    setAnimation(PLAYER_ANIM.IDLE);
+    gsap.killTweensOf(container);
+    state = { ...state, isTakingDamage: true };
+    animIdle.tint = 0xff0000;
+    gsap.to(animIdle, {
+      duration: 0.25,
+      pixi: { tint: 0xffffff },
+      ease: Power0.easeOut,
+    });
+
+    screenShaker.shake({
+      isBidirectional: true,
+      shakeCountMax: 12,
+      shakeAmount: 6,
+      shakeDelay: 20,
+    });
+
     state.integrity -= dmg;
 
     console.log('**DAMAGE** integrity: %o', state.integrity);

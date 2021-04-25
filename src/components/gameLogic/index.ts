@@ -357,6 +357,7 @@ export const gameLogic = (props: Props): GameLogic => {
     gameOverHandler: () => {
       onGameOver();
     },
+    gameContainer,
   });
   subContainer.addChild(playerCharacter.container);
 
