@@ -340,7 +340,6 @@ export const gameLogic = (props: Props): GameLogic => {
   const updatePickups = (): void => {
     const maybePickup = pickupSpawnerRef.spawn();
     maybePickup && pickupContainer.addChild(maybePickup.container);
-    //console.log(pickupSpawnerRef.getPickups());
   };
   const cleanUpPickups = (): void => {
     pickupContainer.removeChildren();
@@ -383,9 +382,9 @@ export const gameLogic = (props: Props): GameLogic => {
     const pY = playerCharacter.container.y;
     const pickups = pickupSpawnerRef.getPickups();
 
-    pickups.map((n, i) => {
-      const nX = n.container.x;
-      const nY = n.container.y;
+    pickups.map((pickup, i) => {
+      const nX = pickup.container.x;
+      const nY = pickup.container.y;
 
       // check collision by x/y locations with a hitbox buffer
       const hitBox = 20;
@@ -398,13 +397,11 @@ export const gameLogic = (props: Props): GameLogic => {
 
       if (collided) {
         playerCharacter.consumeResource({
-          getType: n.getType,
-          getResource: n.getResource,
+          getType: pickup.getType,
+          getResource: pickup.getResource,
         });
-        pickupSpawnerRef.removePickupByIndex(i);
-        pickupContainer.removeChildAt(i);
         scoreDisplay.addToScore(POINTS_GOLD);
-
+        pickup.reset();
         // TODO: pass to pickup
         pixiSound.play('coin', {
           volume: 1 * SFX_VOL_MULT,

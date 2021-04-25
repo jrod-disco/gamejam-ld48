@@ -2,14 +2,15 @@ import * as PIXI from 'pixi.js';
 import gsap, { Power0, Bounce } from 'gsap';
 import { positionUsingDepth } from '@src/util/positionUsingDepth';
 import { 
+  APP_HEIGHT,
+  APP_WIDTH,
   PICKUP_OXYGEN_TANK_QUANTITY,
   PICKUP_TYPES,
-  MAX_LAYER_SCALE,
   LAYER_SPACING,
   LAYER_START_SCALE,
   SPEED_ITEM,
-  START_ROT,
   ROT_INCREMENT,
+  MAX_PICKUP_SCALE,
 } from '@src/constants';
 
 export interface OxygenTank {
@@ -18,12 +19,14 @@ export interface OxygenTank {
   getType: () => PICKUP_TYPES;
   reset: () => void;
   update: (delta: number) => void;
+  getScale: () => number;
 }
 
 interface OxygenTankProps {
   pos?: { x: number; y: number };
   anims?: { [key: string]: Array<PIXI.Texture> };
   depth?: number;
+  pickupBuffer: number;
 }
 
 type OxygenTankPosition = { x: number; y: number };
@@ -44,11 +47,17 @@ export const oxygenTank = (props: OxygenTankProps): OxygenTank => {
   const { anims } = props;
 
   let state = {
-    startPos: { ...pos },
+    endPosX: APP_WIDTH/2,
+    endPosY: APP_HEIGHT/2,
     scale: LAYER_START_SCALE + (props.depth * LAYER_SPACING),
     depth: props.depth,
   };
   const initialState = { ...state };
+
+  const setDestinationPostion = (): void => {
+    state.endPosX = props.pickupBuffer/2 + Math.floor(Math.random() * (APP_WIDTH - props.pickupBuffer));
+    state.endPosY = props.pickupBuffer/2 + Math.floor(Math.random() * (APP_HEIGHT - props.pickupBuffer));
+  }
 
   const oxygenTankContainer = new PIXI.Container();
   container.addChild(oxygenTankContainer);
@@ -63,9 +72,6 @@ export const oxygenTank = (props: OxygenTankProps): OxygenTank => {
   tankSprite.play();
 
   oxygenTankContainer.addChild(tankSprite);
-
-  //tankSprite.scale.set(0.5);
-  //tankSprite.alpha = 0;
 
   // ANIMATION
   const grow = (): void => {
@@ -96,29 +102,28 @@ export const oxygenTank = (props: OxygenTankProps): OxygenTank => {
   // Reset called by play again and also on init
   const reset = (): void => {
     state = { ...initialState };
-    
     //tankSprite.tint = getDepthColor();
-    container.scale.set(state.scale);
+    container.scale.set(LAYER_START_SCALE);
     container.rotation = Math.random() * 360;
-    positionUsingDepth(container, state.startPos.x, state.startPos.y, state.depth);
+    setDestinationPostion();
+    positionUsingDepth(container, state.endPosX, state.endPosY, state.depth);
   };
   reset();
 
   const update = (delta: number): void => {
-    if (state.scale >= MAX_LAYER_SCALE) {
-      state.scale = LAYER_START_SCALE;
-      state.depth = 0;
-      container.parent.setChildIndex(container, 0); // move to bottom of stack
-      container.rotation += START_ROT;
+    if (state.scale >= MAX_PICKUP_SCALE) {
+      reset();
     } else {
+      //sprite.tint = getDepthColor();
       state.scale += SPEED_ITEM * delta;
       state.depth = (state.scale - LAYER_START_SCALE) / LAYER_SPACING;
       container.rotation += ROT_INCREMENT;
+      positionUsingDepth(container, state.endPosX, state.endPosY, state.depth);
+      container.scale.set(state.scale);
     }
-    positionUsingDepth(container, state.startPos.x, state.startPos.y, state.depth);
-    //sprite.tint = getDepthColor();
-    container.scale.set(state.scale);
   };
+
+  const getScale = (): number => state.scale;
 
   return {
     container,
@@ -126,5 +131,6 @@ export const oxygenTank = (props: OxygenTankProps): OxygenTank => {
     update,
     getResource,
     getType,
+    getScale,
   };
 };

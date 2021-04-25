@@ -1,6 +1,4 @@
 import {
-  APP_HEIGHT,
-  APP_WIDTH,
   PICKUPS_MAX,
   PICKUP_SPAWN_RATE,
 } from '@src/constants';
@@ -31,28 +29,18 @@ export const pickupSpawner = (props: PickupSpawnerProps): PickupSpawner => {
   const pickupBuffer = 50;
 
   const spawn = (): OxygenTank | null => {
+    if (PICKUPS_MAX === state.pickupList.length) return;
+
     if (state.lastSpawnTime + PICKUP_SPAWN_RATE > Date.now()) return;
     state.lastSpawnTime = Date.now();
 
-    if (state.pickupList.length > PICKUPS_MAX - 1) return;
-
-    const rX =
-      pickupBuffer / 2 + Math.floor(Math.random() * (APP_WIDTH - pickupBuffer));
-    const rY =
-      pickupBuffer / 2 +
-      Math.floor(Math.random() * (APP_HEIGHT - pickupBuffer));
-
-    // TODO:
-    // - abstract this so that we can support many pickup types
-
     const pickup = oxygenTank({
-      pos: { x: rX, y: rY },
+      pickupBuffer,
       anims,
       depth: 0,
     });
 
     state.pickupList.push(pickup);
-
     return pickup;
   };
 
