@@ -3,7 +3,8 @@ import { Extract } from '@pixi/extract';
 import { Renderer } from '@pixi/core';
 
 import Color from 'color';
-import { APP_HEIGHT, APP_WIDTH, WORLD_WIDTH, WORLD_HEIGHT } from '@src/constants';
+import { APP_HEIGHT, APP_WIDTH, MAX_CAVE_DEPTH } from '@src/constants';
+import { positionUsingDepth } from '@src/util/positionUsingDepth';
 
 Renderer.registerPlugin('extract', Extract);
 
@@ -15,7 +16,6 @@ export interface Cave {
 
 interface CaveProps {
   depth: number;
-  maxDepth: number;
 }
 
 /**
@@ -48,13 +48,8 @@ export const cave = (props: CaveProps): Cave => {
   const getDepthColor = (): number => {
     return WATER_BOT_COLOR.mix(
       WATER_TOP_COLOR,
-      state.depth / props.maxDepth
+      state.depth / MAX_CAVE_DEPTH
     ).rgbNumber();
-  };
-
-  const setPosition = (x: number, y: number): void => {
-    sprite.position.x = APP_WIDTH/2 + ((APP_WIDTH/2-x)/props.maxDepth) * state.depth;
-    sprite.position.y = APP_HEIGHT/2 + ((APP_HEIGHT/2-y)/props.maxDepth) * state.depth;
   };
 
   sprite.anchor.set(0.5);
@@ -62,7 +57,7 @@ export const cave = (props: CaveProps): Cave => {
   sprite.tint = getDepthColor();
   sprite.scale.set(state.scale);
   sprite.rotation = Math.random() * 360;
-  setPosition(APP_WIDTH/2, APP_HEIGHT/2);
+  positionUsingDepth(sprite, APP_WIDTH/2, APP_HEIGHT/2, state.depth);
 
   // Reset called by play again and also on init
   const reset = (): void => {
@@ -80,7 +75,7 @@ export const cave = (props: CaveProps): Cave => {
       state.depth = (state.scale - START_SCALE) / LAYER_SPACING;
       sprite.rotation += SCALE_INCREMENT;
     }
-    setPosition(x, y);
+    positionUsingDepth(sprite, x, y, state.depth);
     sprite.tint = getDepthColor();
     sprite.scale.set(state.scale);
   };

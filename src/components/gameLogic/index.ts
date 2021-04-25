@@ -10,6 +10,7 @@ import {
   POINTS_GOLD,
   START_LEVEL,
   IS_SCORE_INCREMENTY,
+  MAX_CAVE_DEPTH,
 } from '@src/constants';
 import * as COMP from '..';
 import { PlayerCharacter, PlayerMovement } from '../playerCharacter';
@@ -305,11 +306,8 @@ export const gameLogic = (props: Props): GameLogic => {
   gameContainer.addChild(caveContainer);
 
   const caves = [];
-  const maxDepth = 32;
-  for (let depth = 0; depth < maxDepth; depth++) {
-    const cave = COMP.cave({ depth, maxDepth });
-    // cave.sprite.x = APP_WIDTH / 2;
-    // cave.sprite.y = APP_HEIGHT / 2;
+  for (let depth = 0; depth < MAX_CAVE_DEPTH; depth++) {
+    const cave = COMP.cave({ depth });
     caves.push(cave);
     caveContainer.addChild(cave.sprite);
   }
