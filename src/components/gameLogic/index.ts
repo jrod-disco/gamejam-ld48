@@ -14,6 +14,7 @@ import {
 } from '@src/constants';
 import * as COMP from '..';
 import { PlayerCharacter } from '../playerCharacter';
+import { cave, Cave } from '../cave';
 import { RunTime } from '../library/runtime';
 import { Spritesheets } from '@src/core';
 import { scoreDisplay, ScoreDisplay } from '../library/scoreDisplay';
@@ -78,6 +79,7 @@ export const gameLogic = (props: Props): GameLogic => {
   let mainOnAudioCycleOptions: () => void = null;
 
   const { gameContainer } = props;
+  gameContainer.sortableChildren = true;
 
   // Level Message Text
   const messageText = new PIXI.BitmapText('LEVEL UP!', {
@@ -240,6 +242,18 @@ export const gameLogic = (props: Props): GameLogic => {
   const removeOnKeyDown = (): void =>
     window.removeEventListener('keydown', onKeyDownGame);
 
+  const caves = [];
+  for (let depth=0; depth<16; depth++) {
+    const cave = COMP.cave({ depth });
+
+    // Move container to the center
+    cave.sprite.x = APP_WIDTH / 2;
+    cave.sprite.y = APP_HEIGHT / 2;
+
+    caves.push(cave);
+    gameContainer.addChild(cave.sprite);
+  }
+
   // Simple Player Component
   const playerTexture = PIXI.Texture.from('./assets/example/whitebox.png');
   const playerCharacter = COMP.playerCharacter({
@@ -253,7 +267,7 @@ export const gameLogic = (props: Props): GameLogic => {
   const goldContainer = new PIXI.Container();
   gameContainer.addChild(goldContainer);
 
-  gameContainer.filters = [new BloomFilter(4)];
+  // gameContainer.filters = [new BloomFilter(4)];
 
   const updateGold = (): void => {
     const maybeGold = goldSpawnerRef.spawn();
@@ -307,6 +321,11 @@ export const gameLogic = (props: Props): GameLogic => {
     playerCharacter.update(delta);
     checkCollision();
     IS_SCORE_INCREMENTY && scoreDisplay.update(delta);
+
+    caves.forEach(cave => {
+      cave.update(delta);
+    });
+
     updateRan = true;
 
     return updateRan;

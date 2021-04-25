@@ -87,12 +87,12 @@ const bootstrapApp = (props: {
 
   const { pixiApp, mainContainer } = initPIXI(pixiConfig, hostDiv);
 
-  const crtFilter = new CRTFilter({
-    curvature: 2,
-    vignetting: 0.2,
-    noise: 0.1,
-  });
-  mainContainer.filters = [crtFilter];
+  // const crtFilter = new CRTFilter({
+  //   curvature: 2,
+  //   vignetting: 0.2,
+  //   noise: 0.1,
+  // });
+  // mainContainer.filters = [crtFilter];
 
   // Get our preloader assets
   let { spriteSheets } = props;
@@ -154,9 +154,9 @@ const bootstrapApp = (props: {
   baseContainer.name = 'gameContainer';
   uiContainer.name = 'uiContainer';
 
-  const bgTexture = PIXI.Texture.from('./assets/example/background600x600.png');
-  const bgSprite = new PIXI.Sprite(bgTexture);
-  baseContainer.addChild(bgSprite);
+  // const bgTexture = PIXI.Texture.from('./assets/example/background600x600.png');
+  // const bgSprite = new PIXI.Sprite(bgTexture);
+  // baseContainer.addChild(bgSprite);
 
   const setSounds = (soundsLoaded: Sounds): void => {
     sounds = soundsLoaded;
@@ -312,8 +312,8 @@ const bootstrapApp = (props: {
     // Update All The Things
 
     // Animate the CRT filter
-    crtFilter.seed = Math.random();
-    crtFilter.time += 0.25;
+    // crtFilter.seed = Math.random();
+    // crtFilter.time += 0.25;
 
     // Individual components -------------
 

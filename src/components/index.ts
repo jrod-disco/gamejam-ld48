@@ -9,3 +9,4 @@ export * as LIB from './library';
 export { exampleComponent } from './exampleComponent';
 export { gameLogic } from './gameLogic';
 export { playerCharacter } from './playerCharacter';
+export { cave } from './cave';
