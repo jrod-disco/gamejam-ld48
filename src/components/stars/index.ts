@@ -72,7 +72,7 @@ export const stars = (props: ComponentProps): Stars => {
     star.sprite.anchor.set(0.5);
 
     // Tint Matrix for Color Modes
-    tintDisplayObject(star.sprite, 0x55ffaa);
+    tintDisplayObject(star.sprite, 0xaaccff);
 
     randomizeStar(star, true);
     container.addChild(star.sprite);
