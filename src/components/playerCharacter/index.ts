@@ -2,7 +2,10 @@ import * as PIXI from 'pixi.js';
 import gsap, { Power0, Bounce } from 'gsap';
 import PixiPlugin from 'gsap/PixiPlugin';
 
+import { distanceTo2D } from '@src/util/distanceTo';
+
 import {
+  // consts
   APP_HEIGHT,
   APP_WIDTH,
   OBJECT_STATUS,
@@ -12,10 +15,16 @@ import {
   PLAYER_ACCEL,
   PLAYER_DECEL,
   PICKUP_TYPES,
-  Resource,
   PLAYER_MAX_OXYGEN,
   PLAYER_ROTATE_ON_MOVE,
   PLAYER_MAX_ROT_CHANGE,
+  PLAYER_SPRITE_MARGIN,
+  PLAYER_COLLISION_RADIUS,
+  PLAYER_COLLISION_VALUE,
+  PLAYER_COLLISION_DRAG,
+  // types / interface
+  Resource,
+  Point2D,
 } from '@src/constants';
 
 type UpdateProps = {
@@ -213,21 +222,22 @@ export const playerCharacter = (
     }
   };
 
-  // start small so we can grow at start
-  // playerSprite.scale.set(0);
-  const spriteMargin = 20;
-
-  //
-  const checkInBounds = (pos: PlayerPosition): boolean =>
-    pos.x < APP_WIDTH - spriteMargin &&
-    pos.x > spriteMargin &&
-    pos.y < APP_HEIGHT - spriteMargin &&
-    pos.y > spriteMargin;
+  // check distance against center and collision radius
+  const checkInBounds = (pos: PlayerPosition): boolean => {
+    const origin: Point2D = {
+      x: APP_WIDTH / 2,
+      y: APP_HEIGHT / 2,
+    };
+    const player: Point2D = {
+      x: pos.x,
+      y: pos.y,
+    };
+    return distanceTo2D(origin, player) < PLAYER_COLLISION_RADIUS;
+  };
 
   //
   const setMovement = (val: PlayerMovement): void => {
     state.movement = val;
-
     animateTiltOnMovement(val);
   };
 
@@ -294,8 +304,8 @@ export const playerCharacter = (
   const takeDamage = (dmg: number): void => {
     state.integrity -= dmg;
 
-    // console.log('integrity: %o', state.integrity);
-    if (state.integrity < 0) {
+    console.log('**DAMAGE** integrity: %o', state.integrity);
+    if (state.integrity <= 0) {
       console.warn("you've blown up");
       gameOverHandler();
     }
@@ -374,8 +384,10 @@ export const playerCharacter = (
     if (checkInBounds(newPos)) {
       state.pos = newPos;
     } else {
-      state.movementSpeed.x *= -0.3;
-      state.movementSpeed.y *= -0.3;
+      // POW
+      takeDamage(PLAYER_COLLISION_VALUE);
+      state.movementSpeed.x *= PLAYER_COLLISION_DRAG;
+      state.movementSpeed.y *= PLAYER_COLLISION_DRAG;
     }
   };
 
