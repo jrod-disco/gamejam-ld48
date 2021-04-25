@@ -62,7 +62,7 @@ export const cave = (props: CaveProps): Cave => {
   sprite.tint = getDepthColor();
   sprite.scale.set(state.scale);
   sprite.rotation = Math.random() * 360;
-  setPosition(0, 0);
+  setPosition(APP_WIDTH/2, APP_HEIGHT/2);
 
   // Reset called by play again and also on init
   const reset = (): void => {
