@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import gsap, { Power0, Bounce } from 'gsap';
+//import gsap, { Power0, Bounce } from 'gsap';
 import { positionUsingDepth } from '@src/util/positionUsingDepth';
 import { 
   APP_HEIGHT,
@@ -20,6 +20,8 @@ export interface OxygenTank {
   reset: () => void;
   update: (delta: number) => void;
   getScale: () => number;
+  isActive: () => boolean;
+  setActive: (active: boolean) => void;
 }
 
 interface OxygenTankProps {
@@ -49,8 +51,9 @@ export const oxygenTank = (props: OxygenTankProps): OxygenTank => {
   let state = {
     endPosX: APP_WIDTH/2,
     endPosY: APP_HEIGHT/2,
-    scale: LAYER_START_SCALE + (props.depth * LAYER_SPACING),
+    scale: LAYER_START_SCALE,
     depth: props.depth,
+    active: false,
   };
   const initialState = { ...state };
 
@@ -74,21 +77,21 @@ export const oxygenTank = (props: OxygenTankProps): OxygenTank => {
   oxygenTankContainer.addChild(tankSprite);
 
   // ANIMATION
-  const grow = (): void => {
-    gsap.killTweensOf(tankSprite);
-    const myTween = gsap.to(tankSprite, {
-      duration: 0.75,
-      pixi: { scale: 1 },
-      ease: Bounce.easeOut,
-    });
+  // const grow = (): void => {
+  //   gsap.killTweensOf(tankSprite);
+  //   const myTween = gsap.to(tankSprite, {
+  //     duration: 0.75,
+  //     pixi: { scale: 1 },
+  //     ease: Bounce.easeOut,
+  //   });
 
-    const myTweenAlpha = gsap.to(tankSprite, {
-      duration: 0.5,
-      pixi: { alpha: 1 },
-      ease: Power0.easeOut,
-    });
-  };
-  grow();
+  //   const myTweenAlpha = gsap.to(tankSprite, {
+  //     duration: 0.5,
+  //     pixi: { alpha: 1 },
+  //     ease: Power0.easeOut,
+  //   });
+  // };
+  // grow();
 
   // RESOURCE
   const getType = (): PICKUP_TYPES => {
@@ -110,20 +113,25 @@ export const oxygenTank = (props: OxygenTankProps): OxygenTank => {
   };
   reset();
 
+  const isActive = (): boolean => state.active;
+  const setActive = (active: boolean): void => { state.active = active; }
+
+  const getScale = (): number => state.scale;
+
   const update = (delta: number): void => {
+    if (!isActive()) return;
+
     if (state.scale >= MAX_PICKUP_SCALE) {
       reset();
     } else {
       //sprite.tint = getDepthColor();
       state.scale += SPEED_ITEM * delta;
-      state.depth = (state.scale - LAYER_START_SCALE) / LAYER_SPACING;
+      state.depth = (getScale() - LAYER_START_SCALE) / LAYER_SPACING;
       container.rotation += ROT_INCREMENT;
       positionUsingDepth(container, state.endPosX, state.endPosY, state.depth);
-      container.scale.set(state.scale);
+      container.scale.set(getScale());
     }
   };
-
-  const getScale = (): number => state.scale;
 
   return {
     container,
@@ -132,5 +140,7 @@ export const oxygenTank = (props: OxygenTankProps): OxygenTank => {
     getResource,
     getType,
     getScale,
+    isActive,
+    setActive,
   };
 };

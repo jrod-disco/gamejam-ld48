@@ -29,18 +29,21 @@ export const pickupSpawner = (props: PickupSpawnerProps): PickupSpawner => {
   const pickupBuffer = 50;
 
   const spawn = (): OxygenTank | null => {
-    if (PICKUPS_MAX === state.pickupList.length) return;
-
     if (state.lastSpawnTime + PICKUP_SPAWN_RATE > Date.now()) return;
     state.lastSpawnTime = Date.now();
 
-    const pickup = oxygenTank({
-      pickupBuffer,
-      anims,
-      depth: 0,
-    });
+    let pickup;
 
-    state.pickupList.push(pickup);
+    if (PICKUPS_MAX === state.pickupList.length) {
+      // Reached max spawned, recycle if pool contains an inactive pickup
+      pickup = state.pickupList.find((pickup: OxygenTank): boolean => !pickup.isActive());
+    } else {
+      // Spawn
+      pickup = oxygenTank({ pickupBuffer, anims, depth: 0 });
+      state.pickupList.push(pickup);
+    }
+
+    pickup && pickup.setActive(true);
     return pickup;
   };
 
