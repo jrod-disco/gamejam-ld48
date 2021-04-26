@@ -21,6 +21,7 @@ export interface Cave {
   sprite: PIXI.Sprite;
   reset: () => void;
   update: (delta: number, x: number, y: number) => void;
+  land: () => void;
 }
 
 interface CaveProps {
@@ -45,6 +46,8 @@ export const cave = (props: CaveProps): Cave => {
   let state = {
     scale: LAYER_START_SCALE + (props.depth * LAYER_SPACING),
     depth: props.depth,
+    landing: false,
+    maxScale: MAX_LAYER_SCALE,
   };
   const initialState = { ...state };
 
@@ -68,7 +71,8 @@ export const cave = (props: CaveProps): Cave => {
   reset();
 
   const update = (delta: number, x: number, y: number): void => {
-    if (state.scale >= MAX_LAYER_SCALE) {
+    if (state.scale >= state.maxScale) {
+      if (state.landing) return;
       state.scale = LAYER_START_SCALE;
       state.depth = 0;
       sprite.parent.setChildIndex(sprite, 0); // move to bottom of stack
@@ -78,10 +82,17 @@ export const cave = (props: CaveProps): Cave => {
       state.depth = (state.scale - LAYER_START_SCALE) / LAYER_SPACING;
       sprite.rotation += ROT_INCREMENT;
     }
+    if (!state.landing) {
+      sprite.tint = getDepthColor();
+    }
     positionUsingDepth(sprite, x, y, state.depth);
-    sprite.tint = getDepthColor();
     sprite.scale.set(state.scale);
   };
 
-  return { sprite, reset, update };
+  const land = (): void => {
+    state.landing = true;
+    state.maxScale = MAX_LAYER_SCALE * 2;
+  }
+
+  return { sprite, reset, update, land };
 };
