@@ -45,13 +45,13 @@ export const PLAYER_TILT_SPEED_THRESHOLD = 1;
 
 // resources
 export const PLAYER_MAX_OXYGEN = 100; // full tank, init value
-export const PLAYER_OXYGEN_CONSUMPTION_RATE = 0.6; // lbs per second
+export const PLAYER_OXYGEN_CONSUMPTION_RATE = 0.7; // lbs per second
 export const PLAYER_DESCENT_RATE = 0.5; // feet per sec
 export const PLAYER_INTEGRITY = 2000; // starting integrity (not yet consuming)
 
 // collision
 export const PLAYER_COLLISION_RADIUS = 170;
-export const PLAYER_COLLISION_VALUE = 22; // damage from wall collision
+export const PLAYER_COLLISION_VALUE = 15; // damage from wall collision
 export const PLAYER_COLLISION_DRAG = -0.3; // rebound drag
 
 // ITEMS
@@ -60,9 +60,9 @@ export enum PICKUP_TYPES {
 }
 
 // PICKUP Generator
-export const PICKUPS_MAX = 6;
-export const PICKUP_SPAWN_RATE = 5000;
-export const PICKUP_OXYGEN_TANK_QUANTITY = 2; // lbs of oxygen
+export const PICKUPS_MAX = 5;
+export const PICKUP_SPAWN_RATE = 4000;
+export const PICKUP_OXYGEN_TANK_QUANTITY = 3.5; // lbs of oxygen
 
 ///////////////////////////////////////////////////////////////////////////////
 // SIMPLE GAME - deprecate or use
