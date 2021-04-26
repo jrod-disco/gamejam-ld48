@@ -16,12 +16,68 @@ interface Props {
   pos?: { x: number; y: number };
 }
 
-type GuagesState = {
+type GaugesState = {
   isOn: boolean;
   oxygen: number;
   power: number;
   integrity: number;
   structure: number;
+};
+
+const horizontalGauge = ({
+  label = '',
+  width = 150,
+  height = 8,
+  color = THEME.TXT_HUD_HEX,
+  x = 0,
+  y = 0,
+}) => {
+  const gauge = new PIXI.Container();
+  gauge.position.set(x, y);
+
+  let barOffsetY = 0;
+
+  if (label) {
+    barOffsetY = 18;
+
+    const labelTitle = new PIXI.BitmapText(label, {
+      fontName: `FFFFuego-16`,
+      fontSize: 14,
+      align: 'left',
+    });
+    labelTitle.tint = THEME.TXT_TITLES_HEX;
+
+    gauge.addChild(labelTitle);
+  }
+
+  const bgBar = new PIXI.Graphics();
+  bgBar.beginFill(THEME.TXT_TITLES_HEX);
+  bgBar.drawRect(0, 0, width, height);
+  bgBar.endFill();
+  bgBar.alpha = 0.4;
+  bgBar.position.y += barOffsetY;
+
+  const fgBar = new PIXI.Graphics();
+  fgBar.beginFill(color);
+  fgBar.drawRect(0, 0, width, height);
+  fgBar.endFill();
+  fgBar.alpha = 0.8;
+  fgBar.position.y += barOffsetY;
+
+  gauge.alpha = 0.8;
+  gauge.addChild(bgBar, fgBar);
+
+  /**
+   * Scale the gauge to a new percentage value (0 to 1)
+   */
+  const setValue = (newValue: number): void => {
+    fgBar.width = width * newValue;
+  };
+
+  return {
+    container: gauge,
+    setValue,
+  };
 };
 
 /**
@@ -41,7 +97,7 @@ export const gauges = (props: Props): Gauges => {
 
   // STATE
 
-  let state: GuagesState = {
+  let state: GaugesState = {
     isOn: true,
     oxygen: 0,
     power: 0,
@@ -51,72 +107,25 @@ export const gauges = (props: Props): Gauges => {
 
   const initialState = { ...state };
 
-  // Display Items
-  const oxygenTitle = new PIXI.BitmapText('Oxygen', {
-    fontName: `FFFFuego-16`,
-    fontSize: 14,
-    align: 'left',
+  const oxygen = horizontalGauge({
+    label: 'O2',
+    color: 0x35d694,
   });
-  oxygenTitle.anchor.set(0, 0);
-  oxygenTitle.tint = THEME.TXT_TITLES_HEX;
-  oxygenTitle.alpha = 0.8;
+  container.addChild(oxygen.container);
 
-  const oxygen = new PIXI.BitmapText('000', {
-    fontName: `FFFFuego-16-bold`,
-    fontSize: 13,
-    align: 'left',
+  const power = horizontalGauge({
+    label: 'Power',
+    color: 0x35d694,
+    y: 30
   });
-  oxygen.anchor.set(0, 0);
-  oxygen.tint = THEME.TXT_HUD_HEX;
-  oxygen.position.y += 18;
-  oxygen.position.x += 2;
-  container.addChild(oxygenTitle, oxygen);
+  container.addChild(power.container);
 
-  // power
-  const powerTitle = new PIXI.BitmapText('Power', {
-    fontName: `FFFFuego-16`,
-    fontSize: 14,
-    align: 'left',
+  const health = horizontalGauge({
+    label: 'Health',
+    color: 0xe81313,
+    y: 60,
   });
-  powerTitle.anchor.set(0, 0);
-  powerTitle.tint = THEME.TXT_TITLES_HEX;
-  powerTitle.alpha = 0.8;
-  powerTitle.position.y += 40;
-
-  const power = new PIXI.BitmapText('000', {
-    fontName: `FFFFuego-16-bold`,
-    fontSize: 13,
-    align: 'left',
-  });
-  power.anchor.set(0, 0);
-  power.tint = THEME.TXT_HUD_HEX;
-  power.position.y += 58;
-  power.position.x += 2;
-
-  container.addChild(powerTitle, power);
-
-  // integrity
-  const integrityTitle = new PIXI.BitmapText('Health', {
-    fontName: `FFFFuego-16`,
-    fontSize: 14,
-    align: 'left',
-  });
-  integrityTitle.anchor.set(0, 0);
-  integrityTitle.tint = THEME.TXT_TITLES_HEX;
-  integrityTitle.alpha = 0.8;
-  integrityTitle.position.y += 80;
-
-  const integrity = new PIXI.BitmapText('000', {
-    fontName: `FFFFuego-16-bold`,
-    fontSize: 13,
-    align: 'left',
-  });
-  integrity.anchor.set(0, 0);
-  integrity.tint = THEME.TXT_HUD_HEX;
-  integrity.position.y += 98;
-  integrity.position.x += 2;
-
-  container.addChild(integrityTitle, integrity);
+  container.addChild(health.container);
 
   const updateState = (playerState: PlayerState) => {
     state.oxygen = playerState.oxygen;
@@ -125,9 +134,9 @@ export const gauges = (props: Props): Gauges => {
   };
 
   const updateCluster = (): void => {
-    oxygen.text = state.oxygen.toFixed(2);
-    integrity.text = state.integrity.toFixed(2);
-    power.text = state.power.toFixed(2);
+    oxygen.setValue(state.oxygen / 100);
+    power.setValue(state.power / 100);
+    health.setValue(state.integrity / 100);
   };
 
   // Reset called by play again and also on init
