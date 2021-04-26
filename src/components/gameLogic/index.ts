@@ -465,9 +465,13 @@ export const gameLogic = (props: Props): GameLogic => {
       pickup.update(delta);
     });
 
+    const currentDepth = depthMeter.getCurrentDepth();
+
+    const depthLevelSegment = Math.floor(currentDepth / 1500);
+
     playerCharacter.update({
       delta,
-      depth: depthMeter.getCurrentDepth(),
+      depth: currentDepth,
       pressure: depthMeter.getCurrentPressure(),
       time: runtime.getRunTime(),
     });
@@ -475,6 +479,7 @@ export const gameLogic = (props: Props): GameLogic => {
     checkCollision();
 
     // Update individual controller refs here
+
     runtime.update(delta);
     depthMeter.update(delta);
     gauges.update(delta, playerCharacter.getState());
@@ -483,7 +488,7 @@ export const gameLogic = (props: Props): GameLogic => {
 
     const pos = playerCharacter.getState().pos;
     caves.forEach((cave) => {
-      cave.update(delta, pos.x, pos.y);
+      cave.update(delta, pos.x, pos.y, depthLevelSegment);
     });
 
     starfield.update(delta);
