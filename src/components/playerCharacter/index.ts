@@ -512,7 +512,9 @@ export const playerCharacter = (
     // Update called by main
     if (state.status === OBJECT_STATUS.ACTIVE) {
       updateSpeed(delta);
-      updateRotation(delta);
+      if (rotateOnMove) {
+        updateRotation(delta);
+      }
       updatePosition();
       updateContainer();
       randomFlicker();
