@@ -186,13 +186,6 @@ const bootstrapApp = (props: {
   // const bgSprite = new PIXI.Sprite(bgTexture);
   // baseContainer.addChild(bgSprite);
 
-  // Personal Best Score Display
-  const bestScore = COMP.LIB.bestScoreDisplay({
-    pos: { x: Math.round(APP_WIDTH * 0.5), y: 65 },
-    particleTextures: null,
-  });
-  uiContainer.addChild(bestScore.container);
-
   // High Score Manager
   const personalBestManager: PersonalBestScores = personalBestScores(() => 0);
 
@@ -241,6 +234,13 @@ const bootstrapApp = (props: {
     name: SCREENS.ScreenName.MAIN,
     isAnimated: true,
   });
+
+  // Personal Best Score Display
+  const bestScore = COMP.LIB.bestScoreDisplay({
+    pos: { x: Math.round(APP_WIDTH * 0.5), y: 20 },
+    particleTextures: null,
+  });
+  uiContainer.addChild(bestScore.container);
 
   // Audio Option Cycle (just a toggle)
   const onAudioCycleOptions = (): void => {
