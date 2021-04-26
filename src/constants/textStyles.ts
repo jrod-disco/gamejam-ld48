@@ -30,7 +30,7 @@ export const TEXT_STYLE = {
     fontFamily: 'Roboto, sans-serif',
     fontSize: 28,
     fontWeight: 'bold',
-    fill: [THEME.TXT_INFO_HEX],
+    fill: [0xc7a105],
     dropShadow: true,
     dropShadowColor: THEME.BG_HEX,
     dropShadowBlur: 5,
