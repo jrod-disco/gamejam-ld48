@@ -212,6 +212,8 @@ export const gameLogic = (props: Props): GameLogic => {
     depthMeter.reset();
     depthMeter.start();
     playerCharacter.reset();
+    caves.forEach((cave) => cave.reset());
+    
     //
 
     // Start listening for keyboard events

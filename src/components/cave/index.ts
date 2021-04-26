@@ -19,7 +19,7 @@ Renderer.registerPlugin('extract', Extract);
 
 export interface Cave {
   sprite: PIXI.Sprite;
-  reset: () => void;
+  reset: (depth?: number) => void;
   update: (delta: number, x: number, y: number) => void;
   land: () => void;
 }
@@ -61,6 +61,9 @@ export const cave = (props: CaveProps): Cave => {
   // Reset called by play again and also on init
   const reset = (): void => {
     state = { ...initialState };
+    if (sprite.parent) {
+      sprite.parent.setChildIndex(sprite, state.depth); // reset position
+    }
     sprite.anchor.set(0.5);
     sprite.pivot.set(0.5);
     sprite.tint = getDepthColor();
