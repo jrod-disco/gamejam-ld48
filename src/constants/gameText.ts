@@ -12,7 +12,7 @@ export const TEXT_REASONS_WIN = [
 ];
 
 export const TEXT_LOSE = {
-  displayTitle: 'YOUR JOURNEY HAS NOT ENDED WELL',
+  displayTitle: 'YOU DIED',
   displayBody: `Those poor deep sea researchers will never taste the delicious pizza. And you, my friend, are sleeping with the fishes.`,
 };
 
