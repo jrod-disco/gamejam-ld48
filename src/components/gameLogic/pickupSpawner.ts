@@ -16,6 +16,8 @@ export interface PickupSpawner {
 
 interface PickupSpawnerProps {
   anims?: { [key: string]: Array<PIXI.Texture> };
+  pickupContainerLower: PIXI.Container;
+  pickupContainerUpper: PIXI.Container;
 }
 
 export const pickupSpawner = (props: PickupSpawnerProps): PickupSpawner => {
@@ -28,7 +30,7 @@ export const pickupSpawner = (props: PickupSpawnerProps): PickupSpawner => {
 
   const { anims } = props;
 
-  const pickupBuffer = 50;
+  const pickupBuffer = 150; // px from center
 
   const spawn = (): OxygenTank | null => {
     if (state.landing) return;
@@ -43,7 +45,13 @@ export const pickupSpawner = (props: PickupSpawnerProps): PickupSpawner => {
       pickup = state.pickupList.find((pickup: OxygenTank): boolean => !pickup.isActive());
     } else {
       // Spawn
-      pickup = oxygenTank({ pickupBuffer, anims, depth: 0 });
+      pickup = oxygenTank({ 
+        pickupBuffer,
+        anims,
+        depth: 0,
+        lowerContainer: props.pickupContainerLower,
+        upperContainer: props.pickupContainerUpper,
+      });
       state.pickupList.push(pickup);
     }
 

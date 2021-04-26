@@ -13,9 +13,9 @@ import {
   SPEED_ITEM,
   MAX_PICKUP_SCALE,
   ROT_PICKUP_INCREMENT,
-  MAX_LAYER_SCALE,
   MAX_LAYER_DEPTH,
   SFX_VOL_MULT,
+  PICKUP_HIT_HI,
 } from '@src/constants';
 
 export interface OxygenTank {
@@ -35,6 +35,8 @@ interface OxygenTankProps {
   anims?: { [key: string]: Array<PIXI.Texture> };
   depth?: number;
   pickupBuffer: number;
+  lowerContainer: PIXI.Container;
+  upperContainer: PIXI.Container;
 }
 
 type OxygenTankPosition = { x: number; y: number };
@@ -54,7 +56,7 @@ export const oxygenTank = (props: OxygenTankProps): OxygenTank => {
   container.y = pos.y;
   container.name = 'oxygenTank';
 
-  const { anims } = props;
+  const { anims, pickupBuffer } = props;
 
   let state = {
     endPosX: APP_WIDTH / 2,
@@ -67,11 +69,9 @@ export const oxygenTank = (props: OxygenTankProps): OxygenTank => {
 
   const setDestinationPostion = (): void => {
     state.endPosX =
-      props.pickupBuffer / 2 +
-      Math.floor(Math.random() * (APP_WIDTH - props.pickupBuffer));
+      APP_WIDTH / 2 + (Math.random() * pickupBuffer * 2 - pickupBuffer);
     state.endPosY =
-      props.pickupBuffer / 2 +
-      Math.floor(Math.random() * (APP_HEIGHT - props.pickupBuffer));
+      APP_HEIGHT / 2 + (Math.random() * pickupBuffer * 2 - pickupBuffer);
   };
 
   const oxygenTankContainer = new PIXI.Container();
@@ -100,6 +100,7 @@ export const oxygenTank = (props: OxygenTankProps): OxygenTank => {
   // Reset called by play again and also on init
   const reset = (): void => {
     state = { ...initialState };
+    props.lowerContainer.addChild(container);
     container.alpha = 0;
     container.scale.set(LAYER_START_SCALE);
     container.rotation = Math.random() * 360;
@@ -126,6 +127,12 @@ export const oxygenTank = (props: OxygenTankProps): OxygenTank => {
       container.rotation += ROT_PICKUP_INCREMENT;
       positionUsingDepth(container, state.endPosX, state.endPosY, state.depth);
       container.scale.set(getScale());
+      if (
+        getScale() > PICKUP_HIT_HI &&
+        container.parent !== props.upperContainer
+      ) {
+        props.upperContainer.addChild(container);
+      }
     }
   };
 

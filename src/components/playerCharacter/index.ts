@@ -12,7 +12,6 @@ import {
   APP_HEIGHT,
   APP_WIDTH,
   OBJECT_STATUS,
-  PLAYER_MAX_SPEED,
   PLAYER_INIT_ROT,
   PLAYER_OXYGEN_CONSUMPTION_RATE,
   PLAYER_ACCEL,
@@ -21,14 +20,28 @@ import {
   PLAYER_MAX_OXYGEN,
   PLAYER_ROTATE_ON_MOVE,
   PLAYER_MAX_ROT_CHANGE,
-  PLAYER_SPRITE_MARGIN,
   PLAYER_COLLISION_RADIUS,
   PLAYER_COLLISION_VALUE,
   PLAYER_COLLISION_DRAG,
   // types / interface
   Resource,
   Point2D,
+  PLAYER_ROT_DAMPEN,
+  PLAYER_TILT_ANGLE_THRESHOLD,
+  PLAYER_TILT_SPEED_THRESHOLD,
+  PLAYER_TILT_BY_ANGLE,
 } from '@src/constants';
+import {
+  compareMagnitude,
+  getAngle,
+  getMagnitude,
+  getShortestAngleDifference,
+  getUnitVector,
+  vAdd,
+  vScale,
+  withMagnitude,
+} from '@src/util/vector';
+import { clamp } from '@src/util/clamp';
 
 type UpdateProps = {
   delta: number;
@@ -48,7 +61,7 @@ export interface PlayerCharacter {
 }
 
 interface PlayerCharacterProps {
-  pos?: { x: number; y: number; rot: number };
+  pos?: PlayerPosition;
   textures?: { [key: string]: PIXI.Texture };
   anims?: { [key: string]: Array<PIXI.Texture> };
   gameOverHandler?: Function;
@@ -75,7 +88,6 @@ export type PlayerState = {
   pos: PlayerPosition;
   status: OBJECT_STATUS;
   movement: PlayerMovement;
-  maxMovementSpeed: number;
   movementSpeed: { x: number; y: number };
   movementAcceleration: number;
   dragDeceleration: number;
@@ -121,7 +133,6 @@ export const playerCharacter = (
     pos: { ...pos },
     status: OBJECT_STATUS.ACTIVE,
     movement: { x: 0, y: 0 },
-    maxMovementSpeed: PLAYER_MAX_SPEED,
     movementSpeed: { x: 0, y: 0 },
     movementAcceleration: PLAYER_ACCEL,
     dragDeceleration: PLAYER_DECEL,
@@ -198,47 +209,72 @@ export const playerCharacter = (
     shouldAutoPlay && thisAnim.gotoAndPlay(0);
   };
 
-  const animateTiltOnMovement = (val: PlayerMovement) => {
-    if (state.isTakingDamage) return;
+  const tilt = (direction: PLAYER_ANIM) => {
+    setAnimation(direction);
+    animations[state.lastAnim].animationSpeed = 0.3;
+    animations[state.lastAnim].onComplete = null;
+  };
 
-    switch (val.x) {
+  const stopTilt = () => {
+    animations[state.lastAnim].animationSpeed = -0.3;
+    animations[state.lastAnim].play();
+    animations[state.lastAnim].onComplete = () =>
+      setAnimation(PLAYER_ANIM.IDLE);
+  };
+
+  const animateTiltByAngle = () => {
+    const currentSpeed = getMagnitude(state.movementSpeed);
+    const currentAngle = state.pos.rot;
+    const movementAngle = getAngle(state.movementSpeed);
+
+    const angleDifference = getShortestAngleDifference(
+      currentAngle,
+      movementAngle
+    );
+
+    if (angleDifference > PLAYER_TILT_ANGLE_THRESHOLD) {
+      tilt(PLAYER_ANIM.RIGHT);
+    } else if (angleDifference < -PLAYER_TILT_ANGLE_THRESHOLD) {
+      tilt(PLAYER_ANIM.LEFT);
+    } else if (currentSpeed >= PLAYER_TILT_SPEED_THRESHOLD) {
+      tilt(PLAYER_ANIM.FORWARD);
+    } else {
+      stopTilt();
+    }
+  };
+
+  const animateTiltByButton = () => {
+    const { x, y } = state.movement;
+
+    switch (x) {
       case 0:
-        //  setAnimation(PLAYER_ANIM.IDLE);
-        animations[state.lastAnim].animationSpeed = -0.3;
-        animations[state.lastAnim].play();
-        animations[state.lastAnim].onComplete = () =>
-          setAnimation(PLAYER_ANIM.IDLE);
+        stopTilt();
         break;
       case 1:
-        setAnimation(PLAYER_ANIM.RIGHT);
-        animations[state.lastAnim].animationSpeed = 0.3;
-        animations[state.lastAnim].onComplete = null;
+        tilt(PLAYER_ANIM.RIGHT);
         break;
       case -1:
-        setAnimation(PLAYER_ANIM.LEFT);
-        animations[state.lastAnim].animationSpeed = 0.3;
-        animations[state.lastAnim].onComplete = null;
+        tilt(PLAYER_ANIM.LEFT);
         break;
     }
 
-    switch (val.y) {
-      case 0:
-        //  setAnimation(PLAYER_ANIM.IDLE);
-        // animations[state.lastAnim].animationSpeed = -0.3;
-        // animations[state.lastAnim].play();
-        // animations[state.lastAnim].onComplete = () =>
-        //   setAnimation(PLAYER_ANIM.IDLE);
-        break;
+    switch (y) {
       case 1:
-        setAnimation(PLAYER_ANIM.BACK);
-        animations[state.lastAnim].animationSpeed = 0.3;
-        animations[state.lastAnim].onComplete = null;
+        tilt(PLAYER_ANIM.BACK);
         break;
       case -1:
-        setAnimation(PLAYER_ANIM.FORWARD);
-        animations[state.lastAnim].animationSpeed = 0.3;
-        animations[state.lastAnim].onComplete = null;
+        tilt(PLAYER_ANIM.FORWARD);
         break;
+    }
+  };
+
+  const animateTilt = () => {
+    if (state.isTakingDamage) return;
+
+    if (PLAYER_TILT_BY_ANGLE) {
+      animateTiltByAngle();
+    } else {
+      animateTiltByButton();
     }
   };
 
@@ -353,46 +389,14 @@ export const playerCharacter = (
   //
   const setMovement = (val: PlayerMovement): void => {
     state.movement = val;
-    animateTiltOnMovement(val);
+    animateTilt();
   };
 
   const updateSpeed = (delta: number): void => {
-    // Apply a constant drag to the movement
-    const applyDeceleration = (speed: number): number => {
-      if (speed < 0) {
-        return Math.min(speed + state.dragDeceleration * delta, 0);
-      } else if (speed > 0) {
-        return Math.max(speed - state.dragDeceleration * delta, 0);
-      } else {
-        return speed;
-      }
-    };
-
-    // Accelerate if movement is requested
-    const applyAcceleration = (speed: number, move: number): number =>
-      speed + move * state.movementAcceleration * delta;
-
-    // Prevent the speed from exceeding the max
-    const clampSpeed = (speed: number): number => {
-      if (speed < 0 && speed < -state.maxMovementSpeed)
-        return -state.maxMovementSpeed;
-      if (speed > 0 && speed > state.maxMovementSpeed)
-        return state.maxMovementSpeed;
-
-      return speed;
-    };
-
-    const calculateNewSpeed = (speed: number, move: number): number => {
-      const withDeceleration = applyDeceleration(speed);
-      const withAcceleration = applyAcceleration(withDeceleration, move);
-
-      return clampSpeed(withAcceleration);
-    };
-
-    const newSpeed = {
-      x: calculateNewSpeed(state.movementSpeed.x, state.movement.x),
-      y: calculateNewSpeed(state.movementSpeed.y, state.movement.y),
-    };
+    const moveDir = getUnitVector(state.movement);
+    const acceleration = vScale(moveDir, state.movementAcceleration * delta);
+    const drag = vScale(state.movementSpeed, -state.dragDeceleration * delta);
+    let newSpeed = vAdd(state.movementSpeed, acceleration, drag);
 
     state.movementSpeed = newSpeed;
   };
@@ -483,70 +487,44 @@ export const playerCharacter = (
   //
   const getState = () => state;
 
-  //
+  const updateRotation = (delta: number): void => {
+    // Attempt to rotate the sub toward the direction of its movement
+
+    const target = getAngle(state.movementSpeed, state.pos.rot);
+
+    // Put a damper on the amount that we rotate by so we don't snap immediately to the target angle
+    let rotationChange =
+      getShortestAngleDifference(state.pos.rot, target) * PLAYER_ROT_DAMPEN;
+    rotationChange = clamp(rotationChange, -maxRotationDelta, maxRotationDelta);
+
+    let rotation = state.pos.rot + rotationChange * delta;
+
+    // Clip the rotation to the bounds of -PI to PI
+    // Otherwise we get a weird spinning effect
+    const halfRotation = Math.PI;
+    const fullRotation = Math.PI * 2;
+    if (rotation < -halfRotation) {
+      rotation += fullRotation;
+    } else if (rotation >= halfRotation) {
+      rotation -= fullRotation;
+    }
+
+    state.pos.rot = rotation;
+  };
+
   const updatePosition = (): void => {
-    const getTargetRotation = () => {
-      var { x, y } = state.movementSpeed;
-      const rad = Math.PI / 2;
-      if (y === 0) {
-        return x < 0 ? -rad : x > 0 ? rad : state.pos.rot;
-      }
-      const angle = Math.atan(x / -y);
-      return y > 0 ? angle + Math.PI : angle;
-    };
-
-    // this is some real 3am code here...
-    const getRotation = () => {
-      // Check whether it would be a shorter distance to rotate left or right, and
-      // use the shortest rotation amount
-      const target = getTargetRotation();
-      const deltaLeft = target - state.pos.rot;
-      const deltaRight = target - (state.pos.rot + Math.PI * 2);
-
-      var delta: number;
-
-      if (Math.abs(deltaLeft) < Math.abs(deltaRight)) {
-        delta = deltaLeft;
-      } else {
-        delta = deltaRight;
-      }
-      // Put a damper on the amount that we rotate by so we don't snap immediately to the target angle
-      delta *= 0.03;
-      if (delta < 0 && delta < -maxRotationDelta) {
-        delta = -maxRotationDelta;
-      } else if (delta > 0 && delta > maxRotationDelta) {
-        delta = maxRotationDelta;
-      }
-
-      return state.pos.rot + delta;
-    };
-
+    const newCoords = vAdd(state.pos, state.movementSpeed);
     const newPos = {
       ...state.pos,
-      x: state.pos.x + state.movementSpeed.x,
-      y: state.pos.y + state.movementSpeed.y,
+      ...newCoords,
     };
-
-    if (rotateOnMove) {
-      let newRotation = getRotation();
-      const halfRotation = Math.PI;
-      const fullRotation = Math.PI * 2;
-      if (newRotation < -halfRotation) {
-        newRotation += fullRotation;
-      } else if (newRotation >= halfRotation) {
-        newRotation -= fullRotation;
-      }
-
-      newPos.rot = newRotation;
-    }
 
     if (checkInBounds(newPos)) {
       state.pos = newPos;
     } else {
       // POW
       takeDamage(PLAYER_COLLISION_VALUE);
-      state.movementSpeed.x *= PLAYER_COLLISION_DRAG;
-      state.movementSpeed.y *= PLAYER_COLLISION_DRAG;
+      state.movementSpeed = vScale(state.movementSpeed, PLAYER_COLLISION_DRAG);
     }
   };
 
@@ -570,6 +548,9 @@ export const playerCharacter = (
     // Update called by main
     if (state.status === OBJECT_STATUS.ACTIVE) {
       updateSpeed(delta);
+      if (rotateOnMove) {
+        updateRotation(delta);
+      }
       updatePosition();
       updateContainer();
       randomFlicker();
