@@ -32,7 +32,8 @@ export const PLAYER_MAX_SPEED = 5; // not a constant, move
 export const PLAYER_ACCEL = 0.025; // rate of acceleration when explicitly moving
 export const PLAYER_DECEL = 0.009; // constant rate of deceleration, aka drag
 export const PLAYER_INIT_ROT = 0;
-export const PLAYER_MAX_ROT_CHANGE = Math.PI / 80;
+export const PLAYER_ROT_DAMPEN = 0.09; // scales the rotation to ease into small changes
+export const PLAYER_MAX_ROT_CHANGE = Math.PI / 80; // the max change in rotation per update
 export const PLAYER_ROTATE_ON_MOVE = true;
 
 // resources
