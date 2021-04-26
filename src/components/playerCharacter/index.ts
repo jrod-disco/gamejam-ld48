@@ -25,10 +25,14 @@ import {
   Resource,
   Point2D,
   PLAYER_ROT_DAMPEN,
+  PLAYER_TILT_ANGLE_THRESHOLD,
+  PLAYER_TILT_SPEED_THRESHOLD,
+  PLAYER_TILT_BY_ANGLE,
 } from '@src/constants';
 import {
   compareMagnitude,
   getAngle,
+  getMagnitude,
   getShortestAngleDifference,
   getUnitVector,
   vAdd,
@@ -202,47 +206,72 @@ export const playerCharacter = (
     shouldAutoPlay && thisAnim.gotoAndPlay(0);
   };
 
-  const animateTiltOnMovement = (val: PlayerMovement) => {
-    if (state.isTakingDamage) return;
+  const tilt = (direction: PLAYER_ANIM) => {
+    setAnimation(direction);
+    animations[state.lastAnim].animationSpeed = 0.3;
+    animations[state.lastAnim].onComplete = null;
+  };
 
-    switch (val.x) {
+  const stopTilt = () => {
+    animations[state.lastAnim].animationSpeed = -0.3;
+    animations[state.lastAnim].play();
+    animations[state.lastAnim].onComplete = () =>
+      setAnimation(PLAYER_ANIM.IDLE);
+  };
+
+  const animateTiltByAngle = () => {
+    const currentSpeed = getMagnitude(state.movementSpeed);
+    const currentAngle = state.pos.rot;
+    const movementAngle = getAngle(state.movementSpeed);
+
+    const angleDifference = getShortestAngleDifference(
+      currentAngle,
+      movementAngle
+    );
+
+    if (angleDifference > PLAYER_TILT_ANGLE_THRESHOLD) {
+      tilt(PLAYER_ANIM.RIGHT);
+    } else if (angleDifference < -PLAYER_TILT_ANGLE_THRESHOLD) {
+      tilt(PLAYER_ANIM.LEFT);
+    } else if (currentSpeed >= PLAYER_TILT_SPEED_THRESHOLD) {
+      tilt(PLAYER_ANIM.FORWARD);
+    } else {
+      stopTilt();
+    }
+  };
+
+  const animateTiltByButton = () => {
+    const { x, y } = state.movement;
+
+    switch (x) {
       case 0:
-        //  setAnimation(PLAYER_ANIM.IDLE);
-        animations[state.lastAnim].animationSpeed = -0.3;
-        animations[state.lastAnim].play();
-        animations[state.lastAnim].onComplete = () =>
-          setAnimation(PLAYER_ANIM.IDLE);
+        stopTilt();
         break;
       case 1:
-        setAnimation(PLAYER_ANIM.RIGHT);
-        animations[state.lastAnim].animationSpeed = 0.3;
-        animations[state.lastAnim].onComplete = null;
+        tilt(PLAYER_ANIM.RIGHT);
         break;
       case -1:
-        setAnimation(PLAYER_ANIM.LEFT);
-        animations[state.lastAnim].animationSpeed = 0.3;
-        animations[state.lastAnim].onComplete = null;
+        tilt(PLAYER_ANIM.LEFT);
         break;
     }
 
-    switch (val.y) {
-      case 0:
-        //  setAnimation(PLAYER_ANIM.IDLE);
-        // animations[state.lastAnim].animationSpeed = -0.3;
-        // animations[state.lastAnim].play();
-        // animations[state.lastAnim].onComplete = () =>
-        //   setAnimation(PLAYER_ANIM.IDLE);
-        break;
+    switch (y) {
       case 1:
-        setAnimation(PLAYER_ANIM.BACK);
-        animations[state.lastAnim].animationSpeed = 0.3;
-        animations[state.lastAnim].onComplete = null;
+        tilt(PLAYER_ANIM.BACK);
         break;
       case -1:
-        setAnimation(PLAYER_ANIM.FORWARD);
-        animations[state.lastAnim].animationSpeed = 0.3;
-        animations[state.lastAnim].onComplete = null;
+        tilt(PLAYER_ANIM.FORWARD);
         break;
+    }
+  };
+
+  const animateTilt = () => {
+    if (state.isTakingDamage) return;
+
+    if (PLAYER_TILT_BY_ANGLE) {
+      animateTiltByAngle();
+    } else {
+      animateTiltByButton();
     }
   };
 
@@ -357,7 +386,7 @@ export const playerCharacter = (
   //
   const setMovement = (val: PlayerMovement): void => {
     state.movement = val;
-    animateTiltOnMovement(val);
+    animateTilt();
   };
 
   const updateSpeed = (delta: number): void => {

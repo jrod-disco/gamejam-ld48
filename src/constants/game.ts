@@ -37,6 +37,11 @@ export const PLAYER_ROT_DAMPEN = 0.09; // scales the rotation to ease into small
 export const PLAYER_MAX_ROT_CHANGE = Math.PI / 80; // the max change in rotation per update
 export const PLAYER_ROTATE_ON_MOVE = true;
 
+// Player tilt
+export const PLAYER_TILT_BY_ANGLE = true;
+export const PLAYER_TILT_ANGLE_THRESHOLD = 0.2;
+export const PLAYER_TILT_SPEED_THRESHOLD = 0.8;
+
 // resources
 export const PLAYER_MAX_OXYGEN = 100; // full tank, init value
 export const PLAYER_OXYGEN_CONSUMPTION_RATE = 0.6; // lbs per second
