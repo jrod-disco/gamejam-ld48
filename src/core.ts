@@ -171,6 +171,9 @@ const bootstrapApp = (props: {
   pixiSound.add('the_end', './assets/audio/sfx_the_end_2.mp3');
   pixiSound.add('crash', './assets/audio/sfx_crash_2.mp3');
   pixiSound.add('alarm', './assets/audio/sfx_alarm1.mp3');
+  pixiSound.add('motor', './assets/audio/sfx_motor_1.mp3');
+  pixiSound.add('wonder', './assets/audio/sfx_wonder_1.mp3');
+  pixiSound.add('foam', './assets/audio/sfx_foam_1.mp3');
 
   const setSounds = (soundsLoaded: Sounds): void => {
     console.log('core.setSounds');
@@ -328,27 +331,27 @@ const bootstrapApp = (props: {
       isAnimated: true,
       onComplete: () => {
         showPersonalBest();
-        audioLayer.stop;
+        audioLayer.stopAll();
         setTimeout(onGameOver, GAME_OVER_SCREEN_DELAY);
-      },
-    });
 
-    pixiSound.play('crash', {
-      volume: 1,
-    });
-    pixiSound.play('the_end', {
-      volume: 1,
+        pixiSound.play('player_damage1', {
+          volume: 1,
+        });
+        pixiSound.play('crash', {
+          volume: 1,
+        });
+        pixiSound.play('the_end', {
+          volume: 1,
+        });
+      },
     });
   };
 
   // Start Game
   const onStartGame = (): void => {
     console.log('core: onStartGame');
+    audioLayer.music.stopAll();
     removeOnKeyDown();
-
-    pixiSound.play('good', {
-      volume: 1 * SFX_VOL_MULT,
-    });
 
     bestScore.setVisibility(false);
     SCREENS.controller.setCurrentScreen({
@@ -360,7 +363,12 @@ const bootstrapApp = (props: {
         gameLogic.onStartGame();
       },
     });
-    audioLayer.music.loopRandomTrack();
+
+    setTimeout(audioLayer.music.loopRandomTrack, 2000);
+    // audioLayer.music.loopRandomTrack();
+    pixiSound.play('wonder', {
+      volume: 1 * SFX_VOL_MULT,
+    });
   };
 
   // ------------------------------------

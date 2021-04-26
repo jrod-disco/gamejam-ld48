@@ -9,8 +9,8 @@ export const BEGIN_LANDING_DEPTH = 4500; // feet
 export const INIT_PRESSURE = 14; // sea level
 export const MAX_PRESSURE = 1000; // lbs/sq in
 
-export const LANDING_PAUSE_DURATION = 3000; // ms
-export const GAME_OVER_SCREEN_DELAY = 3000; // ms
+export const LANDING_PAUSE_DURATION = 4000; // ms
+export const GAME_OVER_SCREEN_DELAY = 6000; // ms
 
 // - Depth effects
 export const MAX_LAYER_SCALE = 2.5; // % scale of layer at MAX_LAYER_DEPTH
@@ -33,9 +33,9 @@ export const WORLD_HEIGHT = 100;
 
 // Player movement
 export const PLAYER_SPRITE_MARGIN = 40; // approx size of player
-export const PLAYER_ACCEL = 0.04; // rate of acceleration when explicitly moving
+export const PLAYER_ACCEL = 0.038; // rate of acceleration when explicitly moving
 export const PLAYER_DECEL = 0.009; // constant rate of deceleration, aka drag
-export const PLAYER_BOOST_SCALE = 3; // when boosting, multiplies acceleration by this amount
+export const PLAYER_BOOST_SCALE = 2.5; // when boosting, multiplies acceleration by this amount
 export const PLAYER_INIT_ROT = 0;
 export const PLAYER_ROT_DAMPEN = 0.09; // scales the rotation to ease into small changes
 export const PLAYER_MAX_ROT_CHANGE = 0.08; // the max change in rotation per update
@@ -73,6 +73,12 @@ export const PICKUP_SPAWN_RATE = 3650;
 export const PICKUP_OXYGEN_TANK_QUANTITY = 4; // lbs of oxygen
 export const PICKUP_FUEL_TANK_QUANTITY = 3; // lbs of fuel
 
+// Objects
+export enum OBJECT_STATUS {
+  ACTIVE,
+  INACTIVE,
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // SIMPLE GAME - deprecate or use
 
@@ -80,12 +86,5 @@ export const PICKUP_FUEL_TANK_QUANTITY = 3; // lbs of fuel
 export const POINTS_GOLD = 5;
 export const GOLD_SPAWN_RATE = 750;
 export const GOLD_MAX_SPAWNS = 1000;
-
 export const TIME_LIMIT_SECONDS = 10;
 export const START_LEVEL = 1;
-
-// Objects
-export enum OBJECT_STATUS {
-  ACTIVE,
-  INACTIVE,
-}
