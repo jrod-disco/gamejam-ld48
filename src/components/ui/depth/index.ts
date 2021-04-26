@@ -4,7 +4,7 @@ import { zeroPad } from '@src/util/zeroPad';
 import {
   THEME,
   MAX_DEPTH,
-  NEAR_MAX_DEPTH,
+  BEGIN_LANDING_DEPTH,
   PLAYER_DESCENT_RATE,
   INIT_PRESSURE,
   INIT_DEPTH,
@@ -124,7 +124,7 @@ export const depthMeter = (props: Props): DepthMeter => {
       pause();
       maxDepthCallback();
     }
-    else if (state.currentDepth >= NEAR_MAX_DEPTH) {
+    else if (state.currentDepth >= BEGIN_LANDING_DEPTH) {
       nearDepthCallback();
     }
   };

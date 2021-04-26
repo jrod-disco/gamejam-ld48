@@ -26,6 +26,8 @@ export interface Cave {
 
 interface CaveProps {
   depth: number;
+  texture: PIXI.Texture;
+  tintable: boolean;
 }
 
 const WATER_BOT_COLOR = Color('rgb(0, 0, 0)');
@@ -39,15 +41,14 @@ const WATER_TOP_COLOR = Color('rgb(34, 128, 220)');
  * @returns Interface object containing methods that can be called on this module
  */
 export const cave = (props: CaveProps): Cave => {
-  const imgNum = Math.round(Math.random() * 2) + 1;
-  const caveTexture = PIXI.Texture.from(`./assets/cave/cave${imgNum}.png`);
-  const sprite = new PIXI.Sprite(caveTexture);
+  const sprite = new PIXI.Sprite(props.texture);
 
   let state = {
     scale: LAYER_START_SCALE + (props.depth * LAYER_SPACING),
     depth: props.depth,
     landing: false,
     maxScale: MAX_LAYER_SCALE,
+    tintable: props.tintable,
   };
   const initialState = { ...state };
 
@@ -66,7 +67,9 @@ export const cave = (props: CaveProps): Cave => {
     }
     sprite.anchor.set(0.5);
     sprite.pivot.set(0.5);
-    sprite.tint = getDepthColor();
+    if (state.tintable) {
+      sprite.tint = getDepthColor();
+    }
     sprite.scale.set(state.scale);
     sprite.rotation = Math.random() * 360;
     positionUsingDepth(sprite, APP_WIDTH/2, APP_HEIGHT/2, state.depth);
@@ -85,7 +88,7 @@ export const cave = (props: CaveProps): Cave => {
       state.depth = (state.scale - LAYER_START_SCALE) / LAYER_SPACING;
       sprite.rotation += ROT_INCREMENT;
     }
-    if (!state.landing) {
+    if (!state.landing && state.tintable) {
       sprite.tint = getDepthColor();
     }
     positionUsingDepth(sprite, x, y, state.depth);

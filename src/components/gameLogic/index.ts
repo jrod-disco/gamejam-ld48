@@ -10,6 +10,7 @@ import {
   MAX_LAYER_DEPTH,
   PICKUP_HIT_LO,
   PICKUP_HIT_HI,
+  LANDING_PAUSE_DURATION,
 } from '@src/constants';
 import * as COMP from '..';
 import { PlayerCharacter, PlayerMovement } from '../playerCharacter';
@@ -86,6 +87,7 @@ export const gameLogic = (props: Props): GameLogic => {
 
   let pickupSpawnerRef: PickupSpawner = null;
   const caves = [];
+  const caveContainer = new PIXI.Container();
 
   let mainOnGameOver: () => void = null;
   let mainOnGameLose: () => void = null;
@@ -143,6 +145,13 @@ export const gameLogic = (props: Props): GameLogic => {
       nearDepthCallback: () => {
         pickupSpawnerRef.land();
         caves.forEach((cave: Cave) => cave.land());
+        setTimeout((): void => {
+          // delay placing landing graphic to avoid masking from cave holes
+          const texture = PIXI.Texture.from(`./assets/cave/landing.png`);
+          const cave = COMP.cave({ depth: 0, texture, tintable:false });
+          caves.unshift(cave);
+          caveContainer.addChildAt(cave.sprite, 0);
+        }, LANDING_PAUSE_DURATION);
       },
     });
     uiContainerRef.addChild(depthMeter.container);
@@ -322,11 +331,12 @@ export const gameLogic = (props: Props): GameLogic => {
   /////////////////////////////////////////////////////////////////////////////
   // CAVE
 
-  const caveContainer = new PIXI.Container();
   gameContainer.addChild(caveContainer); // place below submarine
 
   for (let depth = 0; depth < MAX_LAYER_DEPTH; depth++) {
-    const cave = COMP.cave({ depth });
+    const imgNum = Math.round(Math.random() * 2) + 1;
+    const texture = PIXI.Texture.from(`./assets/cave/cave${imgNum}.png`);
+    const cave = COMP.cave({ depth, texture, tintable: true });
     caves.push(cave);
     caveContainer.addChild(cave.sprite);
   }

@@ -19,6 +19,8 @@ import {
   Z_MC_BASE,
   Z_MC_UI,
   SFX_VOL_MULT,
+  LANDING_PAUSE_DURATION,
+  GAME_OVER_SCREEN_DELAY,
 } from './constants';
 import './index.scss';
 
@@ -278,15 +280,17 @@ const bootstrapApp = (props: {
   const onGameOver = (): void => {
     console.log('core: onGameOver');
 
-    SCREENS.controller.setCurrentScreen({
-      name: SCREENS.ScreenName.MAIN,
-      isAnimated: true,
-      onComplete: () => {
-        showPersonalBest();
-        addOnKeyDown();
-        audioLayer.music.menuTheme(true);
-      },
-    });
+    setTimeout((): void => {
+      SCREENS.controller.setCurrentScreen({
+        name: SCREENS.ScreenName.MAIN,
+        isAnimated: true,
+        onComplete: () => {
+          showPersonalBest();
+          addOnKeyDown();
+          audioLayer.music.menuTheme(true);
+        },
+      });
+    }, LANDING_PAUSE_DURATION);
   };
 
   const onGameLose = (): void => {
@@ -299,7 +303,7 @@ const bootstrapApp = (props: {
         showPersonalBest();
         // addOnKeyDown();
         audioLayer.stop;
-        setTimeout(onGameOver, 5000);
+        setTimeout(onGameOver, GAME_OVER_SCREEN_DELAY);
       },
     });
 

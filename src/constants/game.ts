@@ -5,9 +5,12 @@ export const IS_SCORE_INCREMENTY = false;
 // - for faux ocean floor:
 export const INIT_DEPTH = 0;
 export const MAX_DEPTH = 5000; // feet
-export const NEAR_MAX_DEPTH = 4500; // feet
+export const BEGIN_LANDING_DEPTH = 4500; // feet
 export const INIT_PRESSURE = 14; // sea level
 export const MAX_PRESSURE = 1000; // lbs/sq in
+
+export const LANDING_PAUSE_DURATION = 3000; // ms
+export const GAME_OVER_SCREEN_DELAY = 5000; // ms
 
 // - Depth effects
 export const MAX_LAYER_SCALE = 2.5; // % scale of layer at MAX_LAYER_DEPTH
