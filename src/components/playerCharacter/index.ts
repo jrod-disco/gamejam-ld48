@@ -33,6 +33,7 @@ import {
   PLAYER_TILT_SPEED_THRESHOLD,
   PLAYER_TILT_BY_ANGLE,
   PLAYER_BOOST_SCALE,
+  PLAYER_BOOST_POWER_CONSUMPTION_RATE,
 } from '@src/constants';
 import {
   compareMagnitude,
@@ -424,7 +425,11 @@ export const playerCharacter = (
   // POWER
   // - TODO: increase power consumption by acceleration
   const consumePower = (delta: number): void => {
-    state.power -= PLAYER_POWER_CONSUMPTION_RATE;
+    const rate = state.movement.boost
+      ? PLAYER_BOOST_POWER_CONSUMPTION_RATE
+      : PLAYER_POWER_CONSUMPTION_RATE;
+
+    state.power -= rate;
 
     if (state.power < 0) {
       state.power = 0;

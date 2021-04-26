@@ -158,7 +158,7 @@ export const gameLogic = (props: Props): GameLogic => {
 
     // Gauges - oxygen, pressure etc
     gauges = COMP.UI.gauges({
-      pos: { x: 25, y: APP_HEIGHT - 150 },
+      pos: { x: 25, y: APP_HEIGHT - 110 },
     });
     uiContainerRef.addChild(gauges.container);
 

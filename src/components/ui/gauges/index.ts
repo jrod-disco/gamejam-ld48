@@ -18,6 +18,7 @@ interface Props {
 
 type GaugesState = {
   isOn: boolean;
+  isBoosting: boolean;
   oxygen: number;
   power: number;
   integrity: number;
@@ -29,9 +30,14 @@ const horizontalGauge = ({
   width = 150,
   height = 8,
   color = THEME.TXT_HUD_HEX,
+  emphasisColor = 0xffffff,
   x = 0,
   y = 0,
 }) => {
+  const BG_ALPHA = 0.4;
+  const FG_ALPHA = 0.8;
+  const OVERALL_ALPHA = 0.8;
+
   const gauge = new PIXI.Container();
   gauge.position.set(x, y);
 
@@ -54,17 +60,17 @@ const horizontalGauge = ({
   bgBar.beginFill(THEME.TXT_TITLES_HEX);
   bgBar.drawRect(0, 0, width, height);
   bgBar.endFill();
-  bgBar.alpha = 0.4;
+  bgBar.alpha = BG_ALPHA;
   bgBar.position.y += barOffsetY;
 
   const fgBar = new PIXI.Graphics();
   fgBar.beginFill(color);
   fgBar.drawRect(0, 0, width, height);
   fgBar.endFill();
-  fgBar.alpha = 0.8;
+  fgBar.alpha = FG_ALPHA;
   fgBar.position.y += barOffsetY;
 
-  gauge.alpha = 0.8;
+  gauge.alpha = OVERALL_ALPHA;
   gauge.addChild(bgBar, fgBar);
 
   /**
@@ -74,8 +80,13 @@ const horizontalGauge = ({
     fgBar.width = width * newValue;
   };
 
+  const setEmphasis = (emphasized: boolean): void => {
+    fgBar.alpha = emphasized ? 1 : FG_ALPHA;
+  };
+
   return {
     container: gauge,
+    setEmphasis,
     setValue,
   };
 };
@@ -99,6 +110,7 @@ export const gauges = (props: Props): Gauges => {
 
   let state: GaugesState = {
     isOn: true,
+    isBoosting: false,
     oxygen: 0,
     power: 0,
     integrity: 0,
@@ -115,14 +127,15 @@ export const gauges = (props: Props): Gauges => {
 
   const power = horizontalGauge({
     label: 'Power',
-    color: 0x35d694,
-    y: 30
+    color: 0xe81313,
+    emphasisColor: 0xf24f4f,
+    y: 30,
   });
   container.addChild(power.container);
 
   const health = horizontalGauge({
     label: 'Health',
-    color: 0xe81313,
+    color: 0xfbf236,
     y: 60,
   });
   container.addChild(health.container);
@@ -130,12 +143,14 @@ export const gauges = (props: Props): Gauges => {
   const updateState = (playerState: PlayerState) => {
     state.oxygen = playerState.oxygen;
     state.power = playerState.power;
+    state.isBoosting = playerState.movement.boost;
     state.integrity = playerState.integrity;
   };
 
   const updateCluster = (): void => {
     oxygen.setValue(state.oxygen / 100);
     power.setValue(state.power / 100);
+    power.setEmphasis(state.isBoosting);
     health.setValue(state.integrity / 100);
   };
 
