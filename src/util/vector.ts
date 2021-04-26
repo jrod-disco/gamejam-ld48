@@ -75,10 +75,16 @@ export function withMagnitude(v: Vector, m: number): Vector {
 /**
  * Return the unit vector (a vector with the same angle but
  * a magnitude of 1) for a given vector input.
+ *
+ * The only exception is: if the input is a zero vector, this
+ * returns the same zero vector.
  */
 export function getUnitVector(v: Vector): Vector {
-  const magnitude = getMagnitude(v);
   const { x, y } = v;
+  if (x === 0 && y === 0) {
+    return v;
+  }
+  const magnitude = getMagnitude(v);
 
   return {
     x: x / magnitude,

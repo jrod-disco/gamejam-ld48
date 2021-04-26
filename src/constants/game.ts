@@ -30,7 +30,6 @@ export const WORLD_HEIGHT = 100;
 
 // Player movement
 export const PLAYER_SPRITE_MARGIN = 40; // approx size of player
-export const PLAYER_MAX_SPEED = 5; // not a constant, move
 export const PLAYER_ACCEL = 0.025; // rate of acceleration when explicitly moving
 export const PLAYER_DECEL = 0.009; // constant rate of deceleration, aka drag
 export const PLAYER_INIT_ROT = 0;

@@ -10,7 +10,6 @@ import {
   APP_HEIGHT,
   APP_WIDTH,
   OBJECT_STATUS,
-  PLAYER_MAX_SPEED,
   PLAYER_INIT_ROT,
   PLAYER_OXYGEN_CONSUMPTION_RATE,
   PLAYER_ACCEL,
@@ -28,10 +27,13 @@ import {
   PLAYER_ROT_DAMPEN,
 } from '@src/constants';
 import {
+  compareMagnitude,
   getAngle,
   getShortestAngleDifference,
+  getUnitVector,
   vAdd,
   vScale,
+  withMagnitude,
 } from '@src/util/vector';
 import { clamp } from '@src/util/clamp';
 
@@ -80,7 +82,6 @@ export type PlayerState = {
   pos: PlayerPosition;
   status: OBJECT_STATUS;
   movement: PlayerMovement;
-  maxMovementSpeed: number;
   movementSpeed: { x: number; y: number };
   movementAcceleration: number;
   dragDeceleration: number;
@@ -125,7 +126,6 @@ export const playerCharacter = (
     pos: { ...pos },
     status: OBJECT_STATUS.ACTIVE,
     movement: { x: 0, y: 0 },
-    maxMovementSpeed: PLAYER_MAX_SPEED,
     movementSpeed: { x: 0, y: 0 },
     movementAcceleration: PLAYER_ACCEL,
     dragDeceleration: PLAYER_DECEL,
@@ -361,36 +361,10 @@ export const playerCharacter = (
   };
 
   const updateSpeed = (delta: number): void => {
-    // Apply a constant drag to the movement
-    const applyDeceleration = (speed: number): number => {
-      if (speed < 0) {
-        return Math.min(speed + state.dragDeceleration * delta, 0);
-      } else if (speed > 0) {
-        return Math.max(speed - state.dragDeceleration * delta, 0);
-      } else {
-        return speed;
-      }
-    };
-
-    // Accelerate if movement is requested
-    const applyAcceleration = (speed: number, move: number): number =>
-      speed + move * state.movementAcceleration * delta;
-
-    const calculateNewSpeed = (speed: number, move: number): number => {
-      const withDeceleration = applyDeceleration(speed);
-      const withAcceleration = applyAcceleration(withDeceleration, move);
-
-      return clamp(
-        withAcceleration,
-        -state.maxMovementSpeed,
-        state.maxMovementSpeed
-      );
-    };
-
-    const newSpeed = {
-      x: calculateNewSpeed(state.movementSpeed.x, state.movement.x),
-      y: calculateNewSpeed(state.movementSpeed.y, state.movement.y),
-    };
+    const moveDir = getUnitVector(state.movement);
+    const acceleration = vScale(moveDir, state.movementAcceleration * delta);
+    const drag = vScale(state.movementSpeed, -state.dragDeceleration * delta);
+    let newSpeed = vAdd(state.movementSpeed, acceleration, drag);
 
     state.movementSpeed = newSpeed;
   };
