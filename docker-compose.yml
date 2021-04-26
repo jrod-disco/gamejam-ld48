@@ -1,0 +1,23 @@
+version: '3.4'
+
+services:
+  dcollage:
+    image: dcollage
+
+    # These two are necessary for change-watching to work
+    stdin_open: true
+    tty: true
+    
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: development
+    volumes:
+      - "./src:/game/src"
+      # - "nodemodules:/game/node_modules"
+    ports:
+      - 10001:10001
+
+volumes:
+  nodemodules: {}

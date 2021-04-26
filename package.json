@@ -52,6 +52,7 @@
   },
   "scripts": {
     "dev": "rollup -c -w --environment BUILD:dev",
+    "dev:docker": "docker-compose up --build",
     "clean": "rimraf dist && rimraf dist-nwjs",
     "prod": "rimraf dist && rollup -c --environment BUILD:clean",
     "build": "rimraf dist && rollup -c --environment BUILD:prod",
