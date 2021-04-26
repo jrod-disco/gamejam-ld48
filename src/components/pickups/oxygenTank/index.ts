@@ -9,8 +9,10 @@ import {
   LAYER_SPACING,
   LAYER_START_SCALE,
   SPEED_ITEM,
-  ROT_INCREMENT,
   MAX_PICKUP_SCALE,
+  ROT_PICKUP_INCREMENT,
+  MAX_LAYER_SCALE,
+  MAX_LAYER_DEPTH,
 } from '@src/constants';
 
 export interface OxygenTank {
@@ -114,7 +116,9 @@ export const oxygenTank = (props: OxygenTankProps): OxygenTank => {
   reset();
 
   const isActive = (): boolean => state.active;
-  const setActive = (active: boolean): void => { state.active = active; }
+  const setActive = (active: boolean): void => { 
+    state.active = active;
+  }
 
   const getScale = (): number => state.scale;
 
@@ -125,9 +129,10 @@ export const oxygenTank = (props: OxygenTankProps): OxygenTank => {
       reset();
     } else {
       //sprite.tint = getDepthColor();
+      container.alpha = state.depth / MAX_LAYER_DEPTH;
       state.scale += SPEED_ITEM * delta;
       state.depth = (getScale() - LAYER_START_SCALE) / LAYER_SPACING;
-      container.rotation += ROT_INCREMENT;
+      container.rotation += ROT_PICKUP_INCREMENT;
       positionUsingDepth(container, state.endPosX, state.endPosY, state.depth);
       container.scale.set(getScale());
     }
