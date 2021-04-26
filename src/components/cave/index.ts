@@ -3,7 +3,7 @@ import { Extract } from '@pixi/extract';
 import { Renderer } from '@pixi/core';
 import Color from 'color';
 import { positionUsingDepth } from '@src/util/positionUsingDepth';
-import { 
+import {
   APP_HEIGHT,
   APP_WIDTH,
   MAX_LAYER_DEPTH,
@@ -45,7 +45,7 @@ export const cave = (props: CaveProps): Cave => {
   const sprite = new PIXI.Sprite(props.texture);
 
   let state = {
-    scale: LAYER_START_SCALE + (props.depth * LAYER_SPACING),
+    scale: LAYER_START_SCALE + props.depth * LAYER_SPACING,
     depth: props.depth,
     landing: false,
     maxScale: MAX_LAYER_SCALE,
@@ -77,7 +77,7 @@ export const cave = (props: CaveProps): Cave => {
     if (!state.isLandLayer) {
       sprite.tint = getDepthColor();
     }
-    positionUsingDepth(sprite, APP_WIDTH/2, APP_HEIGHT/2, state.depth);
+    positionUsingDepth(sprite, APP_WIDTH / 2, APP_HEIGHT / 2, state.depth);
   };
   reset();
 
@@ -97,13 +97,15 @@ export const cave = (props: CaveProps): Cave => {
       sprite.tint = getDepthColor();
     }
     positionUsingDepth(sprite, x, y, state.depth);
-    sprite.scale.set(state.scale);
+    state.isLandLayer
+      ? sprite.scale.set(state.scale * 0.35)
+      : sprite.scale.set(state.scale);
   };
 
   const startLanding = (): void => {
     state.landing = true;
     state.maxScale = MAX_LAYER_SCALE * 2;
-  }
+  };
 
   const isLandLayer = (): boolean => state.isLandLayer;
 
