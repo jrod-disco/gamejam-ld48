@@ -4,7 +4,6 @@ import * as PIXISOUND from 'pixi-sound';
 import {
   APP_WIDTH,
   APP_HEIGHT,
-  SFX_VOL_MULT,
   POINTS_GOLD,
   START_LEVEL,
   IS_SCORE_INCREMENTY,
@@ -107,7 +106,7 @@ export const gameLogic = (props: Props): GameLogic => {
   gameContainer.addChild(messageText);
 
   // Sound bits
-  const pixiSound = PIXISOUND.default;
+  // const pixiSound = PIXISOUND.default;
 
   // Reset called by play again and also on init
   const reset = (): void => {
@@ -135,7 +134,7 @@ export const gameLogic = (props: Props): GameLogic => {
     depthMeter = COMP.UI.depthMeter({
       pos: { x: 25, y: 75 },
       maxDepthCallback: () => {
-        console.log("MAX REACHED");
+        console.log('MAX REACHED');
         onMaxDepthReached();
       },
       nearDepthCallback: () => {
@@ -215,7 +214,7 @@ export const gameLogic = (props: Props): GameLogic => {
     depthMeter.start();
     playerCharacter.reset();
     caves.forEach((cave) => cave.reset());
-    
+
     //
 
     // Start listening for keyboard events
@@ -319,7 +318,7 @@ export const gameLogic = (props: Props): GameLogic => {
   // CAVE
 
   const caveContainer = new PIXI.Container();
-  gameContainer.addChild(caveContainer);  // place below submarine
+  gameContainer.addChild(caveContainer); // place below submarine
 
   for (let depth = 0; depth < MAX_LAYER_DEPTH; depth++) {
     const cave = COMP.cave({ depth });
@@ -423,11 +422,8 @@ export const gameLogic = (props: Props): GameLogic => {
           getResource: pickup.getResource,
         });
         scoreDisplay.addToScore(POINTS_GOLD);
+        pickup.handleCollision();
         pickup.reset();
-        // TODO: pass to pickup
-        pixiSound.play('coin', {
-          volume: 1 * SFX_VOL_MULT,
-        });
       }
     });
   };

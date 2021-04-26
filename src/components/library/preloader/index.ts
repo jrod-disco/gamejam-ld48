@@ -51,12 +51,15 @@ export const preloader = (props: PreloaderProps): Preloader => {
     // Sound bits
     const pixiSound = PIXISOUND.default;
     // Load these up on startup...
-    pixiSound.add('good', './assets/example/good.mp3');
+    pixiSound.add('good', './assets/audio/sfx_foam_1.mp3');
 
     preloader
-      .add('MainTheme', './assets/example/example.mp3')
+      .add('MenuTheme', './assets/audio/bg_menu_1.mp3')
+      .add('MainTheme', './assets/audio/bg_slow_ambient_1.mp3')
+      .add('Track1', './assets/audio/bg_upbeat_1.mp3')
+      .add('Track2', './assets/audio/bg_upbeat_2.mp3')
+      .add('Track3', './assets/audio/bg_slow_ambient_2.mp3')
       .add('game', './assets/deeperSprites.json');
-    //.add('Track2', './assets/sfx/OBTSOST_Track2-mono64.mp3')
 
     preloader.load(onAssetsLoadedCallback);
   };
