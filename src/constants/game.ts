@@ -45,7 +45,7 @@ export const PLAYER_TILT_SPEED_THRESHOLD = 1;
 
 // resources
 export const PLAYER_MAX_OXYGEN = 100; // full tank, init value
-export const PLAYER_OXYGEN_CONSUMPTION_RATE = 0.7; // lbs per second
+export const PLAYER_OXYGEN_CONSUMPTION_RATE = 0.67; // lbs per second
 export const PLAYER_DESCENT_RATE = 0.5; // feet per sec
 export const PLAYER_INTEGRITY = 2000; // starting integrity (not yet consuming)
 
@@ -62,7 +62,7 @@ export enum PICKUP_TYPES {
 // PICKUP Generator
 export const PICKUPS_MAX = 5;
 export const PICKUP_SPAWN_RATE = 4000;
-export const PICKUP_OXYGEN_TANK_QUANTITY = 3.5; // lbs of oxygen
+export const PICKUP_OXYGEN_TANK_QUANTITY = 3.6; // lbs of oxygen
 
 ///////////////////////////////////////////////////////////////////////////////
 // SIMPLE GAME - deprecate or use
