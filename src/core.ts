@@ -169,7 +169,7 @@ const bootstrapApp = (props: {
     sounds = soundsLoaded;
     // Add music as a component
     audioLayer = COMP.LIB.audio(sounds);
-    audioLayer.music.mainTheme(true);
+    audioLayer.music.menuTheme(true);
   };
 
   // Create empty BASE and UI containers and add them to the mainContainer
