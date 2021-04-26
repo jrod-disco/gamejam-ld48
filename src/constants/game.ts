@@ -32,7 +32,7 @@ export const WORLD_HEIGHT = 100;
 export const PLAYER_SPRITE_MARGIN = 40; // approx size of player
 export const PLAYER_ACCEL = 0.04; // rate of acceleration when explicitly moving
 export const PLAYER_DECEL = 0.009; // constant rate of deceleration, aka drag
-export const PLAYER_BOOST_SCALE = 4; // when boosting, multiplies acceleration by this amount
+export const PLAYER_BOOST_SCALE = 1; // when boosting, multiplies acceleration by this amount
 export const PLAYER_INIT_ROT = 0;
 export const PLAYER_ROT_DAMPEN = 0.09; // scales the rotation to ease into small changes
 export const PLAYER_MAX_ROT_CHANGE = 0.08; // the max change in rotation per update
@@ -41,7 +41,7 @@ export const PLAYER_ROTATE_ON_MOVE = true;
 // Player tilt
 export const PLAYER_TILT_BY_ANGLE = true;
 export const PLAYER_TILT_ANGLE_THRESHOLD = 0.2;
-export const PLAYER_TILT_SPEED_THRESHOLD = 0.8;
+export const PLAYER_TILT_SPEED_THRESHOLD = 1;
 
 // resources
 export const PLAYER_MAX_OXYGEN = 100; // full tank, init value
