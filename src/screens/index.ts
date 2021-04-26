@@ -17,17 +17,26 @@ export { gameLayout, GameLayout } from './game/layout';
 // LOSE
 export { loseLayout, LoseLayout } from './lose/layout';
 
+// CREDITS
+export { creditsLayout, CreditsLayout } from './credits/layout';
+
 // Types
 import { MainMenuLayout } from './main/layout';
 import { GameLayout } from './game/layout';
 import { LoseLayout } from './lose/layout';
+import { CreditsLayout } from './credits/layout';
 
-export type ScreenLayout = MainMenuLayout | GameLayout | LoseLayout;
+export type ScreenLayout =
+  | MainMenuLayout
+  | GameLayout
+  | LoseLayout
+  | CreditsLayout;
 
 export enum ScreenName {
   MAIN = 'mainMenu',
   GAME = 'gameScreen',
   LOSE = 'loseScreen',
+  CREDITS = 'creditsScreen',
 }
 
 // Screen Controller

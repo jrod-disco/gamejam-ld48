@@ -10,20 +10,10 @@ export type VisibilityConfig = {
   onCompleteCallback?: () => void;
 };
 
-export type EndGameProps = {
-  isWin: boolean;
-  displayTitle?: string;
-  displayBody?: string;
-  displayReason?: string;
-};
-export interface LoseLayout {
+export interface CreditsLayout {
   container: PIXI.Container;
   reset: () => void;
-  update: (delta: number) => void;
   setVisibility: (config: VisibilityConfig) => void;
-
-  // Game end context...
-  setEndGameContext: (props: EndGameProps) => void;
 }
 
 interface Props {
@@ -38,14 +28,14 @@ interface Props {
  *
  * @returns Interface object containing methods that can be called on this module
  */
-export const loseLayout = (props: Props): LoseLayout => {
+export const creditsLayout = (props: Props): CreditsLayout => {
   const pos = props.pos ?? { x: 0, y: 0 };
 
   const container = new PIXI.Container();
   container.x = pos.x;
   container.y = pos.y;
 
-  container.name = 'game lose layout';
+  container.name = 'game credits layout';
 
   const reset = (): void => {
     container.removeChildren();
@@ -56,40 +46,42 @@ export const loseLayout = (props: Props): LoseLayout => {
   container.addChild(backgroundSprite);
 
   // Text
-  const title = new PIXI.Text('.....', TEXT_STYLE.SCREEN_TITLE);
+
+  const subTitle = new PIXI.Text('LudumDare 48', TEXT_STYLE.SCREEN_BODY_ALT);
+  subTitle.anchor.set(0.5);
+  subTitle.position.x = APP_WIDTH / 2;
+  subTitle.position.y = APP_HEIGHT / 2 - 160;
+  container.addChild(subTitle);
+
+  const title = new PIXI.Text('CREDITS', TEXT_STYLE.SCREEN_TITLE);
   title.anchor.set(0.5);
   title.position.x = APP_WIDTH / 2;
-  title.position.y = APP_HEIGHT / 2 - 100;
+  title.position.y = APP_HEIGHT / 2 - 130;
   container.addChild(title);
 
-  const body = new PIXI.Text('....', TEXT_STYLE.SCREEN_BODY);
+  const body = new PIXI.Text(
+    `
+  CODE
+  Josh Bosworth
+  Ryan Korsak
+  James O'Reilly
+  Jose Rodriguez
+
+  ART
+  Jose Rodriguez
+
+  TUNES
+  Josh Bosworth
+
+  SFX
+  Josh Bosworth
+  `,
+    TEXT_STYLE.SCREEN_BODY
+  );
   body.anchor.set(0.5);
   body.position.x = APP_WIDTH / 2;
-  body.position.y = APP_HEIGHT / 2 - 50;
+  body.position.y = APP_HEIGHT / 2 + 40;
   container.addChild(body);
-
-  const reason = new PIXI.Text('...', TEXT_STYLE.SCREEN_BODY_ALT);
-  reason.anchor.set(0.5);
-  reason.position.x = APP_WIDTH / 2;
-  reason.position.y = APP_HEIGHT / 2 + 25;
-  container.addChild(reason);
-
-  const setEndGameContext = ({
-    isWin = false,
-    displayTitle = 'YOUR JOURNEY HAS ENDED',
-    displayBody = `Those poor deep sea researchers will never taste the delicious pizza. And you, my friend, are sleeping with the fishes.`,
-    displayReason = 'TBD',
-  }): void => {
-    title.text = displayTitle;
-    body.text = displayBody;
-    reason.text = displayReason;
-  };
-
-  // TODO:
-  // - bitmap texture of sadness
-
-  // Interactive Elements --------
-  // - make button
 
   // Screen Visibility Toggle ---------
   const setVisibility = ({
@@ -117,9 +109,5 @@ export const loseLayout = (props: Props): LoseLayout => {
     isAnimated: false,
   });
 
-  const update = (delta: number): void => {
-    // graphicsElement.x += 5 * delta; // throttle by delta
-  };
-
-  return { container, update, reset, setVisibility, setEndGameContext };
+  return { container, reset, setVisibility };
 };
