@@ -34,13 +34,8 @@ export interface AudioLayer {
 export const audio = (sounds: Sounds): AudioLayer => {
   // Main Music Track
   const audio = PIXISOUND.default;
-  audio.add('MainTheme', './assets/audio/title_mix.wav');
-  // audio.add('Track2', sounds.Track2);
 
-  const trackList = [
-    'MainTheme',
-    //'Track2',
-  ];
+  const trackList = ['MainTheme'];
   let currentTrack = 0;
 
   // Fetch and use isMuted state stored in local storage
