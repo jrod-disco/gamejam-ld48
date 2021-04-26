@@ -76,7 +76,7 @@ export const audio = (sounds: Sounds): AudioLayer => {
     });
   };
 
-  const mainVolume = (): number => 1.0 * MUSIC_VOL_MULT;
+  const mainVolume = (): number => 0.5 * MUSIC_VOL_MULT;
   const menuVolume = (): number => 0.5 * MUSIC_VOL_MULT;
 
   // Called when we've got all the things...
@@ -99,13 +99,15 @@ export const audio = (sounds: Sounds): AudioLayer => {
   const playNextTrack = (): void => {
     currentTrack++;
     if (currentTrack > trackList.length - 1) currentTrack = 0;
-    audio.play(trackList[currentTrack], {
-      loop: false,
-      volume: mainVolume(),
-      complete: () => {
-        playNextTrack();
-      },
-    });
+    if (trackList[currentTrack]) {
+      audio.play(trackList[currentTrack], {
+        loop: false,
+        volume: mainVolume(),
+        complete: () => {
+          playNextTrack();
+        },
+      });
+    }
   };
   const playTracklist = (): void => {
     stopAllThemes();
@@ -114,18 +116,21 @@ export const audio = (sounds: Sounds): AudioLayer => {
   };
 
   const playRandomTrack = (): void => {
-    currentTrack = Math.floor(Math.random() * trackList.length) - 1;
+    currentTrack = Math.floor(Math.random() * trackList.length);
     stopAllThemes();
     playNextTrack();
   };
 
   const loopRandomTrack = (): void => {
     stopAllThemes();
-    currentTrack = Math.floor(Math.random() * trackList.length) - 1;
-    audio.play(trackList[currentTrack], {
-      loop: true,
-      volume: mainVolume(),
-    });
+    currentTrack = Math.floor(Math.random() * trackList.length);
+
+    if (trackList[currentTrack]) {
+      audio.play(trackList[currentTrack], {
+        loop: true,
+        volume: mainVolume(),
+      });
+    }
   };
 
   const muteToggle = (shouldMute?: boolean, isTemporary = false): void => {

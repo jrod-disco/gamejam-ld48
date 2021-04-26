@@ -280,7 +280,7 @@ export const gameLogic = (props: Props): GameLogic => {
       arrowUp: 'ArrowUp',
     };
 
-    console.log(keysDown);
+    // console.log(keysDown);
 
     const playerMovement: PlayerMovement = { x: 0, y: 0 };
 
