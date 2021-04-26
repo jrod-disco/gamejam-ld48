@@ -165,7 +165,7 @@ const bootstrapApp = (props: {
   const pixiSound = PIXISOUND.default; // TODO: deal with persistent loading of soundeffects / also make a soundsprite already
   // Load these up on startup...
   pixiSound.add('pickup_1', './assets/audio/sfx_pickup_1.mp3');
-  pixiSound.add('pickup_2', './assets/audio/sfx_pickup_2.mp3');
+  pixiSound.add('pickup_2', './assets/audio/sfx_low_hum1.mp3');
   pixiSound.add('player_damage1', './assets/audio/sfx_gronk_1.mp3');
   pixiSound.add('player_damage2', './assets/audio/sfx_klunk_1.mp3');
   pixiSound.add('the_end', './assets/audio/sfx_the_end_2.mp3');

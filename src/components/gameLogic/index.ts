@@ -422,7 +422,7 @@ export const gameLogic = (props: Props): GameLogic => {
     const pY = playerCharacter.container.y;
     const pickups = pickupSpawnerRef.getPickups();
 
-    pickups.map((pickup: any) => {
+    pickups.map((pickup: any, i: number) => {
       const nX = pickup.container.x;
       const nY = pickup.container.y;
 
@@ -442,6 +442,7 @@ export const gameLogic = (props: Props): GameLogic => {
           getType: pickup.getType,
           getResource: pickup.getResource,
         });
+
         scoreDisplay.addToScore(POINTS_GOLD);
         pickup.handleCollision();
         pickup.reset();
