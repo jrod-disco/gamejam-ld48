@@ -521,7 +521,16 @@ export const playerCharacter = (
     };
 
     if (rotateOnMove) {
-      newPos.rot = getRotation();
+      let newRotation = getRotation();
+      const halfRotation = Math.PI;
+      const fullRotation = Math.PI * 2;
+      if (newRotation < -halfRotation) {
+        newRotation += fullRotation;
+      } else if (newRotation >= halfRotation) {
+        newRotation -= fullRotation;
+      }
+
+      newPos.rot = newRotation;
     }
 
     if (checkInBounds(newPos)) {
