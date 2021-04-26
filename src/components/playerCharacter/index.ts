@@ -455,11 +455,15 @@ export const playerCharacter = (
       isBidirectional: true,
       shakeCountMax: 12,
       shakeAmount: 6,
+
       shakeDelay: 20,
     });
 
-    pixiSound.play('player_damage', {
+    pixiSound.play('player_damage1', {
       volume: 1 * SFX_VOL_MULT,
+    });
+    pixiSound.play('player_damage2', {
+      volume: (1 * SFX_VOL_MULT) / 2,
     });
 
     state.integrity -= dmg;

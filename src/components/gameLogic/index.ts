@@ -28,6 +28,7 @@ type Refs = {
   uiContainer?: PIXI.Container;
   mainOnAudioCycleOptions?: () => void;
   mainOnGameOver?: () => void;
+  mainOnGameLose?: () => void;
 };
 
 export interface GameLogic {
@@ -87,6 +88,7 @@ export const gameLogic = (props: Props): GameLogic => {
   const caves = [];
 
   let mainOnGameOver: () => void = null;
+  let mainOnGameLose: () => void = null;
   let mainOnAudioCycleOptions: () => void = null;
 
   const { gameContainer, spriteSheets } = props;
@@ -121,6 +123,7 @@ export const gameLogic = (props: Props): GameLogic => {
     if (refs.spriteSheets) spriteSheetsRef = refs.spriteSheets;
     if (refs.uiContainer) uiContainerRef = refs.uiContainer;
     if (refs.mainOnGameOver) mainOnGameOver = refs.mainOnGameOver;
+    if (refs.mainOnGameLose) mainOnGameLose = refs.mainOnGameLose;
     if (refs.mainOnAudioCycleOptions)
       mainOnAudioCycleOptions = refs.mainOnAudioCycleOptions;
 
@@ -135,7 +138,7 @@ export const gameLogic = (props: Props): GameLogic => {
       pos: { x: 25, y: 75 },
       maxDepthCallback: () => {
         console.log('MAX REACHED');
-        onMaxDepthReached();
+        onGameOver(true); // win
       },
       nearDepthCallback: () => {
         pickupSpawnerRef.land();
@@ -225,16 +228,12 @@ export const gameLogic = (props: Props): GameLogic => {
   /////////////////////////////////////////////////////////////////////////////
   // GAME OVER, MAN!!
 
-  const onMaxDepthReached = (): void => {
-    onGameOver();
-  };
-
   // TODO:
   // - MAX_DEPTH reached (+ success action?)
   // - playerCharacter.integrity reaches 0
   // - playerCharacter.oxygen reaches 0
 
-  const onGameOver = (): void => {
+  const onGameOver = (win: boolean = true): void => {
     console.log('gameLogic: onGameOver');
     state.isGameOver = true; // should stop updates
 
@@ -249,8 +248,11 @@ export const gameLogic = (props: Props): GameLogic => {
     cleanUpPickups();
 
     // Clean Up Game Logic Remaining
-
-    mainOnGameOver();
+    if (win) {
+      mainOnGameOver();
+    } else {
+      mainOnGameLose();
+    }
   };
 
   /////////////////////////////////////////////////////////////////////////////
@@ -379,7 +381,7 @@ export const gameLogic = (props: Props): GameLogic => {
     },
     anims: spriteSheets.game.animations,
     gameOverHandler: () => {
-      onGameOver();
+      onGameOver(false); // lose
     },
     gameContainer,
   });
