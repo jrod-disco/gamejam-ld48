@@ -4,6 +4,7 @@ import { zeroPad } from '@src/util/zeroPad';
 import {
   THEME,
   MAX_DEPTH,
+  NEAR_MAX_DEPTH,
   PLAYER_DESCENT_RATE,
   INIT_PRESSURE,
   INIT_DEPTH,
@@ -17,7 +18,6 @@ export interface DepthMeter {
   stop: () => void;
   pause: () => void;
   update: (delta: number) => void;
-  getMaxDepth: () => number;
   getCurrentDepth: () => number;
   getMaxPressure: () => number;
   getCurrentPressure: () => number;
@@ -25,8 +25,8 @@ export interface DepthMeter {
 
 interface Props {
   pos?: { x: number; y: number };
-  depth?: number;
   maxDepthCallback?: () => void;
+  nearDepthCallback?: () => void;
 }
 
 /**
@@ -43,9 +43,7 @@ export const depthMeter = (props: Props): DepthMeter => {
   container.x = pos.x;
   container.y = pos.y;
   container.name = 'depthmeter';
-  const { maxDepthCallback } = props;
-
-  let { depth } = props;
+  const { maxDepthCallback, nearDepthCallback } = props;
 
   let state = {
     isOn: false,
@@ -92,11 +90,12 @@ export const depthMeter = (props: Props): DepthMeter => {
     depthText.text = depthString();
   };
 
-  const getMaxDepth = (): number => depth;
   const getCurrentDepth = (): number => Number(Math.floor(state.currentDepth));
   const getMaxPressure = (): number => MAX_PRESSURE;
   const getCurrentPressure = (): number =>
     Number(Math.floor(state.currentPressure));
+
+  let lastUpdateTime = Date.now();
 
   // Reset called by play again and also on init
   const reset = (): void => {
@@ -106,8 +105,6 @@ export const depthMeter = (props: Props): DepthMeter => {
     updateDepthText();
   };
   reset();
-
-  let lastUpdateTime = Date.now();
 
   const start = (): void => {
     lastUpdateTime = Date.now();
@@ -123,10 +120,12 @@ export const depthMeter = (props: Props): DepthMeter => {
   };
 
   const checkMaxDepth = (): void => {
-    if (!depth) return;
-    if (state.currentDepth >= depth) {
+    if (state.currentDepth >= MAX_DEPTH) {
       pause();
       maxDepthCallback();
+    }
+    else if (state.currentDepth >= NEAR_MAX_DEPTH) {
+      nearDepthCallback();
     }
   };
 
@@ -134,7 +133,7 @@ export const depthMeter = (props: Props): DepthMeter => {
   // - this sets the overall depth of the craft
   // - mostly this is driven by time + the descent rate const
   // - TODO: dynamically set descent rate based on power / damage etc
-  const update = (delta): void => {
+  const update = (delta: number): void => {
     // Update called by main
     if (state.isOn && Date.now() > lastUpdateTime + 10) {
       state.currentDepth += PLAYER_DESCENT_RATE;
@@ -158,7 +157,6 @@ export const depthMeter = (props: Props): DepthMeter => {
     update,
 
     getCurrentDepth,
-    getMaxDepth,
 
     getCurrentPressure,
     getMaxPressure,

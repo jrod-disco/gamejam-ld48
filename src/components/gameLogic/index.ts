@@ -1,8 +1,6 @@
 import * as PIXI from 'pixi.js';
 import { BloomFilter } from '@pixi/filter-bloom';
-import { CRTFilter } from '@pixi/filter-crt';
 import * as PIXISOUND from 'pixi-sound';
-import gsap, { Power0, Bounce } from 'gsap';
 import {
   APP_WIDTH,
   APP_HEIGHT,
@@ -16,11 +14,10 @@ import { PlayerCharacter, PlayerMovement } from '../playerCharacter';
 import { RunTime } from '../library/runtime';
 import * as UI from '../ui';
 import { Spritesheets } from '@src/core';
-import { scoreDisplay, ScoreDisplay } from '../library/scoreDisplay';
-import { pickupSpawner } from './pickupSpawner';
-import { stars } from '../stars';
-import { OxygenTank, oxygenTank } from '../pickups';
-import { DisplayObject } from 'pixi.js';
+import { ScoreDisplay } from '../library/scoreDisplay';
+import { PickupSpawner, pickupSpawner } from './pickupSpawner';
+import { OxygenTank } from '../pickups';
+import { Cave } from '../cave';
 
 type Refs = {
   scoreDisplay?: ScoreDisplay;
@@ -84,6 +81,9 @@ export const gameLogic = (props: Props): GameLogic => {
   let depthMeter: UI.DepthMeter = null;
   let gauges: UI.Gauges = null;
 
+  let pickupSpawnerRef: PickupSpawner = null;
+  const caves = [];
+
   let mainOnGameOver: () => void = null;
   let mainOnAudioCycleOptions: () => void = null;
 
@@ -131,9 +131,13 @@ export const gameLogic = (props: Props): GameLogic => {
     // Depth
     depthMeter = COMP.UI.depthMeter({
       pos: { x: 25, y: 75 },
-      depth: 0,
       maxDepthCallback: () => {
+        console.log('MAX REACHED');
         onMaxDepthReached();
+      },
+      nearDepthCallback: () => {
+        pickupSpawnerRef.land();
+        caves.forEach((cave: Cave) => cave.land());
       },
     });
     uiContainerRef.addChild(depthMeter.container);
@@ -207,6 +211,8 @@ export const gameLogic = (props: Props): GameLogic => {
     depthMeter.reset();
     depthMeter.start();
     playerCharacter.reset();
+    caves.forEach((cave) => cave.reset());
+
     //
 
     // Start listening for keyboard events
@@ -268,19 +274,25 @@ export const gameLogic = (props: Props): GameLogic => {
       right: 'KeyD',
       up: 'KeyW',
       down: 'KeyS',
+      arrowLeft: 'ArrowLeft',
+      arrowDown: 'ArrowDown',
+      arrowRight: 'ArrowRight',
+      arrowUp: 'ArrowUp',
     };
+
+    console.log(keysDown);
 
     const playerMovement: PlayerMovement = { x: 0, y: 0 };
 
-    if (keysDown[keys.left]) {
+    if (keysDown[keys.left] || keysDown[keys.arrowLeft]) {
       playerMovement.x = -1;
-    } else if (keysDown[keys.right]) {
+    } else if (keysDown[keys.right] || keysDown[keys.arrowRight]) {
       playerMovement.x = 1;
     }
 
-    if (keysDown[keys.up]) {
+    if (keysDown[keys.up] || keysDown[keys.arrowUp]) {
       playerMovement.y = -1;
-    } else if (keysDown[keys.down]) {
+    } else if (keysDown[keys.down] || keysDown[keys.arrowDown]) {
       playerMovement.y = 1;
     }
 
@@ -305,7 +317,6 @@ export const gameLogic = (props: Props): GameLogic => {
   const caveContainer = new PIXI.Container();
   gameContainer.addChild(caveContainer);
 
-  const caves = [];
   for (let depth = 0; depth < MAX_LAYER_DEPTH; depth++) {
     const cave = COMP.cave({ depth });
     caves.push(cave);
@@ -329,7 +340,7 @@ export const gameLogic = (props: Props): GameLogic => {
   itemContainer.filters = [new BloomFilter(6)];
 
   // Pickup Spawner
-  const pickupSpawnerRef = pickupSpawner({
+  pickupSpawnerRef = pickupSpawner({
     anims: spriteSheets.game.animations,
   });
   const pickupContainer = new PIXI.Container();
