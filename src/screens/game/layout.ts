@@ -42,18 +42,7 @@ export const gameLayout = (props: Props): GameLayout => {
 
   // Text
 
-  const promptText = new PIXI.Text(
-    'Use W, A, S, D to move your character',
-    TEXT_STYLE.GRADIENT_PROMPT
-  );
-  promptText.anchor.set(0.5);
-  promptText.position.x = APP_WIDTH / 2;
-  promptText.position.y = APP_HEIGHT - 20;
-  container.addChild(promptText);
-
   // Interactive Elements --------
-
-  //
 
   // Screen Visibility Toggle ---------
   const setVisibility = ({

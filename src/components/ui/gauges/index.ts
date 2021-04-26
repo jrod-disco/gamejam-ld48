@@ -72,10 +72,31 @@ export const gauges = (props: Props): Gauges => {
   oxygen.position.x += 2;
   container.addChild(oxygenTitle, oxygen);
 
-  // pressure
+  // power
+  const powerTitle = new PIXI.BitmapText('Power', {
+    fontName: `FFFFuego-16`,
+    fontSize: 14,
+    align: 'left',
+  });
+  powerTitle.anchor.set(0, 0);
+  powerTitle.tint = THEME.TXT_TITLES_HEX;
+  powerTitle.alpha = 0.8;
+  powerTitle.position.y += 40;
+
+  const power = new PIXI.BitmapText('000', {
+    fontName: `FFFFuego-16-bold`,
+    fontSize: 13,
+    align: 'left',
+  });
+  power.anchor.set(0, 0);
+  power.tint = THEME.TXT_HUD_HEX;
+  power.position.y += 58;
+  power.position.x += 2;
+
+  container.addChild(powerTitle, power);
 
   // integrity
-  const integrityTitle = new PIXI.BitmapText('Hull Integrity', {
+  const integrityTitle = new PIXI.BitmapText('Health', {
     fontName: `FFFFuego-16`,
     fontSize: 14,
     align: 'left',
@@ -83,7 +104,7 @@ export const gauges = (props: Props): Gauges => {
   integrityTitle.anchor.set(0, 0);
   integrityTitle.tint = THEME.TXT_TITLES_HEX;
   integrityTitle.alpha = 0.8;
-  integrityTitle.position.y += 40;
+  integrityTitle.position.y += 80;
 
   const integrity = new PIXI.BitmapText('000', {
     fontName: `FFFFuego-16-bold`,
@@ -92,7 +113,7 @@ export const gauges = (props: Props): Gauges => {
   });
   integrity.anchor.set(0, 0);
   integrity.tint = THEME.TXT_HUD_HEX;
-  integrity.position.y += 58;
+  integrity.position.y += 98;
   integrity.position.x += 2;
 
   container.addChild(integrityTitle, integrity);
@@ -106,6 +127,7 @@ export const gauges = (props: Props): Gauges => {
   const updateCluster = (): void => {
     oxygen.text = state.oxygen.toFixed(2);
     integrity.text = state.integrity.toFixed(2);
+    power.text = state.power.toFixed(2);
   };
 
   // Reset called by play again and also on init

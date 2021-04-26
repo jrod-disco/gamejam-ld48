@@ -40,6 +40,7 @@ export const PLAYER_INIT_ROT = 0;
 export const PLAYER_ROT_DAMPEN = 0.09; // scales the rotation to ease into small changes
 export const PLAYER_MAX_ROT_CHANGE = 0.08; // the max change in rotation per update
 export const PLAYER_ROTATE_ON_MOVE = true;
+export const PLAYER_DESCENT_RATE = 0.5; // feet per sec
 
 // Player tilt
 export const PLAYER_TILT_BY_ANGLE = true;
@@ -47,10 +48,11 @@ export const PLAYER_TILT_ANGLE_THRESHOLD = 0.2;
 export const PLAYER_TILT_SPEED_THRESHOLD = 1;
 
 // resources
+export const PLAYER_INTEGRITY = 100; // starting integrity
 export const PLAYER_MAX_OXYGEN = 100; // full tank, init value
 export const PLAYER_OXYGEN_CONSUMPTION_RATE = 0.67; // lbs per second
-export const PLAYER_DESCENT_RATE = 0.5; // feet per sec
-export const PLAYER_INTEGRITY = 2000; // starting integrity (not yet consuming)
+export const PLAYER_MAX_POWER = 100; // full tank, init value
+export const PLAYER_POWER_CONSUMPTION_RATE = 0.3; // poper] per second
 
 // collision
 export const PLAYER_COLLISION_RADIUS = 170;
@@ -60,12 +62,15 @@ export const PLAYER_COLLISION_DRAG = -0.3; // rebound drag
 // ITEMS
 export enum PICKUP_TYPES {
   OXYGEN = 'OXYGEN',
+  FUEL = 'FUEL',
 }
 
 // PICKUP Generator
 export const PICKUPS_MAX = 5;
+export const PICKUPS_RANDOM_WEIGHT = 75;
 export const PICKUP_SPAWN_RATE = 4000;
 export const PICKUP_OXYGEN_TANK_QUANTITY = 3.5; // lbs of oxygen
+export const PICKUP_FUEL_TANK_QUANTITY = 3.5; // lbs of fuel
 
 ///////////////////////////////////////////////////////////////////////////////
 // SIMPLE GAME - deprecate or use

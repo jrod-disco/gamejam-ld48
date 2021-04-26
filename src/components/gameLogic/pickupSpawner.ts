@@ -1,14 +1,18 @@
 import {
   PICKUPS_MAX,
   PICKUP_SPAWN_RATE,
+  PICKUPS_RANDOM_WEIGHT,
 } from '@src/constants';
 import * as PIXI from 'pixi.js';
 
-import { oxygenTank, OxygenTank } from '../pickups';
+import { oxygenTank, OxygenTank, fuelTank, FuelTank } from '../pickups';
+
+// TODO: type the pickupList
+// type PickupList = Array<OxygenTank | FuelTank>;
 
 export interface PickupSpawner {
-  spawn: () => OxygenTank | null;
-  getPickups: () => OxygenTank[];
+  spawn: () => OxygenTank | FuelTank | null;
+  getPickups: () => any[];
   removePickupByIndex: (index: number) => void;
   reset: () => void;
   startLanding: () => void;
@@ -42,16 +46,29 @@ export const pickupSpawner = (props: PickupSpawnerProps): PickupSpawner => {
 
     if (PICKUPS_MAX === state.pickupList.length) {
       // Reached max spawned, recycle if pool contains an inactive pickup
-      pickup = state.pickupList.find((pickup: OxygenTank): boolean => !pickup.isActive());
+      pickup = state.pickupList.find(
+        (pickup: OxygenTank): boolean => !pickup.isActive()
+      );
     } else {
       // Spawn
-      pickup = oxygenTank({ 
-        pickupBuffer,
-        anims,
-        depth: 0,
-        lowerContainer: props.pickupContainerLower,
-        upperContainer: props.pickupContainerUpper,
-      });
+      if (Math.random() * 100 < PICKUPS_RANDOM_WEIGHT) {
+        pickup = oxygenTank({
+          pickupBuffer,
+          anims,
+          depth: 0,
+          lowerContainer: props.pickupContainerLower,
+          upperContainer: props.pickupContainerUpper,
+        });
+      } else {
+        pickup = fuelTank({
+          pickupBuffer,
+          anims,
+          depth: 0,
+          lowerContainer: props.pickupContainerLower,
+          upperContainer: props.pickupContainerUpper,
+        });
+      }
+
       state.pickupList.push(pickup);
     }
 
@@ -59,7 +76,7 @@ export const pickupSpawner = (props: PickupSpawnerProps): PickupSpawner => {
     return pickup;
   };
 
-  const getPickups = (): OxygenTank[] => state.pickupList;
+  const getPickups = () => state.pickupList;
 
   const removePickupByIndex = (index: number): void => {
     state.pickupList.splice(index, 1);

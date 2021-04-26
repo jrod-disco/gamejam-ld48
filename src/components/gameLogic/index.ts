@@ -19,7 +19,7 @@ import * as UI from '../ui';
 import { Spritesheets } from '@src/core';
 import { ScoreDisplay } from '../library/scoreDisplay';
 import { PickupSpawner, pickupSpawner } from './pickupSpawner';
-import { OxygenTank } from '../pickups';
+// import { OxygenTank, FuelTank } from '../pickups';
 import { Cave } from '../cave';
 
 type Refs = {
@@ -86,7 +86,7 @@ export const gameLogic = (props: Props): GameLogic => {
   let gauges: UI.Gauges = null;
 
   let pickupSpawnerRef: PickupSpawner = null;
-  let caves = [];  // is reassigned when removing landing layer
+  let caves = []; // is reassigned when removing landing layer
   const caveContainer = new PIXI.Container();
 
   let mainOnGameOver: () => void = null;
@@ -148,7 +148,7 @@ export const gameLogic = (props: Props): GameLogic => {
         setTimeout((): void => {
           // delay placing landing graphic to avoid masking from cave holes
           const texture = PIXI.Texture.from(`./assets/cave/landing.png`);
-          const cave = COMP.cave({ depth: 0, texture, isLandLayer:true });
+          const cave = COMP.cave({ depth: 0, texture, isLandLayer: true });
           caves.unshift(cave);
           caveContainer.addChildAt(cave.sprite, 0);
         }, LANDING_PAUSE_DURATION);
@@ -158,7 +158,7 @@ export const gameLogic = (props: Props): GameLogic => {
 
     // Gauges - oxygen, pressure etc
     gauges = COMP.UI.gauges({
-      pos: { x: 25, y: APP_HEIGHT - 100 },
+      pos: { x: 25, y: APP_HEIGHT - 150 },
     });
     uiContainerRef.addChild(gauges.container);
 
@@ -229,7 +229,7 @@ export const gameLogic = (props: Props): GameLogic => {
     state.isGameOver = false;
     state.currentLevel = START_LEVEL;
     state.playerScore = 0;
-    
+
     // Start listening for keyboard events
     addOnKeyUp();
     addOnKeyDown();
@@ -245,7 +245,12 @@ export const gameLogic = (props: Props): GameLogic => {
 
   const onGameOver = (win: boolean = true): void => {
     console.log('gameLogic: onGameOver');
-    state.isGameOver = true; // should stop updates
+
+    // Force final update of stats
+    gauges.update(0, playerCharacter.getState());
+
+    // stop updates
+    state.isGameOver = true;
 
     // Keyboard Events
     // remove game specific key listeners if there are any
@@ -256,9 +261,6 @@ export const gameLogic = (props: Props): GameLogic => {
     // Clean Up Component Logic and Sprites
     pickupSpawnerRef.reset();
     cleanUpPickups();
-
-    // Force final update of stats
-    gauges.update(0, playerCharacter.getState());
 
     // Clean Up Game Logic Remaining
     if (win) {
@@ -417,7 +419,7 @@ export const gameLogic = (props: Props): GameLogic => {
     const pY = playerCharacter.container.y;
     const pickups = pickupSpawnerRef.getPickups();
 
-    pickups.map((pickup) => {
+    pickups.map((pickup: any) => {
       const nX = pickup.container.x;
       const nY = pickup.container.y;
 
@@ -455,7 +457,7 @@ export const gameLogic = (props: Props): GameLogic => {
     checkDownKeys(state.keysDown);
     updatePickups();
 
-    pickupSpawnerRef.getPickups().forEach((pickup: OxygenTank): void => {
+    pickupSpawnerRef.getPickups().forEach((pickup: any): void => {
       pickup.update(delta);
     });
 
