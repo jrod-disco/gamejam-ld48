@@ -137,11 +137,12 @@ export const playerCharacter = (
   const initialState = { ...state };
 
   // lights
+  const defaultUnderglowAlpha = 0.3;
   const underLightSprite = new PIXI.Sprite(textures.underglow);
   underLightSprite.anchor.set(0.5);
   underLightSprite.x = 0;
   underLightSprite.y = 0;
-  underLightSprite.alpha = 0.5;
+  underLightSprite.alpha = defaultUnderglowAlpha;
   underLightSprite.blendMode = PIXI.BLEND_MODES.ADD;
   container.addChild(underLightSprite);
 
@@ -238,11 +239,12 @@ export const playerCharacter = (
   };
 
   // lights
+  const defaultLightAlpha = 0.35;
   const frontLightLeftSprite = new PIXI.Sprite(textures.frontlightLeft);
   frontLightLeftSprite.anchor.set(0.5, 1);
   frontLightLeftSprite.x = -84;
   frontLightLeftSprite.y = -20;
-  frontLightLeftSprite.alpha = 0.4;
+  frontLightLeftSprite.alpha = 0.5;
   frontLightLeftSprite.blendMode = PIXI.BLEND_MODES.ADD;
   container.addChild(frontLightLeftSprite);
 
@@ -250,7 +252,7 @@ export const playerCharacter = (
   frontLightRightSprite.anchor.set(0.5, 1);
   frontLightRightSprite.x = 84;
   frontLightRightSprite.y = -20;
-  frontLightRightSprite.alpha = 0.4;
+  frontLightRightSprite.alpha = 0.5;
   frontLightRightSprite.blendMode = PIXI.BLEND_MODES.ADD;
   container.addChild(frontLightRightSprite);
 
@@ -258,7 +260,7 @@ export const playerCharacter = (
   rearLightLeftSprite.anchor.set(0.5, 1);
   rearLightLeftSprite.x = -80;
   rearLightLeftSprite.y = 125;
-  rearLightLeftSprite.alpha = 0.3;
+  rearLightLeftSprite.alpha = 0.15;
   rearLightLeftSprite.blendMode = PIXI.BLEND_MODES.ADD;
   container.addChild(rearLightLeftSprite);
 
@@ -266,7 +268,7 @@ export const playerCharacter = (
   rearLightRightSprite.anchor.set(0.5, 1);
   rearLightRightSprite.x = 80;
   rearLightRightSprite.y = 125;
-  rearLightRightSprite.alpha = 0.3;
+  rearLightRightSprite.alpha = 0.15;
   rearLightRightSprite.blendMode = PIXI.BLEND_MODES.ADD;
   container.addChild(rearLightRightSprite);
 
@@ -284,11 +286,26 @@ export const playerCharacter = (
     const ranIndex = Math.floor(Math.random() * lightsList.length);
     const randomLight = lightsList[ranIndex];
 
+    let returnToAlpha;
+    switch (randomLight) {
+      case frontLightLeftSprite:
+      case frontLightRightSprite:
+        returnToAlpha = 0.5;
+        break;
+      case rearLightLeftSprite:
+      case rearLightRightSprite:
+        returnToAlpha = 0.15;
+        break;
+      case underLightSprite:
+        returnToAlpha = 0.3;
+        break;
+    }
+
     gsap.killTweensOf(randomLight);
-    randomLight.alpha = Math.random() * 0.6;
+    randomLight.alpha = Math.random() * 0.5;
     gsap.to(randomLight, {
       duration: 0.2,
-      alpha: 0.3,
+      alpha: returnToAlpha,
       ease: Power0.easeOut,
     });
   };
