@@ -11,7 +11,7 @@ export interface PickupSpawner {
   getPickups: () => OxygenTank[];
   removePickupByIndex: (index: number) => void;
   reset: () => void;
-  land: () => void;
+  startLanding: () => void;
 }
 
 interface PickupSpawnerProps {
@@ -24,7 +24,7 @@ export const pickupSpawner = (props: PickupSpawnerProps): PickupSpawner => {
   let state = {
     lastSpawnTime: Date.now(),
     pickupList: [],
-    landing: false,
+    isLanding: false,
   };
   const initialState = { ...state };
 
@@ -33,7 +33,7 @@ export const pickupSpawner = (props: PickupSpawnerProps): PickupSpawner => {
   const pickupBuffer = 150; // px from center
 
   const spawn = (): OxygenTank | null => {
-    if (state.landing) return;
+    if (state.isLanding) return;
 
     if (state.lastSpawnTime + PICKUP_SPAWN_RATE > Date.now()) return;
     state.lastSpawnTime = Date.now();
@@ -68,13 +68,12 @@ export const pickupSpawner = (props: PickupSpawnerProps): PickupSpawner => {
   // Reset called by play again and also on init
   const reset = (): void => {
     console.log('pickup spawner reset');
-
     state = { ...initialState, pickupList: [] };
   };
   reset();
 
-  const land = (): void => {
-    state.landing = true;
+  const startLanding = (): void => {
+    state.isLanding = true;
   };
 
   return {
@@ -82,6 +81,6 @@ export const pickupSpawner = (props: PickupSpawnerProps): PickupSpawner => {
     getPickups,
     removePickupByIndex,
     reset,
-    land,
+    startLanding,
   };
 };

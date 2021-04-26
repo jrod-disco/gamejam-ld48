@@ -21,13 +21,14 @@ export interface Cave {
   sprite: PIXI.Sprite;
   reset: (depth?: number) => void;
   update: (delta: number, x: number, y: number) => void;
-  land: () => void;
+  startLanding: () => void;
+  isLandLayer: () => boolean;
 }
 
 interface CaveProps {
   depth: number;
   texture: PIXI.Texture;
-  tintable: boolean;
+  isLandLayer: boolean;
 }
 
 const WATER_BOT_COLOR = Color('rgb(0, 0, 0)');
@@ -48,7 +49,7 @@ export const cave = (props: CaveProps): Cave => {
     depth: props.depth,
     landing: false,
     maxScale: MAX_LAYER_SCALE,
-    tintable: props.tintable,
+    isLandLayer: props.isLandLayer,
   };
   const initialState = { ...state };
 
@@ -61,17 +62,21 @@ export const cave = (props: CaveProps): Cave => {
 
   // Reset called by play again and also on init
   const reset = (): void => {
+    if (state.isLandLayer && sprite.parent) {
+      sprite.parent.removeChild(sprite);
+      return;
+    }
     state = { ...initialState };
     if (sprite.parent) {
       sprite.parent.setChildIndex(sprite, state.depth); // reset position
     }
     sprite.anchor.set(0.5);
     sprite.pivot.set(0.5);
-    if (state.tintable) {
-      sprite.tint = getDepthColor();
-    }
     sprite.scale.set(state.scale);
     sprite.rotation = Math.random() * 360;
+    if (!state.isLandLayer) {
+      sprite.tint = getDepthColor();
+    }
     positionUsingDepth(sprite, APP_WIDTH/2, APP_HEIGHT/2, state.depth);
   };
   reset();
@@ -88,17 +93,19 @@ export const cave = (props: CaveProps): Cave => {
       state.depth = (state.scale - LAYER_START_SCALE) / LAYER_SPACING;
       sprite.rotation += ROT_INCREMENT;
     }
-    if (!state.landing && state.tintable) {
+    if (!state.landing && !state.isLandLayer) {
       sprite.tint = getDepthColor();
     }
     positionUsingDepth(sprite, x, y, state.depth);
     sprite.scale.set(state.scale);
   };
 
-  const land = (): void => {
+  const startLanding = (): void => {
     state.landing = true;
     state.maxScale = MAX_LAYER_SCALE * 2;
   }
 
-  return { sprite, reset, update, land };
+  const isLandLayer = (): boolean => state.isLandLayer;
+
+  return { sprite, reset, update, startLanding, isLandLayer };
 };

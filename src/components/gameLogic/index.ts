@@ -86,7 +86,7 @@ export const gameLogic = (props: Props): GameLogic => {
   let gauges: UI.Gauges = null;
 
   let pickupSpawnerRef: PickupSpawner = null;
-  const caves = [];
+  let caves = [];  // is reassigned when removing landing layer
   const caveContainer = new PIXI.Container();
 
   let mainOnGameOver: () => void = null;
@@ -143,12 +143,12 @@ export const gameLogic = (props: Props): GameLogic => {
         onGameOver(true); // win
       },
       nearDepthCallback: () => {
-        pickupSpawnerRef.land();
-        caves.forEach((cave: Cave) => cave.land());
+        pickupSpawnerRef.startLanding();
+        caves.forEach((cave: Cave) => cave.startLanding());
         setTimeout((): void => {
           // delay placing landing graphic to avoid masking from cave holes
           const texture = PIXI.Texture.from(`./assets/cave/landing.png`);
-          const cave = COMP.cave({ depth: 0, texture, tintable:false });
+          const cave = COMP.cave({ depth: 0, texture, isLandLayer:true });
           caves.unshift(cave);
           caveContainer.addChildAt(cave.sprite, 0);
         }, LANDING_PAUSE_DURATION);
@@ -215,20 +215,21 @@ export const gameLogic = (props: Props): GameLogic => {
   const onStartGame = (): void => {
     console.log('gameLogic: onStartGame');
     //
-    state.isGameOver = false;
-    state.currentLevel = START_LEVEL;
-    state.playerScore = 0;
-    //
     scoreDisplay.reset();
     runtime.reset();
     runtime.start();
     depthMeter.reset();
     depthMeter.start();
     playerCharacter.reset();
-    caves.forEach((cave) => cave.reset());
+    caves.forEach((cave: Cave) => cave.reset());
+    // Remove the landing layer
+    caves = caves.filter((cave: Cave): boolean => !cave.isLandLayer());
 
     //
-
+    state.isGameOver = false;
+    state.currentLevel = START_LEVEL;
+    state.playerScore = 0;
+    
     // Start listening for keyboard events
     addOnKeyUp();
     addOnKeyDown();
@@ -336,7 +337,7 @@ export const gameLogic = (props: Props): GameLogic => {
   for (let depth = 0; depth < MAX_LAYER_DEPTH; depth++) {
     const imgNum = Math.round(Math.random() * 2) + 1;
     const texture = PIXI.Texture.from(`./assets/cave/cave${imgNum}.png`);
-    const cave = COMP.cave({ depth, texture, tintable: true });
+    const cave = COMP.cave({ depth, texture, isLandLayer: false });
     caves.push(cave);
     caveContainer.addChild(cave.sprite);
   }
