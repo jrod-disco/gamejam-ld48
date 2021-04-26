@@ -50,10 +50,10 @@ export const PLAYER_TILT_SPEED_THRESHOLD = 1;
 // resources
 export const PLAYER_INTEGRITY = 100; // starting integrity
 export const PLAYER_MAX_OXYGEN = 100; // full tank, init value
-export const PLAYER_OXYGEN_CONSUMPTION_RATE = 0.67; // lbs per second
+export const PLAYER_OXYGEN_CONSUMPTION_RATE = 0.75; // lbs per second
 export const PLAYER_MAX_POWER = 100; // full tank, init value
-export const PLAYER_POWER_CONSUMPTION_RATE = 0.3; // power per second
-export const PLAYER_BOOST_POWER_CONSUMPTION_RATE = 1; // power per second while boosting
+export const PLAYER_POWER_CONSUMPTION_RATE = 0.35; // power per second
+export const PLAYER_BOOST_POWER_CONSUMPTION_RATE = 1.5; // power per second while boosting
 
 // collision
 export const PLAYER_COLLISION_RADIUS = 170;
@@ -67,11 +67,11 @@ export enum PICKUP_TYPES {
 }
 
 // PICKUP Generator
-export const PICKUPS_MAX = 5;
-export const PICKUPS_RANDOM_WEIGHT = 75;
-export const PICKUP_SPAWN_RATE = 4000;
-export const PICKUP_OXYGEN_TANK_QUANTITY = 3.5; // lbs of oxygen
-export const PICKUP_FUEL_TANK_QUANTITY = 3.5; // lbs of fuel
+export const PICKUPS_MAX = 6;
+export const PICKUPS_RANDOM_WEIGHT = 65;
+export const PICKUP_SPAWN_RATE = 3750;
+export const PICKUP_OXYGEN_TANK_QUANTITY = 4; // lbs of oxygen
+export const PICKUP_FUEL_TANK_QUANTITY = 3; // lbs of fuel
 
 ///////////////////////////////////////////////////////////////////////////////
 // SIMPLE GAME - deprecate or use
