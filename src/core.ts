@@ -24,7 +24,7 @@ import './index.scss';
 
 import * as COMP from './components';
 import * as SCREENS from './screens';
-import { Sounds } from './components/library/audio';
+import { audio, Sounds } from './components/library/audio';
 import {
   personalBestScores,
   PersonalBestScores,
@@ -155,8 +155,17 @@ const bootstrapApp = (props: {
   // Sound bits
   const pixiSound = PIXISOUND.default; //TODO: deal with persistent loading of soundeffects / also make a soundsprite already
   // Load these up on startup...
-  pixiSound.add('good', './assets/example/good.mp3');
-  pixiSound.add('coin', './assets/example/coin.wav');
+  pixiSound.add('good', './assets/audio/sfx_wonder_1.mp3');
+  pixiSound.add('pickup_1', './assets/audio/sfx_pickup_1.mp3');
+  pixiSound.add('player_damage', './assets/audio/sfx_klunk_1.mp3');
+
+  const setSounds = (soundsLoaded: Sounds): void => {
+    console.log('core.setSounds');
+    sounds = soundsLoaded;
+    // Add music as a component
+    audioLayer = COMP.LIB.audio(sounds);
+    audioLayer.music.mainTheme(true);
+  };
 
   // Create empty BASE and UI containers and add them to the mainContainer
   // Use constants for Z-index of these containers
@@ -171,14 +180,6 @@ const bootstrapApp = (props: {
   // const bgTexture = PIXI.Texture.from('./assets/example/background600x600.png');
   // const bgSprite = new PIXI.Sprite(bgTexture);
   // baseContainer.addChild(bgSprite);
-
-  const setSounds = (soundsLoaded: Sounds): void => {
-    sounds = soundsLoaded;
-    // Add music as a component
-    audioLayer = COMP.LIB.audio(sounds);
-    // Play a track
-    audioLayer.music.mainTheme(true);
-  };
 
   // Personal Best Score Display
   const bestScore = COMP.LIB.bestScoreDisplay({
@@ -251,7 +252,6 @@ const bootstrapApp = (props: {
         onStartGame();
         break;
     }
-    //console.log(event.code);
   };
 
   const addOnKeyDown = (): void => {
@@ -263,6 +263,7 @@ const bootstrapApp = (props: {
   // Initially start listening for keyboard events
   addOnKeyDown();
 
+  /////////////////////////////////////////////////////////////////////////////
   // Game Events
 
   const onGameOver = (): void => {
@@ -285,6 +286,7 @@ const bootstrapApp = (props: {
   const onStartGame = (): void => {
     console.log('core: onStartGame');
     removeOnKeyDown();
+
     pixiSound.play('good', {
       volume: 1 * SFX_VOL_MULT,
     });
@@ -299,9 +301,7 @@ const bootstrapApp = (props: {
         gameLogic.onStartGame();
       },
     });
-    audioLayer.music.mainTheme();
-    //
-    //
+    audioLayer.music.loopRandomTrack();
   };
 
   // ------------------------------------
@@ -379,6 +379,10 @@ const onSecondaryAssetsLoaded = (): void => {
   };
   const sounds: Sounds = {
     MainTheme: PIXI.Loader.shared.resources['MainTheme'] as any,
+    MenuTheme: PIXI.Loader.shared.resources['MenuTheme'] as any,
+    Track1: PIXI.Loader.shared.resources['Track1'] as any,
+    Track2: PIXI.Loader.shared.resources['Track2'] as any,
+    Track3: PIXI.Loader.shared.resources['Track3'] as any,
   };
   window.APP.coreInterface.setSounds(sounds);
   window.APP.coreInterface.setAdditionalSprites(additionalSprites);

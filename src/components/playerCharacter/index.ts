@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js';
+import * as PIXISOUND from 'pixi-sound';
 import gsap, { Power0, Bounce } from 'gsap';
 import PixiPlugin from 'gsap/PixiPlugin';
 
@@ -7,6 +8,7 @@ import { newShaker } from '@src/util/shakerFactory';
 
 import {
   // consts
+  SFX_VOL_MULT,
   APP_HEIGHT,
   APP_WIDTH,
   OBJECT_STATUS,
@@ -102,6 +104,7 @@ export const playerCharacter = (
   const rotateOnMove = PLAYER_ROTATE_ON_MOVE;
   const maxRotationDelta = PLAYER_MAX_ROT_CHANGE;
 
+  const pixiSound = PIXISOUND.default;
   const container = new PIXI.Container();
   container.x = pos.x;
   container.y = pos.y;
@@ -442,6 +445,10 @@ export const playerCharacter = (
       shakeCountMax: 12,
       shakeAmount: 6,
       shakeDelay: 20,
+    });
+
+    pixiSound.play('player_damage', {
+      volume: 1 * SFX_VOL_MULT,
     });
 
     state.integrity -= dmg;

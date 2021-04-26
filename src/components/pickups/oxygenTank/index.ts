@@ -1,7 +1,9 @@
 import * as PIXI from 'pixi.js';
+import * as PIXISOUND from 'pixi-sound';
+
 //import gsap, { Power0, Bounce } from 'gsap';
 import { positionUsingDepth } from '@src/util/positionUsingDepth';
-import { 
+import {
   APP_HEIGHT,
   APP_WIDTH,
   PICKUP_OXYGEN_TANK_QUANTITY,
@@ -13,6 +15,7 @@ import {
   ROT_PICKUP_INCREMENT,
   MAX_LAYER_SCALE,
   MAX_LAYER_DEPTH,
+  SFX_VOL_MULT,
 } from '@src/constants';
 
 export interface OxygenTank {
@@ -24,6 +27,7 @@ export interface OxygenTank {
   getScale: () => number;
   isActive: () => boolean;
   setActive: (active: boolean) => void;
+  handleCollision: () => void;
 }
 
 interface OxygenTankProps {
@@ -43,6 +47,8 @@ type OxygenTankPosition = { x: number; y: number };
 export const oxygenTank = (props: OxygenTankProps): OxygenTank => {
   const pos = props.pos ?? { x: 0, y: 0 };
 
+  const pixiSound = PIXISOUND.default;
+
   const container = new PIXI.Container();
   container.x = pos.x;
   container.y = pos.y;
@@ -51,8 +57,8 @@ export const oxygenTank = (props: OxygenTankProps): OxygenTank => {
   const { anims } = props;
 
   let state = {
-    endPosX: APP_WIDTH/2,
-    endPosY: APP_HEIGHT/2,
+    endPosX: APP_WIDTH / 2,
+    endPosY: APP_HEIGHT / 2,
     scale: LAYER_START_SCALE,
     depth: props.depth,
     active: false,
@@ -60,9 +66,13 @@ export const oxygenTank = (props: OxygenTankProps): OxygenTank => {
   const initialState = { ...state };
 
   const setDestinationPostion = (): void => {
-    state.endPosX = props.pickupBuffer/2 + Math.floor(Math.random() * (APP_WIDTH - props.pickupBuffer));
-    state.endPosY = props.pickupBuffer/2 + Math.floor(Math.random() * (APP_HEIGHT - props.pickupBuffer));
-  }
+    state.endPosX =
+      props.pickupBuffer / 2 +
+      Math.floor(Math.random() * (APP_WIDTH - props.pickupBuffer));
+    state.endPosY =
+      props.pickupBuffer / 2 +
+      Math.floor(Math.random() * (APP_HEIGHT - props.pickupBuffer));
+  };
 
   const oxygenTankContainer = new PIXI.Container();
   container.addChild(oxygenTankContainer);
@@ -104,6 +114,12 @@ export const oxygenTank = (props: OxygenTankProps): OxygenTank => {
     return PICKUP_OXYGEN_TANK_QUANTITY;
   };
 
+  const handleCollision = (): void => {
+    pixiSound.play('pickup_1', {
+      volume: 1 * SFX_VOL_MULT,
+    });
+  };
+
   // Reset called by play again and also on init
   const reset = (): void => {
     state = { ...initialState };
@@ -116,9 +132,9 @@ export const oxygenTank = (props: OxygenTankProps): OxygenTank => {
   reset();
 
   const isActive = (): boolean => state.active;
-  const setActive = (active: boolean): void => { 
+  const setActive = (active: boolean): void => {
     state.active = active;
-  }
+  };
 
   const getScale = (): number => state.scale;
 
@@ -148,5 +164,6 @@ export const oxygenTank = (props: OxygenTankProps): OxygenTank => {
     getScale,
     isActive,
     setActive,
+    handleCollision,
   };
 };

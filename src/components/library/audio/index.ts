@@ -9,7 +9,10 @@ import { getAppVerShort } from '@src/util/appVer';
 
 export interface Sounds {
   MainTheme: PIXI.LoaderResource;
-  //Track2: PIXI.LoaderResource;
+  MenuTheme: PIXI.LoaderResource;
+  Track1: PIXI.LoaderResource;
+  Track2: PIXI.LoaderResource;
+  Track3: PIXI.LoaderResource;
 }
 export interface AudioLayer {
   music: {
@@ -17,6 +20,7 @@ export interface AudioLayer {
     menuTheme: (isPlay: boolean) => void;
     playRandomTrack: () => void;
     playTracklist: () => void;
+    loopRandomTrack: () => void;
   };
   muteToggle: (shouldMute?: boolean, isTemporary?: boolean) => void;
   getMutedState: () => boolean;
@@ -32,10 +36,17 @@ export interface AudioLayer {
  * @returns Interface object containing methods that can be called on this module
  */
 export const audio = (sounds: Sounds): AudioLayer => {
+  console.log('audio sounds: %o', sounds);
+
   // Main Music Track
   const audio = PIXISOUND.default;
+  audio.add('MainTheme', sounds.MainTheme as any);
+  audio.add('MenuTheme', sounds.MenuTheme as any);
+  audio.add('Track1', sounds.Track1 as any);
+  audio.add('Track2', sounds.Track2 as any);
+  audio.add('Track3', sounds.Track3 as any);
 
-  const trackList = ['MainTheme'];
+  const trackList = ['Track1', `Track2`, `Track3`];
   let currentTrack = 0;
 
   // Fetch and use isMuted state stored in local storage
@@ -71,7 +82,10 @@ export const audio = (sounds: Sounds): AudioLayer => {
   // Called when we've got all the things...
   const stopAllThemes = (): void => {
     audio.stop('MainTheme');
-    // audio.stop('Track2');
+    audio.stop('MenuTheme');
+    audio.stop('Track1');
+    audio.stop('Track2');
+    audio.stop('Track3');
   };
   const mainTheme = (isPlay): void => {
     stopAllThemes();
@@ -105,6 +119,15 @@ export const audio = (sounds: Sounds): AudioLayer => {
     playNextTrack();
   };
 
+  const loopRandomTrack = (): void => {
+    stopAllThemes();
+    currentTrack = Math.floor(Math.random() * trackList.length) - 1;
+    audio.play(trackList[currentTrack], {
+      loop: true,
+      volume: mainVolume(),
+    });
+  };
+
   const muteToggle = (shouldMute?: boolean, isTemporary = false): void => {
     if (shouldMute === undefined) {
       isMuted = !isMuted;
@@ -127,7 +150,13 @@ export const audio = (sounds: Sounds): AudioLayer => {
   };
 
   return {
-    music: { mainTheme, menuTheme, playTracklist, playRandomTrack },
+    music: {
+      mainTheme,
+      menuTheme,
+      playTracklist,
+      playRandomTrack,
+      loopRandomTrack,
+    },
     muteToggle,
     getMutedState,
   };

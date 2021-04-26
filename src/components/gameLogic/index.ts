@@ -6,7 +6,6 @@ import gsap, { Power0, Bounce } from 'gsap';
 import {
   APP_WIDTH,
   APP_HEIGHT,
-  SFX_VOL_MULT,
   POINTS_GOLD,
   START_LEVEL,
   IS_SCORE_INCREMENTY,
@@ -22,7 +21,6 @@ import { pickupSpawner } from './pickupSpawner';
 import { stars } from '../stars';
 import { OxygenTank, oxygenTank } from '../pickups';
 import { DisplayObject } from 'pixi.js';
-// import { goldSpawner } from './goldSpawner';
 
 type Refs = {
   scoreDisplay?: ScoreDisplay;
@@ -106,7 +104,7 @@ export const gameLogic = (props: Props): GameLogic => {
   gameContainer.addChild(messageText);
 
   // Sound bits
-  const pixiSound = PIXISOUND.default;
+  // const pixiSound = PIXISOUND.default;
 
   // Reset called by play again and also on init
   const reset = (): void => {
@@ -402,11 +400,8 @@ export const gameLogic = (props: Props): GameLogic => {
           getResource: pickup.getResource,
         });
         scoreDisplay.addToScore(POINTS_GOLD);
+        pickup.handleCollision();
         pickup.reset();
-        // TODO: pass to pickup
-        pixiSound.play('coin', {
-          volume: 1 * SFX_VOL_MULT,
-        });
       }
     });
   };
