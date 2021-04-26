@@ -10,8 +10,8 @@ export const APP_VERSION = __VERSION__; // <- populated by rollup replace
 // @ts-ignore
 export const DCO_VERSION = __DCOVERSION__; // <- populated by rollup replace
 export const APP_NAME = 'dcollage-boilerplate';
-export const APP_HEIGHT = 800;
-export const APP_WIDTH = 800;
+export const APP_HEIGHT = 600;
+export const APP_WIDTH = 600;
 export const APP_BGCOLOR = 0x000000;
 
 // Layer Depths
