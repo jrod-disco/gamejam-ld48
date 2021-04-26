@@ -43,9 +43,13 @@ export const loseLayout = (props: Props): LoseLayout => {
     container.removeChildren();
   };
 
+  const backgroundTexture = PIXI.Texture.from('./assets/darkscreen.png');
+  const backgroundSprite = new PIXI.Sprite(backgroundTexture);
+  container.addChild(backgroundSprite);
+
   // Text
   const promptText = new PIXI.Text(
-    'YOU LOSE, SUCKER',
+    'THAT DID NOT END WELL...',
     TEXT_STYLE.GRADIENT_PROMPT
   );
   promptText.anchor.set(0.5);
