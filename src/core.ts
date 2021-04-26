@@ -337,7 +337,7 @@ const bootstrapApp = (props: {
       onComplete: () => {
         showPersonalBest();
         audioLayer.stop;
-        setTimeout(onGameOver, GAME_OVER_SCREEN_DELAY);
+        // setTimeout(onGameOver, GAME_OVER_SCREEN_DELAY);
       },
     });
 

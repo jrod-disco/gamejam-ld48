@@ -20,10 +20,12 @@ export const TEXT_REASONS_LOSE = {
   oxygen: [
     'Without oxygen you succumb to hallucinations of dancing sea monkeys who jab you to death with their tiny tridents.',
     'As you gasp for breath, the last thing you see before the world goes dark is the gaping beak-like maw of The Kraken.',
+    'Life without pizza is no life at all. However, life without oxygen is a most painful and torturous death.',
   ],
   health: [
     'The hull creaks, water spraying in your face as the pressure builds until you basicaly explode, painting the walls with your innards.',
     'As you desperately attempt to patch the leaking hull, the last thing you see is the gaping beak-like maw of The Kraken.',
+    'For an excruciatingly long second reality is fractured. The pizza you were delivering mocks you, laughing as your eyes bulge out of your creaking head and you cease to exist.',
   ],
   fuel: [
     'Without fuel you are at the mercy of the depths. With only this crappy deep dish pizza to eat it is only a matter of days before you expire. We will spare you the gory details.',
