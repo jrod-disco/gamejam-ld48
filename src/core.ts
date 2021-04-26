@@ -218,10 +218,17 @@ const bootstrapApp = (props: {
 
   // Callback for Sample "Play Again" Button
   const onPlayButtonPress = (): void => onStartGame();
+  const onCreditsButtonPress = (): void => {
+    SCREENS.controller.setCurrentScreen({
+      name: SCREENS.ScreenName.CREDITS,
+      isAnimated: true,
+    });
+  };
 
   // Sample Screen One - Main Screen'
   const screenMainMenu = SCREENS.mainMenuLayout({
     onPlayButtonPress,
+    onCreditsButtonPress,
     spriteSheets,
   });
   SCREENS.controller.addScreenToList(SCREENS.ScreenName.MAIN, screenMainMenu);
@@ -270,7 +277,7 @@ const bootstrapApp = (props: {
       case 'Space': // Start
       case 'Enter': // Start
       case 'KeyR': // Start
-        screenMainMenu.showPressedButton();
+        screenMainMenu.showPressedStartButton();
         onStartGame();
         break;
     }
