@@ -64,7 +64,7 @@ export function withMagnitude(v: Vector, m: number): Vector {
   const { x, y } = v;
   const currentMag = getMagnitude(v);
 
-  const magnitudeRatio = currentMag / m;
+  const magnitudeRatio = m / currentMag;
 
   return {
     x: x * magnitudeRatio,

@@ -277,13 +277,14 @@ export const gameLogic = (props: Props): GameLogic => {
       right: 'KeyD',
       up: 'KeyW',
       down: 'KeyS',
+      space: 'Space',
       arrowLeft: 'ArrowLeft',
       arrowDown: 'ArrowDown',
       arrowRight: 'ArrowRight',
       arrowUp: 'ArrowUp',
     };
 
-    const playerMovement: PlayerMovement = { x: 0, y: 0 };
+    const playerMovement: PlayerMovement = { x: 0, y: 0, boost: false };
 
     if (keysDown[keys.left] || keysDown[keys.arrowLeft]) {
       playerMovement.x = -1;
@@ -296,6 +297,8 @@ export const gameLogic = (props: Props): GameLogic => {
     } else if (keysDown[keys.down] || keysDown[keys.arrowDown]) {
       playerMovement.y = 1;
     }
+
+    playerMovement.boost = !!keysDown[keys.space];
 
     playerCharacter.setMovement(playerMovement);
   };

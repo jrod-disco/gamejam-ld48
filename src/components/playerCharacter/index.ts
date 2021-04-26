@@ -28,6 +28,7 @@ import {
   PLAYER_TILT_ANGLE_THRESHOLD,
   PLAYER_TILT_SPEED_THRESHOLD,
   PLAYER_TILT_BY_ANGLE,
+  PLAYER_BOOST_SCALE,
 } from '@src/constants';
 import {
   compareMagnitude,
@@ -71,6 +72,7 @@ type PlayerPosition = { x: number; y: number; rot: number };
 export interface PlayerMovement {
   x: -1 | 0 | 1;
   y: -1 | 0 | 1;
+  boost: boolean;
 }
 
 enum PLAYER_ANIM {
@@ -129,7 +131,7 @@ export const playerCharacter = (
     startPos: { ...pos },
     pos: { ...pos },
     status: OBJECT_STATUS.ACTIVE,
-    movement: { x: 0, y: 0 },
+    movement: { x: 0, y: 0, boost: false },
     movementSpeed: { x: 0, y: 0 },
     movementAcceleration: PLAYER_ACCEL,
     dragDeceleration: PLAYER_DECEL,
@@ -390,8 +392,12 @@ export const playerCharacter = (
   };
 
   const updateSpeed = (delta: number): void => {
+    const boostScale = state.movement.boost ? PLAYER_BOOST_SCALE : 1;
     const moveDir = getUnitVector(state.movement);
-    const acceleration = vScale(moveDir, state.movementAcceleration * delta);
+    const acceleration = vScale(
+      moveDir,
+      state.movementAcceleration * boostScale * delta
+    );
     const drag = vScale(state.movementSpeed, -state.dragDeceleration * delta);
     let newSpeed = vAdd(state.movementSpeed, acceleration, drag);
 
