@@ -382,7 +382,7 @@ export const gameLogic = (props: Props): GameLogic => {
     const pY = playerCharacter.container.y;
     const pickups = pickupSpawnerRef.getPickups();
 
-    pickups.map((pickup, i) => {
+    pickups.map((pickup) => {
       const nX = pickup.container.x;
       const nY = pickup.container.y;
 
@@ -393,7 +393,8 @@ export const gameLogic = (props: Props): GameLogic => {
         pX > nX - hitBox &&
         pX < nX + hitBox &&
         pY > nY - hitBox &&
-        pY < nY + hitBox;
+        pY < nY + hitBox &&
+        pickup.getScale() > 1;
 
       if (collided) {
         playerCharacter.consumeResource({
