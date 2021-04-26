@@ -421,7 +421,7 @@ export const gameLogic = (props: Props): GameLogic => {
       const nY = pickup.container.y;
 
       // check collision by x/y locations with a hitbox buffer
-      const hitBox = 20;
+      const hitBox = 40;
 
       const collided =
         pX > nX - hitBox &&

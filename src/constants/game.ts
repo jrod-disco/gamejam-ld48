@@ -21,7 +21,7 @@ export const LAYER_START_SCALE = 0.25; // % scale the layer at depth 0
 export const START_ROT = 5; // starting rotation degrees for object
 export const ROT_INCREMENT = 0.001; // amount of rotation degrees per update()
 export const ROT_PICKUP_INCREMENT = 0.01; // amount of rotation degrees per update()
-export const PICKUP_HIT_LO = 0.9; // scale at which pickup collision occurs
+export const PICKUP_HIT_LO = 1.5; // scale at which pickup collision occurs
 export const PICKUP_HIT_HI = 3; // scale at which pickup collision occurs
 
 export const SPEED_CAVE = 0.003; // cave scale increase per update()

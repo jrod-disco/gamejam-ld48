@@ -16,6 +16,8 @@ import {
   MAX_LAYER_DEPTH,
   SFX_VOL_MULT,
   PICKUP_HIT_HI,
+  THEME,
+  PICKUP_HIT_LO,
 } from '@src/constants';
 
 export interface OxygenTank {
@@ -121,16 +123,20 @@ export const oxygenTank = (props: OxygenTankProps): OxygenTank => {
     if (state.scale >= MAX_PICKUP_SCALE) {
       reset();
     } else {
-      container.alpha = state.depth / MAX_LAYER_DEPTH;
       state.scale += SPEED_ITEM * delta;
       state.depth = (getScale() - LAYER_START_SCALE) / LAYER_SPACING;
       container.rotation += ROT_PICKUP_INCREMENT;
       positionUsingDepth(container, state.endPosX, state.endPosY, state.depth);
       container.scale.set(getScale());
-      if (
-        getScale() > PICKUP_HIT_HI &&
-        container.parent !== props.upperContainer
-      ) {
+      if (getScale() < PICKUP_HIT_LO) {
+        container.alpha = state.depth / MAX_LAYER_DEPTH;
+      }
+      else if (getScale() > PICKUP_HIT_LO && getScale() < PICKUP_HIT_HI)
+      {
+        container.alpha = 1;
+      }
+      else if (container.parent !== props.upperContainer) {
+        container.alpha = 0.25;
         props.upperContainer.addChild(container);
       }
     }
