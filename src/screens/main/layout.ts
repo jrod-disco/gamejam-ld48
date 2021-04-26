@@ -50,20 +50,24 @@ export const mainMenuLayout = (props: Props): MainMenuLayout => {
   container.name = 'main menu layout';
   const name = (): string => 'MAIN';
 
-  // Text
-  const mainTitle = new PIXI.Text('DEEPER AND DEEPER', TEXT_STYLE.TITLE_WHITE);
-  mainTitle.anchor.set(0.5);
-  mainTitle.position.x = APP_WIDTH / 2;
-  mainTitle.position.y = 40;
-  container.addChild(mainTitle);
+  const titleBackground = PIXI.Texture.from('./assets/titlescreen.png');
+  const titleSprite = new PIXI.Sprite(titleBackground);
+  container.addChild(titleSprite);
+
+  // // Text
+  // const mainTitle = new PIXI.Text('DEEPER AND DEEPER', TEXT_STYLE.TITLE_WHITE);
+  // mainTitle.anchor.set(0.5);
+  // mainTitle.position.x = APP_WIDTH / 2;
+  // mainTitle.position.y = 40;
+  // container.addChild(mainTitle);
 
   const promptText = new PIXI.Text(
-    'into the abyss',
+    'Navigate your deep sea craft using W, A, S, D, or the arrow keys. Grab the O2 tanks to stay alive. Get to the underwater research lab before the pizza gets cold or you may pay with your life.',
     TEXT_STYLE.GRADIENT_PROMPT
   );
   promptText.anchor.set(0.5);
   promptText.position.x = APP_WIDTH / 2;
-  promptText.position.y = 400;
+  promptText.position.y = 450;
   container.addChild(promptText);
 
   // Interactive Elements --------
@@ -81,7 +85,7 @@ export const mainMenuLayout = (props: Props): MainMenuLayout => {
   };
 
   const buttonStart = COMP.LIB.btnSimple({
-    pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2 },
+    pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2 + 40 },
     buttonTexture: buttonStartTexture,
     onPress: () => {
       showPressedButton();
