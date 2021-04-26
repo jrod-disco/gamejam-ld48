@@ -12,7 +12,7 @@ export const DCO_VERSION = __DCOVERSION__; // <- populated by rollup replace
 export const APP_NAME = 'dcollage-boilerplate';
 export const APP_HEIGHT = 600;
 export const APP_WIDTH = 600;
-export const APP_BGCOLOR = THEME.BG_HEX;
+export const APP_BGCOLOR = '#000000';
 
 // Layer Depths
 // MC = mainContainer

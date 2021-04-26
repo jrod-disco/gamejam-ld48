@@ -28,7 +28,7 @@ interface CaveProps {
   depth: number;
 }
 
-const WATER_BOT_COLOR = Color('rgb(32, 64, 89)');
+const WATER_BOT_COLOR = Color('rgb(0, 0, 0)');
 const WATER_TOP_COLOR = Color('rgb(34, 128, 220)');
 
 /**
