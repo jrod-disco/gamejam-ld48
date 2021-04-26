@@ -37,7 +37,6 @@ export const screenController = ({
     prevScreen: initialScreen,
   };
 
-
   /**
    * Set the current screen.
    * Tracks screen state and triggers visibility changes on the affected layouts

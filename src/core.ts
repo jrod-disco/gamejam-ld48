@@ -30,6 +30,7 @@ import {
   PersonalBestScores,
 } from './util/personalBestScore';
 import { runtime } from './components/library';
+import { TextureMatrix } from 'pixi.js';
 
 declare global {
   interface Window {
@@ -123,6 +124,7 @@ const bootstrapApp = (props: {
       uiContainer,
       mainOnAudioCycleOptions: onAudioCycleOptions,
       mainOnGameOver: onGameOver,
+      mainOnGameLose: onGameLose,
     });
   };
 
@@ -153,10 +155,14 @@ const bootstrapApp = (props: {
   browserVisibility(handleBrowserVisibility);
 
   // Sound bits
-  const pixiSound = PIXISOUND.default; //TODO: deal with persistent loading of soundeffects / also make a soundsprite already
+  const pixiSound = PIXISOUND.default; // TODO: deal with persistent loading of soundeffects / also make a soundsprite already
   // Load these up on startup...
   pixiSound.add('pickup_1', './assets/audio/sfx_pickup_1.mp3');
-  pixiSound.add('player_damage', './assets/audio/sfx_gronk_1.mp3');
+  pixiSound.add('player_damage1', './assets/audio/sfx_gronk_1.mp3');
+  pixiSound.add('player_damage2', './assets/audio/sfx_klunk_1.mp3');
+  pixiSound.add('the_end', './assets/audio/sfx_the_end_2.mp3');
+  pixiSound.add('crash', './assets/audio/sfx_crash_2.mp3');
+  pixiSound.add('alarm', './assets/audio/sfx_alarm1.mp3');
 
   const setSounds = (soundsLoaded: Sounds): void => {
     console.log('core.setSounds');
@@ -218,14 +224,17 @@ const bootstrapApp = (props: {
     spriteSheets,
   });
   SCREENS.controller.addScreenToList(SCREENS.ScreenName.MAIN, screenMainMenu);
-
   uiContainer.addChild(screenMainMenu.container);
 
-  // Sample Screen Two - Second Screen
+  // Game screen- Second Screen
   const screenGame = SCREENS.gameLayout({});
   SCREENS.controller.addScreenToList(SCREENS.ScreenName.GAME, screenGame);
-
   uiContainer.addChild(screenGame.container);
+
+  // Screen Lose - Second Screen
+  const screenLose = SCREENS.loseLayout({});
+  SCREENS.controller.addScreenToList(SCREENS.ScreenName.LOSE, screenLose);
+  uiContainer.addChild(screenLose.container);
 
   // Set main screen
   SCREENS.controller.setCurrentScreen({
@@ -265,6 +274,7 @@ const bootstrapApp = (props: {
   /////////////////////////////////////////////////////////////////////////////
   // Game Events
 
+  // onGameWin
   const onGameOver = (): void => {
     console.log('core: onGameOver');
 
@@ -275,9 +285,33 @@ const bootstrapApp = (props: {
         showPersonalBest();
         addOnKeyDown();
         // audioLayer.music.somber();
-        // audioLayer.music.menuTheme(true);
-        // audioLayer.music.playRandomTrack();
+        audioLayer.music.menuTheme(true);
       },
+    });
+    pixiSound.play('the_end', {
+      volume: 1 * SFX_VOL_MULT,
+    });
+  };
+
+  const onGameLose = (): void => {
+    console.log('core: onGameLose');
+
+    SCREENS.controller.setCurrentScreen({
+      name: SCREENS.ScreenName.LOSE,
+      isAnimated: true,
+      onComplete: () => {
+        showPersonalBest();
+        // addOnKeyDown();
+        audioLayer.stop;
+        setTimeout(onGameOver, 5000);
+      },
+    });
+
+    pixiSound.play('crash', {
+      volume: 1,
+    });
+    pixiSound.play('the_end', {
+      volume: 1,
     });
   };
 
@@ -341,6 +375,7 @@ const bootstrapApp = (props: {
     coreInterface: {
       setSounds,
       setAdditionalSprites,
+      onGameOver,
     },
   };
 };
