@@ -127,6 +127,7 @@ export const oxygenTank = (props: OxygenTankProps): OxygenTank => {
 
     if (state.scale >= MAX_PICKUP_SCALE) {
       reset();
+      container.alpha = 0;
     } else {
       //sprite.tint = getDepthColor();
       container.alpha = state.depth / MAX_LAYER_DEPTH;
