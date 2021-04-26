@@ -413,6 +413,7 @@ export const playerCharacter = (
     state.oxygen -= PLAYER_OXYGEN_CONSUMPTION_RATE;
 
     if (state.oxygen < 0) {
+      state.oxygen = 0;
       console.warn("you've succumbed to oxygen deprivation");
       gameOverHandler();
     }
@@ -470,6 +471,7 @@ export const playerCharacter = (
 
     console.log('**DAMAGE** integrity: %o', state.integrity);
     if (state.integrity <= 0) {
+      state.integrity = 0;
       console.warn("you've blown up");
       gameOverHandler();
     }

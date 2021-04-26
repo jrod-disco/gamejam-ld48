@@ -284,12 +284,8 @@ const bootstrapApp = (props: {
       onComplete: () => {
         showPersonalBest();
         addOnKeyDown();
-        // audioLayer.music.somber();
         audioLayer.music.menuTheme(true);
       },
-    });
-    pixiSound.play('the_end', {
-      volume: 1 * SFX_VOL_MULT,
     });
   };
 

@@ -62,7 +62,7 @@ export enum PICKUP_TYPES {
 // PICKUP Generator
 export const PICKUPS_MAX = 5;
 export const PICKUP_SPAWN_RATE = 4000;
-export const PICKUP_OXYGEN_TANK_QUANTITY = 3.6; // lbs of oxygen
+export const PICKUP_OXYGEN_TANK_QUANTITY = 3.5; // lbs of oxygen
 
 ///////////////////////////////////////////////////////////////////////////////
 // SIMPLE GAME - deprecate or use

@@ -247,6 +247,9 @@ export const gameLogic = (props: Props): GameLogic => {
     pickupSpawnerRef.reset();
     cleanUpPickups();
 
+    // Force final update of stats
+    gauges.update(0, playerCharacter.getState());
+
     // Clean Up Game Logic Remaining
     if (win) {
       mainOnGameOver();
