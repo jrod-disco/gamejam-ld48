@@ -242,7 +242,7 @@ export const playerCharacter = (
   frontLightLeftSprite.anchor.set(0.5, 1);
   frontLightLeftSprite.x = -84;
   frontLightLeftSprite.y = -20;
-  frontLightLeftSprite.alpha = 0.5;
+  frontLightLeftSprite.alpha = 0.4;
   frontLightLeftSprite.blendMode = PIXI.BLEND_MODES.ADD;
   container.addChild(frontLightLeftSprite);
 
@@ -250,7 +250,7 @@ export const playerCharacter = (
   frontLightRightSprite.anchor.set(0.5, 1);
   frontLightRightSprite.x = 84;
   frontLightRightSprite.y = -20;
-  frontLightRightSprite.alpha = 0.5;
+  frontLightRightSprite.alpha = 0.4;
   frontLightRightSprite.blendMode = PIXI.BLEND_MODES.ADD;
   container.addChild(frontLightRightSprite);
 
@@ -258,7 +258,7 @@ export const playerCharacter = (
   rearLightLeftSprite.anchor.set(0.5, 1);
   rearLightLeftSprite.x = -80;
   rearLightLeftSprite.y = 125;
-  rearLightLeftSprite.alpha = 0.35;
+  rearLightLeftSprite.alpha = 0.3;
   rearLightLeftSprite.blendMode = PIXI.BLEND_MODES.ADD;
   container.addChild(rearLightLeftSprite);
 
@@ -266,9 +266,55 @@ export const playerCharacter = (
   rearLightRightSprite.anchor.set(0.5, 1);
   rearLightRightSprite.x = 80;
   rearLightRightSprite.y = 125;
-  rearLightRightSprite.alpha = 0.35;
+  rearLightRightSprite.alpha = 0.3;
   rearLightRightSprite.blendMode = PIXI.BLEND_MODES.ADD;
   container.addChild(rearLightRightSprite);
+
+  const lightsList = [
+    frontLightLeftSprite,
+    frontLightRightSprite,
+    rearLightLeftSprite,
+    rearLightRightSprite,
+    underLightSprite,
+  ];
+
+  const randomFlicker = () => {
+    if (Math.random() < 0.85 || state.isTakingDamage) return;
+
+    const ranIndex = Math.floor(Math.random() * lightsList.length);
+    const randomLight = lightsList[ranIndex];
+
+    gsap.killTweensOf(randomLight);
+    randomLight.alpha = Math.random() * 0.6;
+    gsap.to(randomLight, {
+      duration: 0.2,
+      alpha: 0.3,
+      ease: Power0.easeOut,
+    });
+  };
+  const allFlicker = () => {
+    lightsList.map((light) => {
+      gsap.killTweensOf(light);
+      light.alpha = 0;
+      gsap.to(light, {
+        duration: 0.5,
+        alpha: 0.3,
+        ease: Power0.easeOut,
+      });
+    });
+  };
+
+  const allGlow = () => {
+    lightsList.map((light) => {
+      gsap.killTweensOf(light);
+      light.alpha = 0.4 + Math.random() * 0.4;
+      gsap.to(light, {
+        duration: 0.5,
+        alpha: 0.3,
+        ease: Power0.easeOut,
+      });
+    });
+  };
 
   // check distance against center and collision radius
   const checkInBounds = (pos: PlayerPosition): boolean => {
@@ -372,6 +418,8 @@ export const playerCharacter = (
       },
     });
 
+    allFlicker();
+
     screenShaker.shake({
       isBidirectional: true,
       shakeCountMax: 12,
@@ -392,7 +440,7 @@ export const playerCharacter = (
   const consumeResource = (resource: Resource): void => {
     const type = resource.getType();
     const quantity = resource.getResource();
-
+    allGlow();
     switch (type) {
       case PICKUP_TYPES.OXYGEN:
         state.oxygen += quantity;
@@ -490,7 +538,7 @@ export const playerCharacter = (
       updateSpeed(delta);
       updatePosition();
       updateContainer();
-
+      randomFlicker();
       // attribute updates
       if (Date.now() > state.lastUpdateTime + 500) {
         state.lastUpdateTime = Date.now();
