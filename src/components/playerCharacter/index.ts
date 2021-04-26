@@ -13,11 +13,13 @@ import {
   APP_WIDTH,
   OBJECT_STATUS,
   PLAYER_INIT_ROT,
-  PLAYER_OXYGEN_CONSUMPTION_RATE,
   PLAYER_ACCEL,
   PLAYER_DECEL,
   PICKUP_TYPES,
+  PLAYER_OXYGEN_CONSUMPTION_RATE,
+  PLAYER_POWER_CONSUMPTION_RATE,
   PLAYER_MAX_OXYGEN,
+  PLAYER_MAX_POWER,
   PLAYER_ROTATE_ON_MOVE,
   PLAYER_MAX_ROT_CHANGE,
   PLAYER_COLLISION_RADIUS,
@@ -420,10 +422,16 @@ export const playerCharacter = (
   };
 
   // POWER
+  // - TODO: increase power consumption by acceleration
+  const consumePower = (delta: number): void => {
+    state.power -= PLAYER_POWER_CONSUMPTION_RATE;
 
-  // should be a consequence of
-  // - time as a constant drain
-  // - additional power as a consequence of thrust
+    if (state.power < 0) {
+      state.power = 0;
+      console.warn("you've lost all power");
+      gameOverHandler();
+    }
+  };
 
   // DAMAGE
   // - collision with cave wall to reduce integrity
@@ -485,12 +493,18 @@ export const playerCharacter = (
     switch (type) {
       case PICKUP_TYPES.OXYGEN:
         state.oxygen += quantity;
-
         if (state.oxygen > PLAYER_MAX_OXYGEN) {
           state.oxygen = PLAYER_MAX_OXYGEN;
         }
-
         break;
+
+      case PICKUP_TYPES.FUEL:
+        state.power += quantity;
+        if (state.power > PLAYER_MAX_POWER) {
+          state.power = PLAYER_MAX_POWER;
+        }
+        break;
+
       default:
         console.warn('whats up with this no type havin Resource crap');
     }
@@ -570,7 +584,7 @@ export const playerCharacter = (
       if (Date.now() > state.lastUpdateTime + 500) {
         state.lastUpdateTime = Date.now();
         consumeOxygen(delta, pressure);
-        // resolvePressure
+        consumePower(delta);
       }
     }
   };
