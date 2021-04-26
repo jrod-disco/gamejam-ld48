@@ -19,13 +19,15 @@ export interface MainMenuLayout {
   container: PIXI.Container;
   setVisibility: (config: VisibilityConfig) => void;
   name: () => string;
-  showPressedButton: () => void;
+  showPressedStartButton: () => void;
+  showPressedCreditsButton: () => void;
 }
 
 interface Props {
   pos?: { x: number; y: number };
   spriteSheets?: Spritesheets;
   onPlayButtonPress: () => void;
+  onCreditsButtonPress: () => void;
 }
 
 /**
@@ -45,7 +47,7 @@ export const mainMenuLayout = (props: Props): MainMenuLayout => {
   container.x = pos.x;
   container.y = pos.y;
 
-  const { spriteSheets, onPlayButtonPress } = props;
+  const { spriteSheets, onPlayButtonPress, onCreditsButtonPress } = props;
 
   container.name = 'main menu layout';
   const name = (): string => 'MAIN';
@@ -68,32 +70,54 @@ export const mainMenuLayout = (props: Props): MainMenuLayout => {
   );
   promptText.anchor.set(0.5);
   promptText.position.x = APP_WIDTH / 2;
-  promptText.position.y = 450;
+  promptText.position.y = 480;
   container.addChild(promptText);
 
   // Interactive Elements --------
 
   // Start Button
   const buttonStartTexture = PIXI.Texture.from(
-    './assets/buttons/startbutton.png'
+    './assets/buttons/btn_start.png'
   );
   const buttonStartTexturePressed = PIXI.Texture.from(
-    './assets/buttons/startbutton_pressed.png'
+    './assets/buttons/btn_start.png'
   );
 
-  const showPressedButton = (): void => {
+  const showPressedStartButton = (): void => {
     buttonStart.setTexture(buttonStartTexturePressed);
   };
 
   const buttonStart = COMP.LIB.btnSimple({
-    pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2 + 40 },
+    pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2 },
     buttonTexture: buttonStartTexture,
     onPress: () => {
-      showPressedButton();
+      showPressedStartButton();
       onPlayButtonPress();
     },
   });
   container.addChild(buttonStart.container);
+
+  // Credits Button
+  const buttonCreditsTexture = PIXI.Texture.from(
+    './assets/buttons/btn_credits.png'
+  );
+  const buttonCreditsTexturePressed = PIXI.Texture.from(
+    './assets/buttons/btn_credits.png'
+  );
+
+  const showPressedCreditsButton = (): void => {
+    buttonCredits.setTexture(buttonCreditsTexturePressed);
+  };
+
+  const buttonCredits = COMP.LIB.btnSimple({
+    pos: { x: APP_WIDTH / 2, y: APP_HEIGHT / 2 + 90 },
+    buttonTexture: buttonCreditsTexture,
+    onPress: () => {
+      showPressedCreditsButton();
+      onCreditsButtonPress();
+    },
+  });
+  container.addChild(buttonCredits.container);
 
   // Screen Visibility Toggle ---------
   // This will be called by the screen scontroller when switching screens.
@@ -120,9 +144,11 @@ export const mainMenuLayout = (props: Props): MainMenuLayout => {
 
     // automaticaly enable or disable the button, this functionality comes from the simple button component
     buttonStart.setEnabled(isVisible);
+    buttonCredits.setEnabled(isVisible);
 
     // since we're using textures for button state, set it back to up when visible
     if (isVisible) buttonStart.setTexture(buttonStartTexture);
+    if (isVisible) buttonCredits.setTexture(buttonCreditsTexture);
   };
 
   // Default to hidden
@@ -135,6 +161,7 @@ export const mainMenuLayout = (props: Props): MainMenuLayout => {
     container,
     name,
     setVisibility,
-    showPressedButton,
+    showPressedStartButton,
+    showPressedCreditsButton,
   };
 };
