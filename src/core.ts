@@ -232,10 +232,15 @@ const bootstrapApp = (props: {
   SCREENS.controller.addScreenToList(SCREENS.ScreenName.GAME, screenGame);
   uiContainer.addChild(screenGame.container);
 
-  // Screen Lose - Second Screen
+  // Screen Game End - Second Screen
   const screenLose = SCREENS.loseLayout({});
   SCREENS.controller.addScreenToList(SCREENS.ScreenName.LOSE, screenLose);
   uiContainer.addChild(screenLose.container);
+
+  // Credits - Second Screen
+  const screenCredits = SCREENS.creditsLayout({});
+  SCREENS.controller.addScreenToList(SCREENS.ScreenName.CREDITS, screenCredits);
+  uiContainer.addChild(screenCredits.container);
 
   // Set main screen
   SCREENS.controller.setCurrentScreen({
@@ -264,6 +269,7 @@ const bootstrapApp = (props: {
         break;
       case 'Space': // Start
       case 'Enter': // Start
+      case 'KeyR': // Start
         screenMainMenu.showPressedButton();
         onStartGame();
         break;
