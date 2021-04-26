@@ -275,19 +275,25 @@ export const gameLogic = (props: Props): GameLogic => {
       right: 'KeyD',
       up: 'KeyW',
       down: 'KeyS',
+      arrowLeft: 'ArrowLeft',
+      arrowDown: 'ArrowDown',
+      arrowRight: 'ArrowRight',
+      arrowUp: 'ArrowUp',
     };
+
+    console.log(keysDown);
 
     const playerMovement: PlayerMovement = { x: 0, y: 0 };
 
-    if (keysDown[keys.left]) {
+    if (keysDown[keys.left] || keysDown[keys.arrowLeft]) {
       playerMovement.x = -1;
-    } else if (keysDown[keys.right]) {
+    } else if (keysDown[keys.right] || keysDown[keys.arrowRight]) {
       playerMovement.x = 1;
     }
 
-    if (keysDown[keys.up]) {
+    if (keysDown[keys.up] || keysDown[keys.arrowUp]) {
       playerMovement.y = -1;
-    } else if (keysDown[keys.down]) {
+    } else if (keysDown[keys.down] || keysDown[keys.arrowDown]) {
       playerMovement.y = 1;
     }
 
