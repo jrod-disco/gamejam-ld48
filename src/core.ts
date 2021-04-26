@@ -249,7 +249,8 @@ const bootstrapApp = (props: {
   SCREENS.controller.addScreenToList(SCREENS.ScreenName.CREDITS, screenCredits);
   uiContainer.addChild(screenCredits.container);
 
-  // Set main screen
+  // SET STARTING SCREEN HERE
+  // Usually main but can be set to any screen for testing
   SCREENS.controller.setCurrentScreen({
     name: SCREENS.ScreenName.MAIN,
     isAnimated: true,

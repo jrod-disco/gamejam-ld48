@@ -1,5 +1,7 @@
 import * as PIXI from 'pixi.js';
 import gsap, { Power0 } from 'gsap';
+import * as COMP from '@src/components';
+import * as SCREENS from '@src/screens';
 import { APP_HEIGHT, APP_WIDTH, TEXT_STYLE } from '@src/constants';
 
 export type ScoreDataObject = { name: string; score: number };
@@ -83,6 +85,31 @@ export const creditsLayout = (props: Props): CreditsLayout => {
   body.position.y = APP_HEIGHT / 2 + 40;
   container.addChild(body);
 
+  // Main Button
+  const buttonMainTexture = PIXI.Texture.from(
+    './assets/buttons/btn_mainmenu.png'
+  );
+  const buttonMainTexturePressed = PIXI.Texture.from(
+    './assets/buttons/btn_mainmenu.png'
+  );
+
+  const showPressedMainButton = (): void => {
+    buttonMain.setTexture(buttonMainTexturePressed);
+  };
+
+  const buttonMain = COMP.LIB.btnSimple({
+    pos: { x: APP_WIDTH / 2 + 7, y: 540 },
+    buttonTexture: buttonMainTexture,
+    onPress: () => {
+      showPressedMainButton();
+      SCREENS.controller.setCurrentScreen({
+        name: SCREENS.ScreenName.MAIN,
+        isAnimated: true,
+      });
+    },
+  });
+  container.addChild(buttonMain.container);
+
   // Screen Visibility Toggle ---------
   const setVisibility = ({
     isVisible,
@@ -101,6 +128,12 @@ export const creditsLayout = (props: Props): CreditsLayout => {
     } else {
       container.alpha = isVisible ? 1 : 0;
     }
+
+    // automaticaly enable or disable the button, this functionality comes from the simple button component
+    buttonMain.setEnabled(isVisible);
+
+    // since we're using textures for button state, set it back to up when visible
+    if (isVisible) buttonMain.setTexture(buttonMainTexture);
   };
 
   // Default to hidden

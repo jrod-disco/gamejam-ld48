@@ -117,7 +117,6 @@ export const mainMenuLayout = (props: Props): MainMenuLayout => {
       onCreditsButtonPress();
     },
   });
-
   container.addChild(buttonCredits.container);
 
   // Screen Visibility Toggle ---------
