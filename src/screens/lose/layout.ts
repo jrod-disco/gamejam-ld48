@@ -9,11 +9,21 @@ export type VisibilityConfig = {
   isAnimated: boolean;
   onCompleteCallback?: () => void;
 };
+
+export type EndGameProps = {
+  isWin: boolean;
+  displayTitle?: string;
+  displayBody?: string;
+  displayReason?: string;
+};
 export interface LoseLayout {
   container: PIXI.Container;
   reset: () => void;
   update: (delta: number) => void;
   setVisibility: (config: VisibilityConfig) => void;
+
+  // Game end context...
+  setEndGameContext: (props: EndGameProps) => void;
 }
 
 interface Props {
@@ -48,14 +58,35 @@ export const loseLayout = (props: Props): LoseLayout => {
   container.addChild(backgroundSprite);
 
   // Text
-  const promptText = new PIXI.Text(
-    'THAT DID NOT END WELL...',
-    TEXT_STYLE.GRADIENT_PROMPT
-  );
-  promptText.anchor.set(0.5);
-  promptText.position.x = APP_WIDTH / 2;
-  promptText.position.y = APP_HEIGHT / 2;
-  container.addChild(promptText);
+  const title = new PIXI.Text('.....', TEXT_STYLE.SCREEN_TITLE);
+  title.anchor.set(0.5);
+  title.position.x = APP_WIDTH / 2;
+  title.position.y = APP_HEIGHT / 2 - 100;
+  container.addChild(title);
+
+  const body = new PIXI.Text('....', TEXT_STYLE.SCREEN_BODY);
+  body.anchor.set(0.5);
+  body.position.x = APP_WIDTH / 2;
+  body.position.y = APP_HEIGHT / 2 - 50;
+  container.addChild(body);
+
+  const reason = new PIXI.Text('...', TEXT_STYLE.SCREEN_BODY_ALT);
+  reason.anchor.set(0.5);
+  reason.position.x = APP_WIDTH / 2;
+  reason.position.y = APP_HEIGHT / 2 + 25;
+  container.addChild(reason);
+
+  const setEndGameContext = ({
+    isWin = false,
+    displayTitle = 'YOUR JOURNEY HAS ENDED',
+    displayBody = `Those poor deep sea researchers will never taste the delicious pizza. And you, my friend, are sleeping with the fishes.`,
+    displayReason = 'TBD',
+  }): void => {
+    title.text = displayTitle;
+    body.text = displayBody;
+    reason.text = displayReason;
+    console.log('end game context - win?', isWin);
+  };
 
   // TODO:
   // - bitmap texture of sadness
@@ -93,5 +124,5 @@ export const loseLayout = (props: Props): LoseLayout => {
     // graphicsElement.x += 5 * delta; // throttle by delta
   };
 
-  return { container, update, reset, setVisibility };
+  return { container, update, reset, setVisibility, setEndGameContext };
 };

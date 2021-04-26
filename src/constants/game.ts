@@ -10,7 +10,7 @@ export const INIT_PRESSURE = 14; // sea level
 export const MAX_PRESSURE = 1000; // lbs/sq in
 
 export const LANDING_PAUSE_DURATION = 3000; // ms
-export const GAME_OVER_SCREEN_DELAY = 5000; // ms
+export const GAME_OVER_SCREEN_DELAY = 3000; // ms
 
 // - Depth effects
 export const MAX_LAYER_SCALE = 2.5; // % scale of layer at MAX_LAYER_DEPTH

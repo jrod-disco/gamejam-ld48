@@ -25,4 +25,36 @@ export const TEXT_STYLE = {
     fill: THEME.TXT_TITLES_HEX,
     align: 'center',
   }),
+
+  SCREEN_TITLE: new PIXI.TextStyle({
+    fontFamily: 'Roboto, sans-serif',
+    fontSize: 28,
+    fontWeight: 'bold',
+    fill: [THEME.TXT_INFO_HEX],
+    dropShadow: true,
+    dropShadowColor: THEME.BG_HEX,
+    dropShadowBlur: 5,
+    dropShadowDistance: 4,
+    align: 'center',
+    wordWrap: true,
+    wordWrapWidth: APP_WIDTH * 0.8,
+  }),
+
+  SCREEN_BODY: new PIXI.TextStyle({
+    fontFamily: 'Roboto, sans-serif',
+    fontSize: 16,
+    fill: [THEME.TXT_INFO_HEX],
+    align: 'center',
+    wordWrap: true,
+    wordWrapWidth: APP_WIDTH * 0.8,
+  }),
+
+  SCREEN_BODY_ALT: new PIXI.TextStyle({
+    fontFamily: 'Roboto, sans-serif',
+    fontSize: 21,
+    fill: [THEME.TXT_INFO_HEX],
+    align: 'center',
+    wordWrap: true,
+    wordWrapWidth: APP_WIDTH * 0.8,
+  }),
 };

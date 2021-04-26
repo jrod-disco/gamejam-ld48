@@ -21,6 +21,10 @@ import {
   SFX_VOL_MULT,
   LANDING_PAUSE_DURATION,
   GAME_OVER_SCREEN_DELAY,
+  TEXT_WIN,
+  TEXT_LOSE,
+  TEXT_REASONS_WIN,
+  TEXT_REASONS_LOSE,
 } from './constants';
 import './index.scss';
 
@@ -33,6 +37,7 @@ import {
 } from './util/personalBestScore';
 import { runtime } from './components/library';
 import { TextureMatrix } from 'pixi.js';
+import { EndGameProps } from './screens/lose/layout';
 
 declare global {
   interface Window {
@@ -126,7 +131,7 @@ const bootstrapApp = (props: {
       uiContainer,
       mainOnAudioCycleOptions: onAudioCycleOptions,
       mainOnGameOver: onGameOver,
-      mainOnGameLose: onGameLose,
+      mainOnDisplayGameEndScreen: onDisplayGameEndScreen,
     });
   };
 
@@ -294,15 +299,29 @@ const bootstrapApp = (props: {
     }, LANDING_PAUSE_DURATION);
   };
 
-  const onGameLose = (): void => {
-    console.log('core: onGameLose');
+  const onDisplayGameEndScreen = (props?: EndGameProps): void => {
+    console.log('core: onDisplayGameEndScreen');
+    const { isWin, displayReason } = props;
+    const titleAndBody = isWin ? TEXT_WIN : TEXT_LOSE;
+
+    const loseReasonTextPool = TEXT_REASONS_LOSE[displayReason];
+    const reasonText = isWin
+      ? TEXT_REASONS_WIN[Math.floor(Math.random() * TEXT_REASONS_WIN.length)]
+      : loseReasonTextPool[
+          Math.floor(Math.random() * loseReasonTextPool.length)
+        ];
+
+    screenLose.setEndGameContext({
+      isWin,
+      ...titleAndBody,
+      displayReason: reasonText,
+    });
 
     SCREENS.controller.setCurrentScreen({
       name: SCREENS.ScreenName.LOSE,
       isAnimated: true,
       onComplete: () => {
         showPersonalBest();
-        // addOnKeyDown();
         audioLayer.stop;
         setTimeout(onGameOver, GAME_OVER_SCREEN_DELAY);
       },

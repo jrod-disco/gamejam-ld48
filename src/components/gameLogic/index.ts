@@ -21,6 +21,7 @@ import { ScoreDisplay } from '../library/scoreDisplay';
 import { PickupSpawner, pickupSpawner } from './pickupSpawner';
 // import { OxygenTank, FuelTank } from '../pickups';
 import { Cave } from '../cave';
+import { EndGameProps } from '@src/screens/lose/layout';
 
 type Refs = {
   scoreDisplay?: ScoreDisplay;
@@ -29,7 +30,7 @@ type Refs = {
   uiContainer?: PIXI.Container;
   mainOnAudioCycleOptions?: () => void;
   mainOnGameOver?: () => void;
-  mainOnGameLose?: () => void;
+  mainOnDisplayGameEndScreen?: () => void;
 };
 
 export interface GameLogic {
@@ -90,7 +91,7 @@ export const gameLogic = (props: Props): GameLogic => {
   const caveContainer = new PIXI.Container();
 
   let mainOnGameOver: () => void = null;
-  let mainOnGameLose: () => void = null;
+  let mainOnDisplayGameEndScreen: (props: EndGameProps) => void = null;
   let mainOnAudioCycleOptions: () => void = null;
 
   const { gameContainer, spriteSheets } = props;
@@ -125,7 +126,8 @@ export const gameLogic = (props: Props): GameLogic => {
     if (refs.spriteSheets) spriteSheetsRef = refs.spriteSheets;
     if (refs.uiContainer) uiContainerRef = refs.uiContainer;
     if (refs.mainOnGameOver) mainOnGameOver = refs.mainOnGameOver;
-    if (refs.mainOnGameLose) mainOnGameLose = refs.mainOnGameLose;
+    if (refs.mainOnDisplayGameEndScreen)
+      mainOnDisplayGameEndScreen = refs.mainOnDisplayGameEndScreen;
     if (refs.mainOnAudioCycleOptions)
       mainOnAudioCycleOptions = refs.mainOnAudioCycleOptions;
 
@@ -243,11 +245,12 @@ export const gameLogic = (props: Props): GameLogic => {
   // - playerCharacter.integrity reaches 0
   // - playerCharacter.oxygen reaches 0
 
-  const onGameOver = (win: boolean = true): void => {
+  const onGameOver = (win = true): void => {
     console.log('gameLogic: onGameOver');
 
+    const finalPlayerState = playerCharacter.getState();
     // Force final update of stats
-    gauges.update(0, playerCharacter.getState());
+    gauges.update(0, finalPlayerState);
 
     // stop updates
     state.isGameOver = true;
@@ -262,12 +265,12 @@ export const gameLogic = (props: Props): GameLogic => {
     pickupSpawnerRef.reset();
     cleanUpPickups();
 
-    // Clean Up Game Logic Remaining
-    if (win) {
-      mainOnGameOver();
-    } else {
-      mainOnGameLose();
-    }
+    // Display endscreen and provide context
+    // this screen will show for some time then go back to main menu automatically
+    let displayReason = 'health';
+    if (finalPlayerState.oxygen === 0) displayReason = 'oxygen';
+    if (finalPlayerState.power === 0) displayReason = 'fuel';
+    mainOnDisplayGameEndScreen({ isWin: win, displayReason });
   };
 
   /////////////////////////////////////////////////////////////////////////////

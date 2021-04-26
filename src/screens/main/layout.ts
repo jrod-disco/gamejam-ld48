@@ -62,7 +62,8 @@ export const mainMenuLayout = (props: Props): MainMenuLayout => {
   // container.addChild(mainTitle);
 
   const promptText = new PIXI.Text(
-    'Navigate your deep sea craft using W, A, S, D, or the arrow keys. Grab the O2 tanks to stay alive. Get to the underwater research lab before the pizza gets cold or you may pay with your life.',
+    `Navigate your deep sea craft using W, A, S, D, or the arrow keys. Grab the O2 tanks to stay alive. Hold SPACE for a speed boost.
+    Get to the underwater research lab before the pizza gets cold or you may pay with your life.`,
     TEXT_STYLE.GRADIENT_PROMPT
   );
   promptText.anchor.set(0.5);
