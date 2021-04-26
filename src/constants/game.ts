@@ -4,8 +4,8 @@ export const IS_SCORE_INCREMENTY = false;
 // - mariana trench is 40k deep,  8000 lbs/sq in
 // - for faux ocean floor:
 export const INIT_DEPTH = 0;
-export const MAX_DEPTH = 5000; // feet
-export const NEAR_MAX_DEPTH = 4500; // feet
+export const MAX_DEPTH = 2000; // feet
+export const NEAR_MAX_DEPTH = 1500; // feet
 export const INIT_PRESSURE = 14; // sea level
 export const MAX_PRESSURE = 1000; // lbs/sq in
 

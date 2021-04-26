@@ -3,7 +3,7 @@ import { Extract } from '@pixi/extract';
 import { Renderer } from '@pixi/core';
 import Color from 'color';
 import { positionUsingDepth } from '@src/util/positionUsingDepth';
-import { 
+import {
   APP_HEIGHT,
   APP_WIDTH,
   MAX_LAYER_DEPTH,
@@ -28,7 +28,7 @@ interface CaveProps {
   depth: number;
 }
 
-const WATER_BOT_COLOR = Color('rgb(0, 0, 0)');
+const WATER_BOT_COLOR = Color('rgb(4, 0, 0)');
 const WATER_TOP_COLOR = Color('rgb(34, 128, 220)');
 
 /**
@@ -44,7 +44,7 @@ export const cave = (props: CaveProps): Cave => {
   const sprite = new PIXI.Sprite(caveTexture);
 
   let state = {
-    scale: LAYER_START_SCALE + (props.depth * LAYER_SPACING),
+    scale: LAYER_START_SCALE + props.depth * LAYER_SPACING,
     depth: props.depth,
     landing: false,
     maxScale: MAX_LAYER_SCALE,
@@ -69,7 +69,7 @@ export const cave = (props: CaveProps): Cave => {
     sprite.tint = getDepthColor();
     sprite.scale.set(state.scale);
     sprite.rotation = Math.random() * 360;
-    positionUsingDepth(sprite, APP_WIDTH/2, APP_HEIGHT/2, state.depth);
+    positionUsingDepth(sprite, APP_WIDTH / 2, APP_HEIGHT / 2, state.depth);
   };
   reset();
 
@@ -95,7 +95,7 @@ export const cave = (props: CaveProps): Cave => {
   const land = (): void => {
     state.landing = true;
     state.maxScale = MAX_LAYER_SCALE * 2;
-  }
+  };
 
   return { sprite, reset, update, land };
 };

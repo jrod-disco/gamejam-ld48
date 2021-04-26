@@ -140,6 +140,7 @@ export const gameLogic = (props: Props): GameLogic => {
       nearDepthCallback: () => {
         pickupSpawnerRef.land();
         caves.forEach((cave: Cave) => cave.land());
+        fadeInLandingPlatform();
       },
     });
     uiContainerRef.addChild(depthMeter.container);
@@ -159,6 +160,14 @@ export const gameLogic = (props: Props): GameLogic => {
 
   const setSpriteSheet = (spriteSheet: Spritesheets): void => {
     spriteSheetsRef = { ...spriteSheetsRef, ...spriteSheet };
+  };
+
+  const landingPlatformTexture = PIXI.Texture.from(
+    `./assets/cave/caveBottom.png`
+  );
+  const landingPlatformSprite = new PIXI.Sprite(landingPlatformTexture);
+  const fadeInLandingPlatform = () => {
+    caveContainer.addChildAt(landingPlatformSprite, 0);
   };
 
   /////////////////////////////////////////////////////////////////////////////
