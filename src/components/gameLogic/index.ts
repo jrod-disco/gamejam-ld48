@@ -9,6 +9,8 @@ import {
   START_LEVEL,
   IS_SCORE_INCREMENTY,
   MAX_LAYER_DEPTH,
+  PICKUP_HIT_LO,
+  PICKUP_HIT_HI,
 } from '@src/constants';
 import * as COMP from '..';
 import { PlayerCharacter, PlayerMovement } from '../playerCharacter';
@@ -281,8 +283,6 @@ export const gameLogic = (props: Props): GameLogic => {
       arrowUp: 'ArrowUp',
     };
 
-    console.log(keysDown);
-
     const playerMovement: PlayerMovement = { x: 0, y: 0 };
 
     if (keysDown[keys.left] || keysDown[keys.arrowLeft]) {
@@ -316,7 +316,7 @@ export const gameLogic = (props: Props): GameLogic => {
   // CAVE
 
   const caveContainer = new PIXI.Container();
-  gameContainer.addChild(caveContainer);
+  gameContainer.addChild(caveContainer);  // place below submarine
 
   for (let depth = 0; depth < MAX_LAYER_DEPTH; depth++) {
     const cave = COMP.cave({ depth });
@@ -336,23 +336,26 @@ export const gameLogic = (props: Props): GameLogic => {
   /////////////////////////////////////////////////////////////////////////////
   // ITEMZ
 
-  const itemContainer = new PIXI.Container();
-  gameContainer.addChild(itemContainer);
-  itemContainer.filters = [new BloomFilter(6)];
+  const pickupContainerLower = new PIXI.Container();
+  const pickupContainerUpper = new PIXI.Container();
 
   // Pickup Spawner
   pickupSpawnerRef = pickupSpawner({
     anims: spriteSheets.game.animations,
+    pickupContainerLower,
+    pickupContainerUpper,
   });
-  const pickupContainer = new PIXI.Container();
-  itemContainer.addChild(pickupContainer);
+
+  // Must be lower than Submarine
+  pickupContainerLower.filters = [new BloomFilter(6)];
+  gameContainer.addChild(pickupContainerLower);
 
   const updatePickups = (): void => {
     const maybePickup = pickupSpawnerRef.spawn();
-    maybePickup && pickupContainer.addChild(maybePickup.container);
+    maybePickup && pickupContainerLower.addChild(maybePickup.container);
   };
   const cleanUpPickups = (): void => {
-    pickupContainer.removeChildren();
+    pickupContainerLower.removeChildren();
   };
 
   /////////////////////////////////////////////////////////////////////////////
@@ -380,6 +383,10 @@ export const gameLogic = (props: Props): GameLogic => {
   });
   subContainer.addChild(playerCharacter.container);
 
+  // Must be on top of Submarine
+  pickupContainerUpper.filters = [new BloomFilter(6)];
+  gameContainer.addChild(pickupContainerUpper);
+
   // TODO:
   // - abstract to class
 
@@ -404,7 +411,8 @@ export const gameLogic = (props: Props): GameLogic => {
         pX < nX + hitBox &&
         pY > nY - hitBox &&
         pY < nY + hitBox &&
-        pickup.getScale() > 1;
+        pickup.getScale() > PICKUP_HIT_LO &&
+        pickup.getScale() < PICKUP_HIT_HI;
 
       if (collided) {
         playerCharacter.consumeResource({
