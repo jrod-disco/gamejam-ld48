@@ -579,6 +579,12 @@ export const playerCharacter = (
     state.pos = { ...state.startPos };
     updateContainer();
     state = { ...initialState };
+
+    // lights out
+    lightsList.map((light) => {
+      gsap.killTweensOf(light);
+      light.alpha = 0;
+    });
   };
 
   const update = (props: UpdateProps): void => {
