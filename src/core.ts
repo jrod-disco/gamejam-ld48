@@ -169,8 +169,10 @@ const bootstrapApp = (props: {
   pixiSound.add('player_damage1', './assets/audio/sfx_gronk_1.mp3');
   pixiSound.add('player_damage2', './assets/audio/sfx_klunk_1.mp3');
   pixiSound.add('the_end', './assets/audio/sfx_the_end_2.mp3');
-  pixiSound.add('crash', './assets/audio/sfx_crash_2.mp3');
   pixiSound.add('alarm', './assets/audio/sfx_alarm1.mp3');
+  pixiSound.add('motor', './assets/audio/sfx_motor_1.mp3');
+  pixiSound.add('wonder', './assets/audio/sfx_wonder_1.mp3');
+  pixiSound.add('foam', './assets/audio/sfx_foam_1.mp3');
 
   const setSounds = (soundsLoaded: Sounds): void => {
     console.log('core.setSounds');
@@ -299,6 +301,7 @@ const bootstrapApp = (props: {
   // onGameWin
   const onGameOver = (): void => {
     console.log('core: onGameOver');
+    // audioLayer.stopAll();
 
     setTimeout((): void => {
       SCREENS.controller.setCurrentScreen({
@@ -336,27 +339,32 @@ const bootstrapApp = (props: {
       isAnimated: true,
       onComplete: () => {
         showPersonalBest();
-        audioLayer.stop;
-        // setTimeout(onGameOver, GAME_OVER_SCREEN_DELAY);
+        audioLayer.stopAll();
+        audioLayer.music.mainTheme(true);
+        if (!isWin) {
+          pixiSound.play('player_damage1', {
+            volume: 1 * SFX_VOL_MULT,
+          });
+          pixiSound.play('the_end', {
+            volume: 1 * SFX_VOL_MULT,
+          });
+        } else {
+          pixiSound.play('wonder', {
+            volume: 1 * SFX_VOL_MULT,
+          });
+          pixiSound.play('foam', {
+            volume: 1 * SFX_VOL_MULT,
+          });
+        }
       },
-    });
-
-    pixiSound.play('crash', {
-      volume: 1,
-    });
-    pixiSound.play('the_end', {
-      volume: 1,
     });
   };
 
   // Start Game
   const onStartGame = (): void => {
     console.log('core: onStartGame');
+    audioLayer.stopAll();
     removeOnKeyDown();
-
-    pixiSound.play('good', {
-      volume: 1 * SFX_VOL_MULT,
-    });
 
     bestScore.setVisibility(false);
     SCREENS.controller.setCurrentScreen({
@@ -368,7 +376,12 @@ const bootstrapApp = (props: {
         gameLogic.onStartGame();
       },
     });
-    audioLayer.music.loopRandomTrack();
+
+    setTimeout(audioLayer.music.loopRandomTrack, 2000);
+    // audioLayer.music.loopRandomTrack();
+    pixiSound.play('wonder', {
+      volume: 1 * SFX_VOL_MULT,
+    });
   };
 
   // ------------------------------------

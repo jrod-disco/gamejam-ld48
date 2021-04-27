@@ -22,6 +22,7 @@ export interface AudioLayer {
     playTracklist: () => void;
     loopRandomTrack: () => void;
   };
+  stopAll: () => void;
   muteToggle: (shouldMute?: boolean, isTemporary?: boolean) => void;
   getMutedState: () => boolean;
 }
@@ -76,8 +77,8 @@ export const audio = (sounds: Sounds): AudioLayer => {
     });
   };
 
-  const mainVolume = (): number => 0.5 * MUSIC_VOL_MULT;
-  const menuVolume = (): number => 0.5 * MUSIC_VOL_MULT;
+  const mainVolume = (): number => 1 * MUSIC_VOL_MULT;
+  const menuVolume = (): number => 1 * MUSIC_VOL_MULT;
 
   // Called when we've got all the things...
   const stopAllThemes = (): void => {
@@ -133,6 +134,10 @@ export const audio = (sounds: Sounds): AudioLayer => {
     }
   };
 
+  const stopAll = (): void => {
+    stopAllThemes();
+  };
+
   const muteToggle = (shouldMute?: boolean, isTemporary = false): void => {
     if (shouldMute === undefined) {
       isMuted = !isMuted;
@@ -162,6 +167,7 @@ export const audio = (sounds: Sounds): AudioLayer => {
       playRandomTrack,
       loopRandomTrack,
     },
+    stopAll,
     muteToggle,
     getMutedState,
   };

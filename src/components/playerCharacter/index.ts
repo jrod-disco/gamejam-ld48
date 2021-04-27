@@ -423,11 +423,16 @@ export const playerCharacter = (
   };
 
   // POWER
-  // - TODO: increase power consumption by acceleration
   const consumePower = (delta: number): void => {
     const rate = state.movement.boost
       ? PLAYER_BOOST_POWER_CONSUMPTION_RATE
       : PLAYER_POWER_CONSUMPTION_RATE;
+
+    if (state.movement.boost) {
+      pixiSound.play('motor', {
+        volume: 1 * SFX_VOL_MULT,
+      });
+    }
 
     state.power -= rate;
 
