@@ -50,9 +50,9 @@ export const PLAYER_TILT_SPEED_THRESHOLD = 1;
 // resources
 export const PLAYER_INTEGRITY = 100; // starting integrity
 export const PLAYER_MAX_OXYGEN = 100; // full tank, init value
-export const PLAYER_OXYGEN_CONSUMPTION_RATE = 0.72; // lbs per second
+export const PLAYER_OXYGEN_CONSUMPTION_RATE = 0.68; // lbs per second
 export const PLAYER_MAX_POWER = 100; // full tank, init value
-export const PLAYER_POWER_CONSUMPTION_RATE = 0.35; // power per second
+export const PLAYER_POWER_CONSUMPTION_RATE = 0.38; // power per second
 export const PLAYER_BOOST_POWER_CONSUMPTION_RATE = 1.5; // power per second while boosting
 
 // collision
@@ -68,10 +68,10 @@ export enum PICKUP_TYPES {
 
 // PICKUP Generator
 export const PICKUPS_MAX = 6;
-export const PICKUPS_RANDOM_WEIGHT = 70;
+export const PICKUPS_RANDOM_WEIGHT = 75;
 export const PICKUP_SPAWN_RATE = 3650;
-export const PICKUP_OXYGEN_TANK_QUANTITY = 4; // lbs of oxygen
-export const PICKUP_FUEL_TANK_QUANTITY = 3; // lbs of fuel
+export const PICKUP_OXYGEN_TANK_QUANTITY = 4.25; // lbs of oxygen
+export const PICKUP_FUEL_TANK_QUANTITY = 2.75; // lbs of fuel
 
 // Objects
 export enum OBJECT_STATUS {
