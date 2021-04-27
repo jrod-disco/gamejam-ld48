@@ -227,6 +227,7 @@ export const gameLogic = (props: Props): GameLogic => {
     depthMeter.reset();
     depthMeter.start();
     playerCharacter.reset();
+    caveBottom.reset();
     caves.forEach((cave: Cave) => cave.reset());
     // Remove the landing layer
     caves = caves.filter((cave: Cave): boolean => !cave.isLandLayer());
@@ -341,6 +342,8 @@ export const gameLogic = (props: Props): GameLogic => {
   /////////////////////////////////////////////////////////////////////////////
   // CAVE
 
+  const caveBottom = COMP.caveBottom();
+  gameContainer.addChild(caveBottom.sprite);
   gameContainer.addChild(caveContainer); // place below submarine
 
   for (let depth = 0; depth < MAX_LAYER_DEPTH; depth++) {
@@ -501,6 +504,8 @@ export const gameLogic = (props: Props): GameLogic => {
     gauges.update(delta, playerCharacter.getState());
 
     IS_SCORE_INCREMENTY && scoreDisplay.update(delta);
+
+    caveBottom.update(delta, depthLevelSegment);
 
     const pos = playerCharacter.getState().pos;
     caves.forEach((cave) => {

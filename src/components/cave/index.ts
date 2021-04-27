@@ -20,7 +20,7 @@ Renderer.registerPlugin('extract', Extract);
 export interface Cave {
   sprite: PIXI.Sprite;
   reset: (depth?: number) => void;
-  update: (delta: number, x: number, y: number) => void;
+  update: (delta: number, x: number, y: number, level: number) => void;
   startLanding: () => void;
   isLandLayer: () => boolean;
 }
@@ -31,8 +31,13 @@ interface CaveProps {
   isLandLayer: boolean;
 }
 
-const WATER_BOT_COLOR = Color('rgb(0, 0, 0)');
-const WATER_TOP_COLOR = Color('rgb(34, 128, 220)');
+export const WATER_COLORS: Color[] = [
+  Color('rgb(27, 192, 221)'),
+  Color('rgb(17, 99, 144)'),
+  Color('rgb(10, 30, 71)'),
+  Color('rgb(3, 7, 17)'),
+  Color('rgb(0, 0, 0)'),
+]
 
 /**
  * A component boiler plate for use when creating new components
@@ -50,12 +55,13 @@ export const cave = (props: CaveProps): Cave => {
     landing: false,
     maxScale: MAX_LAYER_SCALE,
     isLandLayer: props.isLandLayer,
+    level: 0
   };
   const initialState = { ...state };
 
   const getDepthColor = (): number => {
-    return WATER_BOT_COLOR.mix(
-      WATER_TOP_COLOR,
+    return WATER_COLORS[state.level + 1].mix(
+      WATER_COLORS[state.level],
       state.depth / MAX_LAYER_DEPTH
     ).rgbNumber();
   };
@@ -81,7 +87,9 @@ export const cave = (props: CaveProps): Cave => {
   };
   reset();
 
-  const update = (delta: number, x: number, y: number): void => {
+  const update = (delta: number, x: number, y: number, level: number): void => {
+    state.level = level;
+
     if (state.scale >= state.maxScale) {
       if (state.landing) return;
       state.scale = LAYER_START_SCALE;
