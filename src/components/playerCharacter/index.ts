@@ -34,6 +34,7 @@ import {
   PLAYER_TILT_BY_ANGLE,
   PLAYER_BOOST_SCALE,
   PLAYER_BOOST_POWER_CONSUMPTION_RATE,
+  PLAYER_IDLE_POWER_CONSUMPTION_RATE,
 } from '@src/constants';
 import {
   compareMagnitude,
@@ -427,12 +428,14 @@ export const playerCharacter = (
 
   // POWER
   const consumePower = (delta: number): void => {
+    const isMoving = state.movement.x !== 0 || state.movement.y !== 0;
+
+    // reduce power consumption when we're not moving, and consume extra while boosting
     const rate = state.movement.boost
       ? PLAYER_BOOST_POWER_CONSUMPTION_RATE
-      : // reduce power consumption when we're not moving
-      state.movement.x === 0 || state.movement.y === 0
-      ? PLAYER_POWER_CONSUMPTION_RATE * 0.1
-      : PLAYER_POWER_CONSUMPTION_RATE;
+      : isMoving
+      ? PLAYER_POWER_CONSUMPTION_RATE
+      : PLAYER_IDLE_POWER_CONSUMPTION_RATE;
 
     if (state.movement.boost) {
       pixiSound.play('motor', {
@@ -440,7 +443,7 @@ export const playerCharacter = (
       });
     }
 
-    state.power -= rate;
+    state.power -= rate * delta;
 
     if (state.power < 0) {
       state.power = 0;

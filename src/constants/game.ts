@@ -52,6 +52,7 @@ export const PLAYER_INTEGRITY = 100; // starting integrity
 export const PLAYER_MAX_OXYGEN = 100; // full tank, init value
 export const PLAYER_OXYGEN_CONSUMPTION_RATE = 0.68; // lbs per second
 export const PLAYER_MAX_POWER = 100; // full tank, init value
+export const PLAYER_IDLE_POWER_CONSUMPTION_RATE = 0.1; // power per second
 export const PLAYER_POWER_CONSUMPTION_RATE = 0.38; // power per second
 export const PLAYER_BOOST_POWER_CONSUMPTION_RATE = 1.5; // power per second while boosting
 

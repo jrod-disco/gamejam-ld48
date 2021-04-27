@@ -140,7 +140,7 @@ export const gauges = (props: Props): Gauges => {
   });
   container.addChild(health.container);
 
-  const updateState = (playerState: PlayerState) => {
+  const updateState = (playerState: PlayerState): void => {
     state.oxygen = playerState.oxygen;
     state.power = playerState.power;
     state.isBoosting = playerState.movement.boost;
