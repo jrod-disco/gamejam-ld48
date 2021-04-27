@@ -267,7 +267,6 @@ export const gameLogic = (props: Props): GameLogic => {
     removeOnKeyDown();
 
     // Clean Up Component Logic and Sprites
-    pickupSpawnerRef.reset();
     cleanUpPickups();
 
     // Display endscreen and provide context
@@ -385,7 +384,9 @@ export const gameLogic = (props: Props): GameLogic => {
     maybePickup && pickupContainerLower.addChild(maybePickup.container);
   };
   const cleanUpPickups = (): void => {
+    pickupSpawnerRef.reset();
     pickupContainerLower.removeChildren();
+    pickupContainerUpper.removeChildren();
   };
 
   /////////////////////////////////////////////////////////////////////////////
