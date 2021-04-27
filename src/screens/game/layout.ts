@@ -52,7 +52,7 @@ export const gameLayout = (props: Props): GameLayout => {
   }: VisibilityConfig): void => {
     if (isAnimated) {
       gsap.to(container, 0.5, {
-        delay: 0.25,
+        delay: isVisible ? 1.25 : 0.25,
         alpha: isVisible ? 1 : 0,
         ease: Power0.easeOut,
         onComplete: () => {
