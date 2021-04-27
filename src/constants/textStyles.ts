@@ -37,7 +37,7 @@ export const TEXT_STYLE = {
     dropShadowDistance: 4,
     align: 'center',
     wordWrap: true,
-    wordWrapWidth: APP_WIDTH * 0.8,
+    wordWrapWidth: APP_WIDTH * 0.9,
   }),
 
   SCREEN_BODY: new PIXI.TextStyle({
