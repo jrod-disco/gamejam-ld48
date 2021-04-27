@@ -373,9 +373,10 @@ const bootstrapApp = (props: {
       onComplete: () => {
         console.log('core: screen transition complete');
         // Defer starting the timer until the fade is complete
-        gameLogic.onStartGame();
       },
     });
+
+    gameLogic.onStartGame();
 
     setTimeout(audioLayer.music.loopRandomTrack, 2000);
     // audioLayer.music.loopRandomTrack();
