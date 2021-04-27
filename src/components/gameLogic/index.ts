@@ -229,6 +229,7 @@ export const gameLogic = (props: Props): GameLogic => {
     playerCharacter.reset();
     caveBottom.reset();
     caves.forEach((cave: Cave) => cave.reset());
+    pickupSpawnerRef.reset();
     // Remove the landing layer
     caves = caves.filter((cave: Cave): boolean => !cave.isLandLayer());
 
