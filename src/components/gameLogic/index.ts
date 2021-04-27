@@ -5,6 +5,7 @@ import {
   APP_WIDTH,
   APP_HEIGHT,
   POINTS_GOLD,
+  POINTS_WIN,
   START_LEVEL,
   IS_SCORE_INCREMENTY,
   MAX_LAYER_DEPTH,
@@ -143,6 +144,7 @@ export const gameLogic = (props: Props): GameLogic => {
     depthMeter = COMP.UI.depthMeter({
       pos: { x: 25, y: 75 },
       maxDepthCallback: () => {
+        scoreDisplay.addToScore(POINTS_WIN);
         console.log('MAX REACHED');
         onGameOver(true); // win
       },

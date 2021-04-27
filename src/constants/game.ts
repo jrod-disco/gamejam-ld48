@@ -83,6 +83,7 @@ export enum OBJECT_STATUS {
 // SIMPLE GAME - deprecate or use
 
 export const POINTS_DEPTH_MULTIPLIER = [5, 10, 25, 50];
+export const POINTS_WIN = 15000;
 
 // Gold
 export const POINTS_GOLD = 2;
