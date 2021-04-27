@@ -68,6 +68,7 @@ export const pickupSpawner = (props: PickupSpawnerProps): PickupSpawner => {
   // Reset called by play again and also on init
   const reset = (): void => {
     console.log('pickup spawner reset');
+    state.pickupList.forEach((pickup: PickupTank) => pickup.reset)
     state = { ...initialState, pickupList: [] };
   };
   reset();
