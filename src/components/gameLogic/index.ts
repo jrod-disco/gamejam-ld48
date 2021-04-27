@@ -11,6 +11,7 @@ import {
   PICKUP_HIT_LO,
   PICKUP_HIT_HI,
   LANDING_PAUSE_DURATION,
+  POINTS_DEPTH_MULTIPLIER,
 } from '@src/constants';
 import * as COMP from '..';
 import { PlayerCharacter, PlayerMovement } from '../playerCharacter';
@@ -71,6 +72,7 @@ export const gameLogic = (props: Props): GameLogic => {
     isGameOver: true,
     isGamePaused: false,
     playerScore: 0,
+    lastDepth: 0,
   };
   const initialState = { ...state };
 
@@ -443,7 +445,11 @@ export const gameLogic = (props: Props): GameLogic => {
           getResource: pickup.getResource,
         });
 
-        scoreDisplay.addToScore(POINTS_GOLD);
+        const currentDepth = depthMeter.getCurrentDepth();
+        const depthLevelSegment = Math.floor(currentDepth / 1500);
+        const multiplier = POINTS_DEPTH_MULTIPLIER[depthLevelSegment];
+
+        scoreDisplay.addToScore(POINTS_GOLD * multiplier);
         pickup.handleCollision();
         pickup.reset();
       }
@@ -461,12 +467,13 @@ export const gameLogic = (props: Props): GameLogic => {
     checkDownKeys(state.keysDown);
     updatePickups();
 
+    // Spawner
     pickupSpawnerRef.getPickups().forEach((pickup: any): void => {
       pickup.update(delta);
     });
 
+    // Depth and depth 4 segments
     const currentDepth = depthMeter.getCurrentDepth();
-
     const depthLevelSegment = Math.floor(currentDepth / 1500);
 
     playerCharacter.update({
@@ -476,6 +483,13 @@ export const gameLogic = (props: Props): GameLogic => {
       time: runtime.getRunTime(),
     });
 
+    // Lots of Points
+    const multiplier = POINTS_DEPTH_MULTIPLIER[depthLevelSegment];
+    if (currentDepth > state.lastDepth) scoreDisplay.addToScore(1 * multiplier);
+
+    state.lastDepth = currentDepth;
+
+    // Collision detection
     checkCollision();
 
     // Update individual controller refs here
