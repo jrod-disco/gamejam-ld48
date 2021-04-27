@@ -105,6 +105,7 @@ export type PlayerState = {
   lastAnim: PLAYER_ANIM;
   isTakingDamage: boolean;
   lastUpdateTime: number;
+  depthLevelSegment: number;
 };
 
 /**
@@ -152,6 +153,8 @@ export const playerCharacter = (
     lastAnim: PLAYER_ANIM.IDLE,
     isTakingDamage: false,
     lastUpdateTime: Date.now(),
+    //
+    depthLevelSegment: 0,
   };
   const initialState = { ...state };
 
@@ -162,7 +165,7 @@ export const playerCharacter = (
   underLightSprite.anchor.set(0.5);
   underLightSprite.x = 0;
   underLightSprite.y = 0;
-  underLightSprite.alpha = defaultUnderglowAlpha;
+  underLightSprite.alpha = 0;
   underLightSprite.blendMode = lightBlendMode;
   container.addChild(underLightSprite);
 
@@ -289,7 +292,7 @@ export const playerCharacter = (
   frontLightLeftSprite.anchor.set(0.5, 1);
   frontLightLeftSprite.x = -84;
   frontLightLeftSprite.y = -20;
-  frontLightLeftSprite.alpha = 0.5;
+  frontLightLeftSprite.alpha = 0;
   frontLightLeftSprite.blendMode = lightBlendMode;
   container.addChild(frontLightLeftSprite);
 
@@ -297,7 +300,7 @@ export const playerCharacter = (
   frontLightRightSprite.anchor.set(0.5, 1);
   frontLightRightSprite.x = 84;
   frontLightRightSprite.y = -20;
-  frontLightRightSprite.alpha = 0.5;
+  frontLightRightSprite.alpha = 0;
   frontLightRightSprite.blendMode = lightBlendMode;
   container.addChild(frontLightRightSprite);
 
@@ -305,7 +308,7 @@ export const playerCharacter = (
   rearLightLeftSprite.anchor.set(0.5, 1);
   rearLightLeftSprite.x = -80;
   rearLightLeftSprite.y = 125;
-  rearLightLeftSprite.alpha = 0.15;
+  rearLightLeftSprite.alpha = 0;
   rearLightLeftSprite.blendMode = lightBlendMode;
   container.addChild(rearLightLeftSprite);
 
@@ -313,7 +316,7 @@ export const playerCharacter = (
   rearLightRightSprite.anchor.set(0.5, 1);
   rearLightRightSprite.x = 80;
   rearLightRightSprite.y = 125;
-  rearLightRightSprite.alpha = 0.15;
+  rearLightRightSprite.alpha = 0;
   rearLightRightSprite.blendMode = lightBlendMode;
   container.addChild(rearLightRightSprite);
 
@@ -360,7 +363,7 @@ export const playerCharacter = (
       light.alpha = 0;
       gsap.to(light, {
         duration: 0.5,
-        alpha: 0.3,
+        alpha: state.depthLevelSegment > 0 ? 0.3 : 0,
         ease: Power0.easeOut,
       });
     });
@@ -372,7 +375,7 @@ export const playerCharacter = (
       light.alpha = 0.4 + Math.random() * 0.4;
       gsap.to(light, {
         duration: 0.5,
-        alpha: 0.3,
+        alpha: state.depthLevelSegment > 0 ? 0.3 : 0,
         ease: Power0.easeOut,
       });
     });
@@ -589,7 +592,12 @@ export const playerCharacter = (
       }
       updatePosition();
       updateContainer();
-      randomFlicker();
+
+      // Depth and depth 4 segments
+      const depthLevelSegment = Math.floor(depth / 1500);
+      state.depthLevelSegment = depthLevelSegment;
+      if (depthLevelSegment > 0) randomFlicker();
+
       // attribute updates
       if (Date.now() > state.lastUpdateTime + 500) {
         state.lastUpdateTime = Date.now();
