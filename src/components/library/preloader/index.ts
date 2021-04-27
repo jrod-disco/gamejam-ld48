@@ -48,11 +48,6 @@ export const preloader = (props: PreloaderProps): Preloader => {
   };
 
   const secondaryLoad = (onAssetsLoadedCallback: () => void): void => {
-    // Sound bits
-    const pixiSound = PIXISOUND.default;
-    // Load these up on startup...
-    pixiSound.add('good', './assets/audio/sfx_foam_1.mp3');
-
     preloader
       .add('MenuTheme', './assets/audio/bg_menu_1.mp3')
       .add('MainTheme', './assets/audio/bg_slow_ambient_1.mp3')
