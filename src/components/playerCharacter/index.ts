@@ -429,6 +429,9 @@ export const playerCharacter = (
   const consumePower = (delta: number): void => {
     const rate = state.movement.boost
       ? PLAYER_BOOST_POWER_CONSUMPTION_RATE
+      : // reduce power consumption when we're not moving
+      state.movement.x === 0 || state.movement.y === 0
+      ? PLAYER_POWER_CONSUMPTION_RATE * 0.1
       : PLAYER_POWER_CONSUMPTION_RATE;
 
     if (state.movement.boost) {
