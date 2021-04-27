@@ -43,7 +43,6 @@ import {
   getShortestAngleDifference,
   getUnitVector,
   vAdd,
-  Vector,
   vScale,
   withMagnitude,
 } from '@src/util/vector';
@@ -403,17 +402,12 @@ export const playerCharacter = (
   };
 
   const updateSpeed = (delta: number): void => {
-    let acceleration: Vector;
-    if (state.movement.boost) {
-      acceleration = withMagnitude(
-        state.movementSpeed,
-        PLAYER_ACCEL * PLAYER_BOOST_SCALE
-      );
-    } else {
-      const moveDir = getUnitVector(state.movement);
-      acceleration = vScale(moveDir, state.movementAcceleration * delta);
-    }
-
+    const boostScale = state.movement.boost ? PLAYER_BOOST_SCALE : 1;
+    const moveDir = getUnitVector(state.movement);
+    const acceleration = vScale(
+      moveDir,
+      state.movementAcceleration * boostScale * delta
+    );
     const drag = vScale(state.movementSpeed, -state.dragDeceleration * delta);
     let newSpeed = vAdd(state.movementSpeed, acceleration, drag);
 
