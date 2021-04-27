@@ -82,8 +82,10 @@ export enum OBJECT_STATUS {
 ///////////////////////////////////////////////////////////////////////////////
 // SIMPLE GAME - deprecate or use
 
+export const POINTS_DEPTH_MULTIPLIER = [5, 10, 25, 50];
+
 // Gold
-export const POINTS_GOLD = 5;
+export const POINTS_GOLD = 2;
 export const GOLD_SPAWN_RATE = 750;
 export const GOLD_MAX_SPAWNS = 1000;
 export const TIME_LIMIT_SECONDS = 10;
