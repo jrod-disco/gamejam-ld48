@@ -417,7 +417,7 @@ export const playerCharacter = (
   // OXYGEN
   const consumeOxygen = (delta: number, pressure: number): void => {
     // TODO: as pressure increases, increase rate of consumption
-    state.oxygen -= PLAYER_OXYGEN_CONSUMPTION_RATE;
+    state.oxygen -= delta * PLAYER_OXYGEN_CONSUMPTION_RATE;
 
     if (state.oxygen < 0) {
       state.oxygen = 0;
@@ -494,7 +494,9 @@ export const playerCharacter = (
       volume: (1 * SFX_VOL_MULT) / 2,
     });
 
-    state.integrity -= dmg;
+    // this is just for hitting the wall
+    // - move out of this scope if more damage types
+    state.integrity -= dmg / state.movementAcceleration;
 
     console.log('**DAMAGE** integrity: %o', state.integrity);
     if (state.integrity <= 0) {
@@ -611,11 +613,11 @@ export const playerCharacter = (
       if (depthLevelSegment > 0) randomFlicker();
 
       // attribute updates
-      if (Date.now() > state.lastUpdateTime + 500) {
-        state.lastUpdateTime = Date.now();
-        consumeOxygen(delta, pressure);
-        consumePower(delta);
-      }
+      // if (Date.now() > state.lastUpdateTime + 10) {
+      state.lastUpdateTime = Date.now();
+      consumeOxygen(delta, pressure);
+      consumePower(delta);
+      // }
     }
   };
 

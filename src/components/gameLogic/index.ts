@@ -13,6 +13,7 @@ import {
   PICKUP_HIT_HI,
   LANDING_PAUSE_DURATION,
   POINTS_DEPTH_MULTIPLIER,
+  PICKUP_TYPES,
 } from '@src/constants';
 import * as COMP from '..';
 import { PlayerCharacter, PlayerMovement } from '../playerCharacter';
@@ -493,31 +494,24 @@ export const gameLogic = (props: Props): GameLogic => {
     // Lots of Points
     const multiplier = POINTS_DEPTH_MULTIPLIER[depthLevelSegment];
     if (currentDepth > state.lastDepth) scoreDisplay.addToScore(1 * multiplier);
-
     state.lastDepth = currentDepth;
 
     // Collision detection
     checkCollision();
 
     // Update individual controller refs here
-
     runtime.update(delta);
     depthMeter.update(delta);
     gauges.update(delta, playerCharacter.getState());
-
     IS_SCORE_INCREMENTY && scoreDisplay.update(delta);
-
     caveBottom.update(delta, depthLevelSegment);
 
     const pos = playerCharacter.getState().pos;
     caves.forEach((cave) => {
       cave.update(delta, pos.x, pos.y, depthLevelSegment);
     });
-
     starfield.update(delta);
-
     updateRan = true;
-
     return updateRan;
   };
 
