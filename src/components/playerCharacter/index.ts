@@ -47,6 +47,7 @@ import {
   withMagnitude,
 } from '@src/util/vector';
 import { clamp } from '@src/util/clamp';
+import { BloomFilter } from '@pixi/filter-bloom';
 
 type UpdateProps = {
   delta: number;
@@ -162,18 +163,21 @@ export const playerCharacter = (
   const initialState = { ...state };
 
   // lights
-  const lightBlendMode = PIXI.BLEND_MODES.SCREEN;
+  const lightLayer = new PIXI.Container();
+  lightLayer.filters = [new BloomFilter(10, 2)];
+  container.addChild(lightLayer);
+  //const lightBlendMode = PIXI.BLEND_MODES.SCREEN;
   const defaultUnderglowAlpha = 0.2;
   const underLightSprite = new PIXI.Sprite(textures.underglow);
   underLightSprite.anchor.set(0.5);
   underLightSprite.x = 0;
   underLightSprite.y = 0;
   underLightSprite.alpha = 0;
-  underLightSprite.blendMode = lightBlendMode;
+  // underLightSprite.blendMode = lightBlendMode;
   container.addChild(underLightSprite);
 
   const playerContainer = new PIXI.Container();
-  container.addChild(playerContainer);
+  lightLayer.addChild(playerContainer);
 
   // Build up animations
   const PLAYER_ANIM_TILT_SPEED = 0.3;
@@ -298,32 +302,32 @@ export const playerCharacter = (
   frontLightLeftSprite.x = -84;
   frontLightLeftSprite.y = -20;
   frontLightLeftSprite.alpha = 0;
-  frontLightLeftSprite.blendMode = lightBlendMode;
-  container.addChild(frontLightLeftSprite);
+  // frontLightLeftSprite.blendMode = lightBlendMode;
+  lightLayer.addChild(frontLightLeftSprite);
 
   const frontLightRightSprite = new PIXI.Sprite(textures.frontlightRight);
   frontLightRightSprite.anchor.set(0.5, 1);
   frontLightRightSprite.x = 84;
   frontLightRightSprite.y = -20;
   frontLightRightSprite.alpha = 0;
-  frontLightRightSprite.blendMode = lightBlendMode;
-  container.addChild(frontLightRightSprite);
+  //frontLightRightSprite.blendMode = lightBlendMode;
+  lightLayer.addChild(frontLightRightSprite);
 
   const rearLightLeftSprite = new PIXI.Sprite(textures.rearlightLeft);
   rearLightLeftSprite.anchor.set(0.5, 1);
   rearLightLeftSprite.x = -80;
   rearLightLeftSprite.y = 125;
   rearLightLeftSprite.alpha = 0;
-  rearLightLeftSprite.blendMode = lightBlendMode;
-  container.addChild(rearLightLeftSprite);
+  //rearLightLeftSprite.blendMode = lightBlendMode;
+  lightLayer.addChild(rearLightLeftSprite);
 
   const rearLightRightSprite = new PIXI.Sprite(textures.rearlightRight);
   rearLightRightSprite.anchor.set(0.5, 1);
   rearLightRightSprite.x = 80;
   rearLightRightSprite.y = 125;
   rearLightRightSprite.alpha = 0;
-  rearLightRightSprite.blendMode = lightBlendMode;
-  container.addChild(rearLightRightSprite);
+  //rearLightRightSprite.blendMode = lightBlendMode;
+  lightLayer.addChild(rearLightRightSprite);
 
   const lightsList = [
     frontLightLeftSprite,

@@ -355,7 +355,7 @@ export const gameLogic = (props: Props): GameLogic => {
 
   const ambientContainer = new PIXI.Container();
   gameContainer.addChild(ambientContainer);
-  ambientContainer.filters = [new BloomFilter(10)];
+  ambientContainer.filters = [new BloomFilter(6, 2)];
   // Starfield for ambient effect
   const starfield = COMP.stars({
     texture: PIXI.Texture.from('./assets/example/whitebox.png'),
@@ -376,7 +376,7 @@ export const gameLogic = (props: Props): GameLogic => {
   });
 
   // Must be lower than Submarine
-  pickupContainerLower.filters = [new BloomFilter(6)];
+  // pickupContainerLower.filters = [new BloomFilter(6)];
   gameContainer.addChild(pickupContainerLower);
 
   const updatePickups = (): void => {
@@ -394,7 +394,7 @@ export const gameLogic = (props: Props): GameLogic => {
 
   const subContainer = new PIXI.Container();
   gameContainer.addChild(subContainer);
-  subContainer.filters = [new BloomFilter(3)];
+  //subContainer.filters = [new BloomFilter(3)];
 
   // Simple Player Component
   const playerCharacter = COMP.playerCharacter({
@@ -415,7 +415,7 @@ export const gameLogic = (props: Props): GameLogic => {
   subContainer.addChild(playerCharacter.container);
 
   // Must be on top of Submarine
-  pickupContainerUpper.filters = [new BloomFilter(6)];
+  //pickupContainerUpper.filters = [new BloomFilter(6)];
   gameContainer.addChild(pickupContainerUpper);
 
   // TODO:
