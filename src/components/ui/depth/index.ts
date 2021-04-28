@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js';
+import * as PIXISOUND from 'pixi-sound';
 import { zeroPad } from '@src/util/zeroPad';
 
 import {
@@ -9,6 +10,7 @@ import {
   INIT_PRESSURE,
   INIT_DEPTH,
   MAX_PRESSURE,
+  SFX_VOL_MULT,
 } from '@src/constants';
 
 export interface DepthMeter {
@@ -38,8 +40,9 @@ interface Props {
  */
 export const depthMeter = (props: Props): DepthMeter => {
   const pos = props.pos ?? { x: 0, y: 0 };
-  const container = new PIXI.Container();
+  const pixiSound = PIXISOUND.default;
 
+  const container = new PIXI.Container();
   container.x = pos.x;
   container.y = pos.y;
   container.name = 'depthmeter';
@@ -96,7 +99,6 @@ export const depthMeter = (props: Props): DepthMeter => {
     Number(Math.floor(state.currentPressure));
 
   let lastUpdateTime = Date.now();
-
   // Reset called by play again and also on init
   const reset = (): void => {
     state = null;
@@ -119,12 +121,26 @@ export const depthMeter = (props: Props): DepthMeter => {
     state = { ...state, isOn: false };
   };
 
+  let approached = false;
+  const sfxApproach = (): void => {
+    approached = true;
+    pixiSound.play('alarm', {
+      volume: 1 * SFX_VOL_MULT,
+    });
+    pixiSound.play('foam', {
+      volume: 1 * SFX_VOL_MULT,
+    });
+  };
+
   const checkMaxDepth = (): void => {
     if (state.currentDepth >= MAX_DEPTH) {
       pause();
+      pixiSound.play('wonder', {
+        volume: 1 * SFX_VOL_MULT,
+      });
       maxDepthCallback();
-    }
-    else if (state.currentDepth >= BEGIN_LANDING_DEPTH) {
+    } else if (state.currentDepth >= BEGIN_LANDING_DEPTH) {
+      if (!approached) sfxApproach();
       nearDepthCallback();
     }
   };
@@ -136,7 +152,7 @@ export const depthMeter = (props: Props): DepthMeter => {
   const update = (delta: number): void => {
     // Update called by main
     if (state.isOn && Date.now() > lastUpdateTime + 10) {
-      state.currentDepth += PLAYER_DESCENT_RATE;
+      state.currentDepth += PLAYER_DESCENT_RATE * delta;
 
       // TODO: Pressure = (density x gravity x depth)
       // - need to introduce gravity / denisty. until then this is approx

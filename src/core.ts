@@ -20,7 +20,6 @@ import {
   Z_MC_UI,
   SFX_VOL_MULT,
   LANDING_PAUSE_DURATION,
-  GAME_OVER_SCREEN_DELAY,
   TEXT_WIN,
   TEXT_LOSE,
   TEXT_REASONS_WIN,
@@ -35,8 +34,6 @@ import {
   personalBestScores,
   PersonalBestScores,
 } from './util/personalBestScore';
-import { runtime } from './components/library';
-import { TextureMatrix } from 'pixi.js';
 import { EndGameProps } from './screens/lose/layout';
 
 declare global {
@@ -341,21 +338,6 @@ const bootstrapApp = (props: {
         showPersonalBest();
         audioLayer.stopAll();
         audioLayer.music.mainTheme(true);
-        if (!isWin) {
-          pixiSound.play('player_damage1', {
-            volume: 1 * SFX_VOL_MULT,
-          });
-          pixiSound.play('the_end', {
-            volume: 1 * SFX_VOL_MULT,
-          });
-        } else {
-          pixiSound.play('wonder', {
-            volume: 1 * SFX_VOL_MULT,
-          });
-          pixiSound.play('foam', {
-            volume: 1 * SFX_VOL_MULT,
-          });
-        }
       },
     });
   };

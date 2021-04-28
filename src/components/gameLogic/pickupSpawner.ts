@@ -1,10 +1,15 @@
-import { PICKUPS_MAX, PICKUP_SPAWN_RATE } from '@src/constants';
 import * as PIXI from 'pixi.js';
+import {
+  PICKUPS_MAX,
+  PICKUP_SPAWN_RATE_MIN,
+  PICKUP_SPAWN_RATE_MAX,
+} from '@src/constants';
+import { randomInteger } from '@src/util/random';
 
 import { pickupTank, PickupTank } from '../pickups';
 
 // TODO: type the pickupList
-// type PickupList = Array<OxygenTank | FuelTank>;
+type PickupList = Array<PickupTank>;
 
 export interface PickupSpawner {
   spawn: () => PickupTank | null;
@@ -22,7 +27,7 @@ interface PickupSpawnerProps {
 
 export const pickupSpawner = (props: PickupSpawnerProps): PickupSpawner => {
   let state = {
-    lastSpawnTime: Date.now(),
+    nextSpawnTime: Date.now(),
     pickupList: [],
     isLanding: false,
   };
@@ -34,9 +39,9 @@ export const pickupSpawner = (props: PickupSpawnerProps): PickupSpawner => {
 
   const spawn = (): PickupTank | null => {
     if (state.isLanding) return;
-
-    if (state.lastSpawnTime + PICKUP_SPAWN_RATE > Date.now()) return;
-    state.lastSpawnTime = Date.now();
+    if (Date.now() < state.nextSpawnTime) return;
+    state.nextSpawnTime =
+      Date.now() + randomInteger(PICKUP_SPAWN_RATE_MIN, PICKUP_SPAWN_RATE_MAX);
 
     let pickup;
     if (PICKUPS_MAX === state.pickupList.length) {
@@ -59,7 +64,7 @@ export const pickupSpawner = (props: PickupSpawnerProps): PickupSpawner => {
     return pickup;
   };
 
-  const getPickups = () => state.pickupList;
+  const getPickups = (): PickupList => state.pickupList;
 
   const removePickupByIndex = (index: number): void => {
     state.pickupList.splice(index, 1);
@@ -68,7 +73,7 @@ export const pickupSpawner = (props: PickupSpawnerProps): PickupSpawner => {
   // Reset called by play again and also on init
   const reset = (): void => {
     console.log('pickup spawner reset');
-    state.pickupList.forEach((pickup: PickupTank) => pickup.reset)
+    state.pickupList.forEach((pickup: PickupTank) => pickup.reset);
     state = { ...initialState, pickupList: [] };
   };
   reset();
