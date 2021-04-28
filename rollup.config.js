@@ -52,7 +52,7 @@ export default [
       isDev && serve('dist/'),
       isDev && livereload(),
     ],
-    // Don't bundle PIXI -- coming via CDN in index.html
-    external: ['pixi.js'],
+    // Don't bundle PIXI -- uncomment below if coming via CDN in index.html
+    // external: ['pixi.js'],
   },
 ];
