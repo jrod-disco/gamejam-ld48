@@ -10,7 +10,6 @@ export const INIT_PRESSURE = 14; // sea level
 export const MAX_PRESSURE = 1000; // lbs/sq in
 
 export const LANDING_PAUSE_DURATION = 4000; // ms
-export const GAME_OVER_SCREEN_DELAY = 6000; // ms
 
 // - Depth effects
 export const MAX_LAYER_SCALE = 2.5; // % scale of layer at MAX_LAYER_DEPTH
@@ -40,7 +39,7 @@ export const PLAYER_INIT_ROT = 0;
 export const PLAYER_ROT_DAMPEN = 0.09; // scales the rotation to ease into small changes
 export const PLAYER_MAX_ROT_CHANGE = 0.08; // the max change in rotation per update
 export const PLAYER_ROTATE_ON_MOVE = true;
-export const PLAYER_DESCENT_RATE = 0.5; // feet per sec
+export const PLAYER_DESCENT_RATE = 0.4; // feet per update
 
 // Player tilt
 export const PLAYER_TILT_BY_ANGLE = true;
@@ -50,15 +49,15 @@ export const PLAYER_TILT_SPEED_THRESHOLD = 1;
 // resources
 export const PLAYER_INTEGRITY = 100; // starting integrity
 export const PLAYER_MAX_OXYGEN = 100; // full tank, init value
-export const PLAYER_OXYGEN_CONSUMPTION_RATE = 0.65; // lbs per second
+export const PLAYER_OXYGEN_CONSUMPTION_RATE = 0.015; // lbs per update
 export const PLAYER_MAX_POWER = 100; // full tank, init value
-export const PLAYER_IDLE_POWER_CONSUMPTION_RATE = 0.2; // power per second
-export const PLAYER_POWER_CONSUMPTION_RATE = 0.7; // power per second
-export const PLAYER_BOOST_POWER_CONSUMPTION_RATE = 5; // power per second while boosting
+export const PLAYER_IDLE_POWER_CONSUMPTION_RATE = 0.005; // power per update
+export const PLAYER_POWER_CONSUMPTION_RATE = 0.015; // power per update
+export const PLAYER_BOOST_POWER_CONSUMPTION_RATE = 0.1; // power per update while boosting
 
 // collision
 export const PLAYER_COLLISION_RADIUS = 170;
-export const PLAYER_COLLISION_VALUE = 15; // damage from wall collision
+export const PLAYER_COLLISION_VALUE = 2.4; // damage from wall collision (x movement speed)
 export const PLAYER_COLLISION_DRAG = -0.3; // rebound drag
 
 // ITEMS
@@ -69,10 +68,12 @@ export enum PICKUP_TYPES {
 
 // PICKUP Generator
 export const PICKUPS_MAX = 6;
-export const PICKUPS_RANDOM_WEIGHT = 80;
-export const PICKUP_SPAWN_RATE = 3750;
-export const PICKUP_OXYGEN_TANK_QUANTITY = 3.8; // lbs of oxygen
-export const PICKUP_FUEL_TANK_QUANTITY = 3; // lbs of fuel
+export const PICKUP_SPAWN_RATE_MIN = 1500; // random time between next spawn / min
+export const PICKUP_SPAWN_RATE_MAX = 4000; // random time between next spawn / max
+
+export const PICKUP_OXY_WEIGHT = 40; // percent weight ran chooses oxy over fuel
+export const PICKUP_OXYGEN_TANK_QUANTITY = 3.5; // lbs of oxygen
+export const PICKUP_FUEL_TANK_QUANTITY = 2.5; // lbs of fuel
 
 // Objects
 export enum OBJECT_STATUS {

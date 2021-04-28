@@ -11,11 +11,9 @@ export interface Gauges {
   pause: () => void;
   update: (delta: number, state: PlayerState) => void;
 }
-
-interface Props {
+interface GuageProps {
   pos?: { x: number; y: number };
 }
-
 type GaugesState = {
   isOn: boolean;
   isBoosting: boolean;
@@ -25,6 +23,22 @@ type GaugesState = {
   structure: number;
 };
 
+type HorizontalGuageProps = {
+  label: string;
+  color: number;
+  width?: number;
+  height?: number;
+  emphasisColor?: number;
+  x?: number;
+  y?: number;
+};
+
+interface HorizontalGauge {
+  container: PIXI.Container;
+  setEmphasis: (emphasized: boolean) => void;
+  setValue: (newValue: number) => void;
+}
+
 const horizontalGauge = ({
   label = '',
   width = 150,
@@ -33,7 +47,7 @@ const horizontalGauge = ({
   emphasisColor = 0xffffff,
   x = 0,
   y = 0,
-}) => {
+}: HorizontalGuageProps): HorizontalGauge => {
   const BG_ALPHA = 0.4;
   const FG_ALPHA = 0.8;
   const OVERALL_ALPHA = 0.8;
@@ -51,7 +65,7 @@ const horizontalGauge = ({
       fontSize: 14,
       align: 'left',
     });
-    labelTitle.tint = THEME.TXT_TITLES_HEX;
+    labelTitle.tint = 0xffffff; // TODO: figure out this theme ref
 
     gauge.addChild(labelTitle);
   }
@@ -98,7 +112,7 @@ const horizontalGauge = ({
  *
  * @returns Interface object containing methods that can be called on this module
  */
-export const gauges = (props: Props): Gauges => {
+export const gauges = (props: GuageProps): Gauges => {
   const pos = props.pos ?? { x: 0, y: 0 };
   const container = new PIXI.Container();
 

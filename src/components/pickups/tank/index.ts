@@ -6,7 +6,6 @@ import { positionUsingDepth } from '@src/util/positionUsingDepth';
 import {
   APP_HEIGHT,
   APP_WIDTH,
-  THEME,
   LAYER_SPACING,
   LAYER_START_SCALE,
   SPEED_ITEM,
@@ -19,7 +18,7 @@ import {
   PICKUP_TYPES,
   PICKUP_OXYGEN_TANK_QUANTITY,
   PICKUP_FUEL_TANK_QUANTITY,
-  PICKUPS_RANDOM_WEIGHT,
+  PICKUP_OXY_WEIGHT,
 } from '@src/constants';
 
 export interface PickupTank {
@@ -79,7 +78,8 @@ export const pickupTank = (props: PickupTankProps): PickupTank => {
     let quantity: number;
     let sound: string;
 
-    if (Math.random() * 100 < PICKUPS_RANDOM_WEIGHT) {
+    const ran = Math.random() * 100;
+    if (ran < PICKUP_OXY_WEIGHT) {
       type = PICKUP_TYPES.OXYGEN;
       quantity = PICKUP_OXYGEN_TANK_QUANTITY;
       sound = 'pickup_1';
@@ -135,7 +135,7 @@ export const pickupTank = (props: PickupTankProps): PickupTank => {
   fuelSprite.anchor.set(0.5);
   fuelSprite.play();
 
-  const updateSpriteContainer = () => {
+  const updateSpriteContainer = (): void => {
     spriteContainer.removeChildren();
     switch (state.type) {
       case PICKUP_TYPES.OXYGEN:

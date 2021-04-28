@@ -1,6 +1,5 @@
 import * as PIXI from 'pixi.js';
 import { BloomFilter } from '@pixi/filter-bloom';
-import * as PIXISOUND from 'pixi-sound';
 import {
   APP_WIDTH,
   APP_HEIGHT,
@@ -20,10 +19,10 @@ import { RunTime } from '../library/runtime';
 import * as UI from '../ui';
 import { Spritesheets } from '@src/core';
 import { ScoreDisplay } from '../library/scoreDisplay';
-import { PickupSpawner, pickupSpawner } from './pickupSpawner';
-// import { OxygenTank, FuelTank } from '../pickups';
 import { Cave } from '../cave';
 import { EndGameProps } from '@src/screens/lose/layout';
+import { pickupSpawner, PickupSpawner } from './pickupSpawner';
+import { PickupTank } from '../pickups';
 
 type Refs = {
   scoreDisplay?: ScoreDisplay;
@@ -431,7 +430,7 @@ export const gameLogic = (props: Props): GameLogic => {
     const pY = playerCharacter.container.y;
     const pickups = pickupSpawnerRef.getPickups();
 
-    pickups.map((pickup: any, i: number) => {
+    pickups.map((pickup: PickupTank) => {
       const nX = pickup.container.x;
       const nY = pickup.container.y;
 
@@ -475,7 +474,7 @@ export const gameLogic = (props: Props): GameLogic => {
     updatePickups();
 
     // Spawner
-    pickupSpawnerRef.getPickups().forEach((pickup: any): void => {
+    pickupSpawnerRef.getPickups().forEach((pickup: PickupTank): void => {
       pickup.update(delta);
     });
 
@@ -493,31 +492,24 @@ export const gameLogic = (props: Props): GameLogic => {
     // Lots of Points
     const multiplier = POINTS_DEPTH_MULTIPLIER[depthLevelSegment];
     if (currentDepth > state.lastDepth) scoreDisplay.addToScore(1 * multiplier);
-
     state.lastDepth = currentDepth;
 
     // Collision detection
     checkCollision();
 
     // Update individual controller refs here
-
     runtime.update(delta);
     depthMeter.update(delta);
     gauges.update(delta, playerCharacter.getState());
-
     IS_SCORE_INCREMENTY && scoreDisplay.update(delta);
-
     caveBottom.update(delta, depthLevelSegment);
 
     const pos = playerCharacter.getState().pos;
     caves.forEach((cave) => {
       cave.update(delta, pos.x, pos.y, depthLevelSegment);
     });
-
     starfield.update(delta);
-
     updateRan = true;
-
     return updateRan;
   };
 
