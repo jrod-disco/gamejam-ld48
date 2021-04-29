@@ -16,7 +16,7 @@ import {
   PICKUP_HIT_HI,
   PICKUP_HIT_LO,
 } from '@src/constants';
-import { getPickupType, PICKUP_TYPES } from './items';
+import { PickupConfig, PICKUP_TYPES } from './items';
 
 export interface PickupItem {
   container: PIXI.Container;
@@ -30,13 +30,18 @@ export interface PickupItem {
   handleCollision: () => void;
 }
 
+export interface Resource {
+  getType: () => PICKUP_TYPES;
+  getResource: () => number;
+}
+
 interface PickupItemProps {
   pos?: { x: number; y: number };
   anims?: { [key: string]: Array<PIXI.Texture> };
   depth?: number;
-  pickupBuffer: number;
   lowerContainer: PIXI.Container;
   upperContainer: PIXI.Container;
+  config: PickupConfig;
 }
 
 type PickupState = {
@@ -45,11 +50,7 @@ type PickupState = {
   scale: number;
   depth: number;
   active: boolean;
-  // Composite from PickupType
-  type?: PICKUP_TYPES;
-  quantity?: number;
-  sound?: string;
-  animName?: string;
+  config: PickupConfig;
 };
 
 /**
@@ -58,38 +59,36 @@ type PickupState = {
  * @returns Interface object
  */
 export const pickupItem = (props: PickupItemProps): PickupItem => {
+  const PICKUP_BUFFER = 150;
   const pos = props.pos ?? { x: 0, y: 0 };
   const pixiSound = PIXISOUND.default;
   const container = new PIXI.Container();
+  const { anims } = props;
+
   container.x = pos.x;
   container.y = pos.y;
   container.name = 'PickupItem';
 
-  const { anims, pickupBuffer } = props;
   let state: PickupState = {
     endPosX: APP_WIDTH / 2,
     endPosY: APP_HEIGHT / 2,
     scale: LAYER_START_SCALE,
     depth: props.depth,
     active: false,
-    ...getPickupType(),
+    config: props.config,
   };
-  // capture initial state
   const initialState = { ...state };
-
-  // augement with random type, we'll do this again on reset
-  //state = { ...state, ...getPickupType() };
 
   const setDestinationPostion = (): void => {
     state.endPosX =
-      APP_WIDTH / 2 + (Math.random() * pickupBuffer * 2 - pickupBuffer);
+      APP_WIDTH / 2 + (Math.random() * PICKUP_BUFFER * 2 - PICKUP_BUFFER);
     state.endPosY =
-      APP_HEIGHT / 2 + (Math.random() * pickupBuffer * 2 - pickupBuffer);
+      APP_HEIGHT / 2 + (Math.random() * PICKUP_BUFFER * 2 - PICKUP_BUFFER);
   };
 
   /////////////////////////////////////////////////////////////////////////////
   // SPRITES
-  const sprite = new PIXI.AnimatedSprite(anims[state.animName]);
+  const sprite = new PIXI.AnimatedSprite(anims[state.config.type]);
   sprite.animationSpeed = 0.25;
   sprite.loop = true;
   sprite.anchor.set(0.5);
@@ -98,12 +97,12 @@ export const pickupItem = (props: PickupItemProps): PickupItem => {
   container.addChild(sprite);
   container.pivot.set(0.5);
 
-  const getType = (): PICKUP_TYPES => state.type;
-  const getResource = (): number => state.quantity;
+  const getType = (): PICKUP_TYPES => state.config.type;
+  const getResource = (): number => state.config.quantity;
 
   const handleCollision = (): void => {
-    if (state.sound) {
-      pixiSound.play(state.sound, {
+    if (state.config.sound) {
+      pixiSound.play(state.config.sound, {
         volume: 1 * SFX_VOL_MULT,
       });
     }

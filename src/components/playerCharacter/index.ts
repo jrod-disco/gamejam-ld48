@@ -45,7 +45,8 @@ import {
   withMagnitude,
 } from '@src/util/vector';
 import { clamp } from '@src/util/clamp';
-import { PICKUP_TYPES, Resource } from '../pickups/items';
+import { Resource } from '../pickups';
+import { PICKUP_TYPES } from '../pickups/items';
 
 type UpdateProps = {
   delta: number;

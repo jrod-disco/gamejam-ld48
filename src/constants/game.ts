@@ -1,3 +1,5 @@
+import { PickupConfig, PICKUP_TYPES } from "@src/components/pickups/items";
+
 // Environment
 export const IS_SCORE_INCREMENTY = false;
 
@@ -65,15 +67,25 @@ export const PICKUPS_MAX = 5;
 export const PICKUP_SPAWN_RATE_MIN = 1500; // random time between next spawn / min
 export const PICKUP_SPAWN_RATE_MAX = 4000; // random time between next spawn / max
 
-export const PICKUP_OXY_WEIGHT = .4; // percent weight ran chooses oxy over fuel
-export const PICKUP_OXYGEN_TANK_QUANTITY = 3.5; // lbs of oxygen
-export const PICKUP_FUEL_TANK_QUANTITY = 2.5; // lbs of fuel
+export const OxygenConfig: PickupConfig = {
+  type: PICKUP_TYPES.OXYGEN,
+  quantity: 3.5,        // lbs of oxygen
+  poolCount: 4,         // count in pool
+  sound: 'pickup_1',
+};
+
+export const FuelConfig: PickupConfig = {
+  type: PICKUP_TYPES.FUEL,
+  quantity: 2.5,        // lbs of fuel
+  poolCount: 6,         // count in pool
+  sound: 'pickup_2',
+};
 
 // Objects
 export enum OBJECT_STATUS {
   ACTIVE,
   INACTIVE,
-}
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // SIMPLE GAME - deprecate or use
