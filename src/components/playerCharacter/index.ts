@@ -15,7 +15,6 @@ import {
   PLAYER_INIT_ROT,
   PLAYER_ACCEL,
   PLAYER_DECEL,
-  PICKUP_TYPES,
   PLAYER_OXYGEN_CONSUMPTION_RATE,
   PLAYER_POWER_CONSUMPTION_RATE,
   PLAYER_MAX_OXYGEN,
@@ -26,7 +25,6 @@ import {
   PLAYER_COLLISION_VALUE,
   PLAYER_COLLISION_DRAG,
   // types / interface
-  Resource,
   Point2D,
   PLAYER_ROT_DAMPEN,
   PLAYER_TILT_ANGLE_THRESHOLD,
@@ -47,6 +45,7 @@ import {
   withMagnitude,
 } from '@src/util/vector';
 import { clamp } from '@src/util/clamp';
+import { PICKUP_TYPES, Resource } from '../pickups/items';
 
 type UpdateProps = {
   delta: number;

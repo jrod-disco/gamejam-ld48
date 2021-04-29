@@ -1,13 +1,3 @@
-import { PICKUP_TYPES } from './game';
-
-/**
- * pickup / item resource
- */
-export interface Resource {
-  getType: () => PICKUP_TYPES;
-  getResource: () => number;
-}
-
 /**
  * simple coordinates
  */

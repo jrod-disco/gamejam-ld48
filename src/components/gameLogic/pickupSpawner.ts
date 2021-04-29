@@ -6,14 +6,14 @@ import {
 } from '@src/constants';
 import { randomInteger } from '@src/util/random';
 
-import { pickupTank, PickupTank } from '../pickups';
+import { pickupItem, PickupItem } from '../pickups';
 
 // TODO: type the pickupList
-type PickupList = Array<PickupTank>;
+type PickupList = Array<PickupItem>;
 
 export interface PickupSpawner {
-  spawn: () => PickupTank | null;
-  getPickups: () => PickupTank[];
+  spawn: () => PickupItem | null;
+  getPickups: () => PickupItem[];
   removePickupByIndex: (index: number) => void;
   reset: () => void;
   startLanding: () => void;
@@ -37,7 +37,7 @@ export const pickupSpawner = (props: PickupSpawnerProps): PickupSpawner => {
 
   const pickupBuffer = 150; // px from center
 
-  const spawn = (): PickupTank | null => {
+  const spawn = (): PickupItem | null => {
     if (state.isLanding) return;
     if (Date.now() < state.nextSpawnTime) return;
     state.nextSpawnTime =
@@ -47,10 +47,10 @@ export const pickupSpawner = (props: PickupSpawnerProps): PickupSpawner => {
     if (PICKUPS_MAX === state.pickupList.length) {
       // Reached max spawned, recycle if pool contains an inactive pickup
       pickup = state.pickupList.find(
-        (pickup: PickupTank): boolean => !pickup.isActive()
+        (pickup: PickupItem): boolean => !pickup.isActive()
       );
     } else {
-      pickup = pickupTank({
+      pickup = pickupItem({
         pickupBuffer,
         anims,
         depth: 0,
@@ -73,7 +73,7 @@ export const pickupSpawner = (props: PickupSpawnerProps): PickupSpawner => {
   // Reset called by play again and also on init
   const reset = (): void => {
     console.log('pickup spawner reset');
-    state.pickupList.forEach((pickup: PickupTank) => pickup.reset);
+    state.pickupList.forEach((pickup: PickupItem) => pickup.reset);
     state = { ...initialState, pickupList: [] };
   };
   reset();

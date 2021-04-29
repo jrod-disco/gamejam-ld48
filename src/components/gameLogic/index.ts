@@ -22,7 +22,7 @@ import { ScoreDisplay } from '../library/scoreDisplay';
 import { Cave } from '../cave';
 import { EndGameProps } from '@src/screens/lose/layout';
 import { pickupSpawner, PickupSpawner } from './pickupSpawner';
-import { PickupTank } from '../pickups';
+import { PickupItem } from '../pickups';
 
 type Refs = {
   scoreDisplay?: ScoreDisplay;
@@ -430,7 +430,7 @@ export const gameLogic = (props: Props): GameLogic => {
     const pY = playerCharacter.container.y;
     const pickups = pickupSpawnerRef.getPickups();
 
-    pickups.map((pickup: PickupTank) => {
+    pickups.map((pickup: PickupItem) => {
       const nX = pickup.container.x;
       const nY = pickup.container.y;
 
@@ -446,10 +446,7 @@ export const gameLogic = (props: Props): GameLogic => {
         pickup.getScale() < PICKUP_HIT_HI;
 
       if (collided) {
-        playerCharacter.consumeResource({
-          getType: pickup.getType,
-          getResource: pickup.getResource,
-        });
+        playerCharacter.consumeResource(pickup);
 
         const currentDepth = depthMeter.getCurrentDepth();
         const depthLevelSegment = Math.floor(currentDepth / 1500);
@@ -474,7 +471,7 @@ export const gameLogic = (props: Props): GameLogic => {
     updatePickups();
 
     // Spawner
-    pickupSpawnerRef.getPickups().forEach((pickup: PickupTank): void => {
+    pickupSpawnerRef.getPickups().forEach((pickup: PickupItem): void => {
       pickup.update(delta);
     });
 

@@ -60,18 +60,12 @@ export const PLAYER_COLLISION_RADIUS = 170;
 export const PLAYER_COLLISION_VALUE = 2.4; // damage from wall collision (x movement speed)
 export const PLAYER_COLLISION_DRAG = -0.3; // rebound drag
 
-// ITEMS
-export enum PICKUP_TYPES {
-  OXYGEN = 'OXYGEN',
-  FUEL = 'FUEL',
-}
-
 // PICKUP Generator
 export const PICKUPS_MAX = 6;
 export const PICKUP_SPAWN_RATE_MIN = 1500; // random time between next spawn / min
 export const PICKUP_SPAWN_RATE_MAX = 4000; // random time between next spawn / max
 
-export const PICKUP_OXY_WEIGHT = 40; // percent weight ran chooses oxy over fuel
+export const PICKUP_OXY_WEIGHT = .4; // percent weight ran chooses oxy over fuel
 export const PICKUP_OXYGEN_TANK_QUANTITY = 3.5; // lbs of oxygen
 export const PICKUP_FUEL_TANK_QUANTITY = 2.5; // lbs of fuel
 
