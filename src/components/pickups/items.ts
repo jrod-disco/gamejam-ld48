@@ -6,10 +6,11 @@ export enum PICKUP_TYPES {
 }
 
 export type PickupConfig = {
-  type: PICKUP_TYPES;
-  quantity: number;
-  poolCount: number;
-  sound: string;
+  type: PICKUP_TYPES;   // type of the pickup
+  quantity: number;     // amount awarded when collected
+  poolCount: number;    // number of items to place in pool
+  sound: string;        // name of the sound
+  speed: number;        // scale increase per update()
 };
 
 export const getConfig = (type: string): PickupConfig => {

@@ -26,7 +26,6 @@ export const PICKUP_HIT_LO = 1.5; // scale at which pickup collision occurs
 export const PICKUP_HIT_HI = 3; // scale at which pickup collision occurs
 
 export const SPEED_CAVE = 0.003; // cave scale increase per update()
-export const SPEED_ITEM = 0.01; // cave scale increase per update()
 
 // - Normalized world sizes
 export const WORLD_WIDTH = 100;
@@ -71,6 +70,7 @@ export const OxygenConfig: PickupConfig = {
   quantity: 3.5,        // lbs of oxygen
   poolCount: 4,         // count in pool
   sound: 'pickup_1',
+  speed: 0.005,         // scale increase per update()
 };
 
 export const FuelConfig: PickupConfig = {
@@ -78,6 +78,7 @@ export const FuelConfig: PickupConfig = {
   quantity: 2.5,        // lbs of fuel
   poolCount: 6,         // count in pool
   sound: 'pickup_2',
+  speed: 0.007,         // scale increase per update()
 };
 
 // Objects

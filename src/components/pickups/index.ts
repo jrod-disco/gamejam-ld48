@@ -8,7 +8,6 @@ import {
   APP_WIDTH,
   LAYER_SPACING,
   LAYER_START_SCALE,
-  SPEED_ITEM,
   MAX_PICKUP_SCALE,
   ROT_PICKUP_INCREMENT,
   MAX_LAYER_DEPTH,
@@ -135,7 +134,7 @@ export const pickupItem = (props: PickupItemProps): PickupItem => {
     if (state.scale >= MAX_PICKUP_SCALE) {
       reset();
     } else {
-      state.scale += SPEED_ITEM * delta;
+      state.scale += state.config.speed * delta;
       state.depth = (getScale() - LAYER_START_SCALE) / LAYER_SPACING;
       container.rotation += ROT_PICKUP_INCREMENT;
       positionUsingDepth(container, state.endPosX, state.endPosY, state.depth);
