@@ -61,7 +61,7 @@ export const PLAYER_COLLISION_VALUE = 2.4; // damage from wall collision (x move
 export const PLAYER_COLLISION_DRAG = -0.3; // rebound drag
 
 // PICKUP Generator
-export const PICKUPS_MAX = 6;
+export const PICKUPS_MAX = 5;
 export const PICKUP_SPAWN_RATE_MIN = 1500; // random time between next spawn / min
 export const PICKUP_SPAWN_RATE_MAX = 4000; // random time between next spawn / max
 

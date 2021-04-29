@@ -40,15 +40,22 @@ export const pickupSpawner = (props: PickupSpawnerProps): PickupSpawner => {
   const spawn = (): PickupItem | null => {
     if (state.isLanding) return;
     if (Date.now() < state.nextSpawnTime) return;
+
     state.nextSpawnTime =
       Date.now() + randomInteger(PICKUP_SPAWN_RATE_MIN, PICKUP_SPAWN_RATE_MAX);
 
-    let pickup;
+    let pickup: PickupItem = null;
     if (PICKUPS_MAX === state.pickupList.length) {
       // Reached max spawned, recycle if pool contains an inactive pickup
-      pickup = state.pickupList.find(
-        (pickup: PickupItem): boolean => !pickup.isActive()
-      );
+      // this requires the pool to be larger than the number of possible 
+      // active pickups. A larger number also improves randomess ratios.
+      while (pickup == null) {
+        const i: number = randomInteger(0, state.pickupList.length - 1);
+        pickup = state.pickupList[i];
+        if (pickup.isActive()) {
+          pickup = null;
+        }
+      }
     } else {
       pickup = pickupItem({
         pickupBuffer,
@@ -58,6 +65,9 @@ export const pickupSpawner = (props: PickupSpawnerProps): PickupSpawner => {
         upperContainer: props.pickupContainerUpper,
       });
       state.pickupList.push(pickup);
+      // console.log(state.pickupList.reduce((p: string, c: PickupItem) => {
+      //   return p + ', ' + c.getType();
+      // }, ''));
     }
 
     pickup && pickup.setActive(true);

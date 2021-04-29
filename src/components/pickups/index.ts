@@ -72,12 +72,13 @@ export const pickupItem = (props: PickupItemProps): PickupItem => {
     scale: LAYER_START_SCALE,
     depth: props.depth,
     active: false,
+    ...getPickupType(),
   };
   // capture initial state
   const initialState = { ...state };
 
   // augement with random type, we'll do this again on reset
-  state = { ...state, ...getPickupType() };
+  //state = { ...state, ...getPickupType() };
 
   const setDestinationPostion = (): void => {
     state.endPosX =
@@ -88,21 +89,14 @@ export const pickupItem = (props: PickupItemProps): PickupItem => {
 
   /////////////////////////////////////////////////////////////////////////////
   // SPRITES
-  const spriteContainer = new PIXI.Container();
-  container.addChild(spriteContainer);
+  const sprite = new PIXI.AnimatedSprite(anims[state.animName]);
+  sprite.animationSpeed = 0.25;
+  sprite.loop = true;
+  sprite.anchor.set(0.5);
+  sprite.play();
+
+  container.addChild(sprite);
   container.pivot.set(0.5);
-
-  const updateSpriteContainer = (): void => {
-    spriteContainer.removeChildren();
-
-    const sprite = new PIXI.AnimatedSprite(anims[state.animName]);
-    sprite.animationSpeed = 0.25;
-    sprite.loop = true;
-    sprite.anchor.set(0.5);
-    sprite.play();
-    
-    spriteContainer.addChild(sprite);
-  };
 
   const getType = (): PICKUP_TYPES => state.type;
   const getResource = (): number => state.quantity;
@@ -117,8 +111,7 @@ export const pickupItem = (props: PickupItemProps): PickupItem => {
 
   // Reset called by play again and also on init
   const reset = (): void => {
-    state = { ...initialState, ...getPickupType() };
-    updateSpriteContainer();
+    state = { ...initialState };
 
     props.lowerContainer.addChild(container);
 
