@@ -1,6 +1,5 @@
 import * as PIXI from 'pixi.js';
 import {
-  PICKUPS_MAX,
   PICKUP_SPAWN_RATE_MIN,
   PICKUP_SPAWN_RATE_MAX,
   OxygenConfig,
@@ -29,7 +28,7 @@ interface PickupSpawnerProps {
   pickupContainerUpper: PIXI.Container;
 }
 
-const createPool = (max: number, props: PickupSpawnerProps): PickupItem[] => {
+const createPool = (props: PickupSpawnerProps): PickupItem[] => {
   const items: PickupItem[] = [];
   
   const {
@@ -57,7 +56,7 @@ const createPool = (max: number, props: PickupSpawnerProps): PickupItem[] => {
 export const pickupSpawner = (props: PickupSpawnerProps): PickupSpawner => {
   let state = {
     nextSpawnTime: Date.now(),
-    pickupList: createPool(PICKUPS_MAX, props),
+    pickupList: createPool(props),
     isLanding: false,
   };
   const initialState = { ...state };
