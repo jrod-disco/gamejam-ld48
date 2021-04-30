@@ -338,6 +338,7 @@ const bootstrapApp = (props: {
         showPersonalBest();
         audioLayer.stopAll();
         audioLayer.music.mainTheme(true);
+        mainContainer.filters = [crtFilter];
       },
     });
   };
@@ -347,15 +348,14 @@ const bootstrapApp = (props: {
     console.log('core: onStartGame');
     audioLayer.stopAll();
     removeOnKeyDown();
+    setTimeout(() => {
+      mainContainer.filters = [];
+    }, 250);
 
     bestScore.setVisibility(false);
     SCREENS.controller.setCurrentScreen({
       name: SCREENS.ScreenName.GAME,
       isAnimated: true,
-      onComplete: () => {
-        console.log('core: screen transition complete');
-        // Defer starting the timer until the fade is complete
-      },
     });
 
     gameLogic.onStartGame();
