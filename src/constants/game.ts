@@ -23,7 +23,7 @@ export const LAYER_SPACING = 0.15; // start distance between each layer (was 0.0
 export const LAYER_START_SCALE = 0.25; // % scale the layer at depth 0
 export const START_ROT = 5; // starting rotation degrees for object
 export const ROT_INCREMENT = 0.001; // amount of rotation degrees per update()
-export const ROT_PICKUP_INCREMENT = 0.01; // amount of rotation degrees per update()
+export const ROT_PICKUP_INCREMENT = 0.004; // amount of rotation degrees per update()
 export const PICKUP_HIT_LO = 1.5; // scale at which pickup collision occurs
 export const PICKUP_HIT_HI = 3; // scale at which pickup collision occurs
 // TODO: Make cave speed a function of layer depth and descent rate
@@ -72,7 +72,7 @@ export const OxygenConfig: PickupConfig = {
   quantity: 3.5, // lbs of oxygen
   poolCount: 4, // count in pool
   sound: 'pickup_1',
-  speed: 0.005, // scale increase per update()
+  speed: 0.004, // scale increase per update()
 };
 
 export const FuelConfig: PickupConfig = {
@@ -80,7 +80,7 @@ export const FuelConfig: PickupConfig = {
   quantity: 2.5, // lbs of fuel
   poolCount: 6, // count in pool
   sound: 'pickup_2',
-  speed: 0.007, // scale increase per update()
+  speed: 0.004, // scale increase per update()
 };
 
 // Objects
