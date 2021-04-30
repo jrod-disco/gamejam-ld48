@@ -1,3 +1,5 @@
+import { PickupConfig, PICKUP_TYPES } from "@src/components/pickups/items";
+
 // Environment
 export const IS_SCORE_INCREMENTY = false;
 
@@ -24,7 +26,6 @@ export const PICKUP_HIT_LO = 1.5; // scale at which pickup collision occurs
 export const PICKUP_HIT_HI = 3; // scale at which pickup collision occurs
 
 export const SPEED_CAVE = 0.003; // cave scale increase per update()
-export const SPEED_ITEM = 0.01; // cave scale increase per update()
 
 // - Normalized world sizes
 export const WORLD_WIDTH = 100;
@@ -60,26 +61,31 @@ export const PLAYER_COLLISION_RADIUS = 170;
 export const PLAYER_COLLISION_VALUE = 2.4; // damage from wall collision (x movement speed)
 export const PLAYER_COLLISION_DRAG = -0.3; // rebound drag
 
-// ITEMS
-export enum PICKUP_TYPES {
-  OXYGEN = 'OXYGEN',
-  FUEL = 'FUEL',
-}
-
 // PICKUP Generator
-export const PICKUPS_MAX = 6;
 export const PICKUP_SPAWN_RATE_MIN = 1500; // random time between next spawn / min
 export const PICKUP_SPAWN_RATE_MAX = 4000; // random time between next spawn / max
 
-export const PICKUP_OXY_WEIGHT = 40; // percent weight ran chooses oxy over fuel
-export const PICKUP_OXYGEN_TANK_QUANTITY = 3.5; // lbs of oxygen
-export const PICKUP_FUEL_TANK_QUANTITY = 2.5; // lbs of fuel
+export const OxygenConfig: PickupConfig = {
+  type: PICKUP_TYPES.OXYGEN,
+  quantity: 3.5,        // lbs of oxygen
+  poolCount: 4,         // count in pool
+  sound: 'pickup_1',
+  speed: 0.005,         // scale increase per update()
+};
+
+export const FuelConfig: PickupConfig = {
+  type: PICKUP_TYPES.FUEL,
+  quantity: 2.5,        // lbs of fuel
+  poolCount: 6,         // count in pool
+  sound: 'pickup_2',
+  speed: 0.007,         // scale increase per update()
+};
 
 // Objects
 export enum OBJECT_STATUS {
   ACTIVE,
   INACTIVE,
-}
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // SIMPLE GAME - deprecate or use

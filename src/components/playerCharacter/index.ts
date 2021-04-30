@@ -2,40 +2,8 @@ import * as PIXI from 'pixi.js';
 import * as PIXISOUND from 'pixi-sound';
 import gsap, { Power0, Bounce } from 'gsap';
 import PixiPlugin from 'gsap/PixiPlugin';
+import { BloomFilter } from '@pixi/filter-bloom';
 
-import { distanceTo2D } from '@src/util/distanceTo';
-import { newShaker } from '@src/util/shakerFactory';
-
-import {
-  // consts
-  SFX_VOL_MULT,
-  APP_HEIGHT,
-  APP_WIDTH,
-  OBJECT_STATUS,
-  PLAYER_INIT_ROT,
-  PLAYER_ACCEL,
-  PLAYER_DECEL,
-  PICKUP_TYPES,
-  PLAYER_OXYGEN_CONSUMPTION_RATE,
-  PLAYER_POWER_CONSUMPTION_RATE,
-  PLAYER_MAX_OXYGEN,
-  PLAYER_MAX_POWER,
-  PLAYER_ROTATE_ON_MOVE,
-  PLAYER_MAX_ROT_CHANGE,
-  PLAYER_COLLISION_RADIUS,
-  PLAYER_COLLISION_VALUE,
-  PLAYER_COLLISION_DRAG,
-  // types / interface
-  Resource,
-  Point2D,
-  PLAYER_ROT_DAMPEN,
-  PLAYER_TILT_ANGLE_THRESHOLD,
-  PLAYER_TILT_SPEED_THRESHOLD,
-  PLAYER_TILT_BY_ANGLE,
-  PLAYER_BOOST_SCALE,
-  PLAYER_BOOST_POWER_CONSUMPTION_RATE,
-  PLAYER_IDLE_POWER_CONSUMPTION_RATE,
-} from '@src/constants';
 import {
   compareMagnitude,
   getAngle,
@@ -46,8 +14,40 @@ import {
   vScale,
   withMagnitude,
 } from '@src/util/vector';
+import { distanceTo2D } from '@src/util/distanceTo';
+import { newShaker } from '@src/util/shakerFactory';
 import { clamp } from '@src/util/clamp';
-import { BloomFilter } from '@pixi/filter-bloom';
+import { Resource } from '../pickups';
+import { PICKUP_TYPES } from '../pickups/items';
+
+import {
+  // consts
+  SFX_VOL_MULT,
+  APP_HEIGHT,
+  APP_WIDTH,
+  OBJECT_STATUS,
+  PLAYER_INIT_ROT,
+  PLAYER_ACCEL,
+  PLAYER_DECEL,
+  PLAYER_OXYGEN_CONSUMPTION_RATE,
+  PLAYER_POWER_CONSUMPTION_RATE,
+  PLAYER_MAX_OXYGEN,
+  PLAYER_MAX_POWER,
+  PLAYER_ROTATE_ON_MOVE,
+  PLAYER_MAX_ROT_CHANGE,
+  PLAYER_COLLISION_RADIUS,
+  PLAYER_COLLISION_VALUE,
+  PLAYER_COLLISION_DRAG,
+  // types / interface
+  Point2D,
+  PLAYER_ROT_DAMPEN,
+  PLAYER_TILT_ANGLE_THRESHOLD,
+  PLAYER_TILT_SPEED_THRESHOLD,
+  PLAYER_TILT_BY_ANGLE,
+  PLAYER_BOOST_SCALE,
+  PLAYER_BOOST_POWER_CONSUMPTION_RATE,
+  PLAYER_IDLE_POWER_CONSUMPTION_RATE,
+} from '@src/constants';
 
 type UpdateProps = {
   delta: number;
