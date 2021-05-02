@@ -6,8 +6,8 @@ import * as PIXISOUND from 'pixi-sound';
 
 import jrvascii from './util/jrvascii';
 import { browserVisibility } from './util/browserVisibility';
-
 import initPIXI, { PixiConfig } from './pixi';
+import * as GAMEPAD from './components/library/gamePad';
 
 import {
   APP_NAME,
@@ -292,6 +292,9 @@ const bootstrapApp = (props: {
   // Initially start listening for keyboard events
   addOnKeyDown();
 
+  // Initialize Gamepad
+  GAMEPAD.initialize();
+
   /////////////////////////////////////////////////////////////////////////////
   // Game Events
 
@@ -379,6 +382,9 @@ const bootstrapApp = (props: {
     // Animate the CRT filter
     // crtFilter.seed = Math.random();
     // crtFilter.time += 0.25;
+
+    // GamePad
+    GAMEPAD.update(delta);
 
     // Individual components -------------
 
